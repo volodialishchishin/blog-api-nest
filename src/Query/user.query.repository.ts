@@ -40,7 +40,7 @@ export class UserQueryRepository {
       .exec();
     const matchedUsers = await this.userModel
       .find({
-        $and: [
+        $or: [
           {
             login: searchLoginTerm
               ? { $regex: searchLoginTerm, $options: 'gi' }
@@ -55,7 +55,6 @@ export class UserQueryRepository {
       })
       .exec();
     const pagesCount = Math.ceil(matchedUsers.length / pageSize);
-    console.log(searchLoginTerm);
     return {
       pagesCount: Number(pagesCount),
       page: Number(pageNumber),

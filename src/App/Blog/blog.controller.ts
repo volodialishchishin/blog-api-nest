@@ -114,13 +114,19 @@ export class BlogController {
             return
         }
 
-        let updateResult  = await this.blogService.updateBlog(
+        let updateResult  =  await this.blogService.updateBlog(
             createBlogDto.name,
             createBlogDto.websiteUrl,
             createBlogDto.description,
             params.id,
         );
-        response.sendStatus(204)
+        if (updateResult){
+            response.sendStatus(204)
+        }
+        else{
+            response.sendStatus(404)
+        }
+
 
     }
 

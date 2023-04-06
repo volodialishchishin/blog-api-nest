@@ -45,7 +45,7 @@ export class PostService {
     content: string,
     shortDescription: string,
     id: string,
-  ): Promise<number> {
+  ): Promise<boolean> {
     return await this.postRep.updatePost(
         blogId,
         title,

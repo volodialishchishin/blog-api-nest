@@ -27,7 +27,7 @@ export class PostsRepository {
     content: string,
     shortDescription: string,
     id: string,
-  ): Promise<number> {
+  ): Promise<boolean> {
     const result = await this.postModel.updateOne(
       { _id: id },
       {
@@ -39,7 +39,7 @@ export class PostsRepository {
         },
       },
     );
-    return result.modifiedCount;
+    return result.matchedCount === 1;
   }
   async deletePost(id: string): Promise<number> {
     const result = await this.postModel.deleteOne({ _id: id });

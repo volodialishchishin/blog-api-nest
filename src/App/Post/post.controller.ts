@@ -72,7 +72,7 @@ export class PostController {
       response.sendStatus(404)
       return
     }
-    let result =  this.postService.updatePost(
+    let result = await this.postService.updatePost(
       updatePostDTO.blogId,
       updatePostDTO.title,
       updatePostDTO.content,
