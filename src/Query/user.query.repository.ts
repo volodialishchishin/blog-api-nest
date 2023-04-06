@@ -36,7 +36,7 @@ export class UserQueryRepository {
       })
       .skip((pageNumber - 1) * pageSize)
       .limit(Number(pageSize))
-      .sort({ sortBy: sortDirection })
+      .sort([[sortBy,sortDirection]])
       .exec();
     const matchedUsers = await this.userModel
       .find({

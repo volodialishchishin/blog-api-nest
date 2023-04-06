@@ -22,7 +22,7 @@ export class CommentQueryRepository {
       .find({ postId: postId })
       .skip((pageNumber - 1) * pageSize)
       .limit(Number(pageSize))
-      .sort({ sortBy: sortDirection })
+      .sort([[sortBy,sortDirection]])
       .exec();
     const matchedComments = await this.commentModel
       .find({ postId: postId })

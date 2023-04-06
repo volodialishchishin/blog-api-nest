@@ -31,7 +31,7 @@ export class BlogQueryRepository {
       })
       .skip((pageNumber - 1) * pageSize)
       .limit(Number(pageSize))
-      .sort({ sortBy: sortDirection })
+      .sort([[sortBy,sortDirection]])
       .exec();
 
     const matchedBlogs = await this.blogModel
@@ -63,7 +63,7 @@ export class BlogQueryRepository {
       .find({ blogId: blogId })
       .skip((pageNumber - 1) * pageSize)
       .limit(Number(pageSize))
-      .sort({ sortBy: sortDirection })
+      .sort([[sortBy,sortDirection]])
       .exec();
 
     const matchedPosts = await this.postModel.find({ blogId: blogId }).exec();
