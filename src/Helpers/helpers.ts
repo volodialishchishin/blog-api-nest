@@ -56,7 +56,8 @@ export class Helpers {
       name: blog.name,
       createdAt: blog.createdAt,
       websiteUrl: blog.websiteUrl,
-      description:blog.description
+      description:blog.description,
+      isMembership: blog.isMembership
     };
   }
 }

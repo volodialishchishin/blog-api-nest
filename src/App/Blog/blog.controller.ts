@@ -54,7 +54,7 @@ export class BlogController {
         @Query('searchNameTerm') searchNameTerm,
         @Res() response: Response,
     ) {
-        let blog = this.blogService.getBlog(params.blogId)
+        let blog = await this.blogService.getBlog(params.blogId)
         if (!blog){
             response.sendStatus(404)
             return
@@ -103,11 +103,12 @@ export class BlogController {
             createPostDto.shortDescription,
             blog.name
         );
+        response.json(post)
     }
 
     @Put(':id')
     async updateBlog(@Param() params, @Body() createBlogDto: BlogInputModel,@Res() response: Response,) {
-        let blog = this.blogService.getBlog(params.blogId)
+        let blog = await this.blogService.getBlog(params.blogId)
         if (!blog){
             response.sendStatus(404)
             return
