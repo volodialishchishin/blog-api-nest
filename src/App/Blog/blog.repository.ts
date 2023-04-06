@@ -30,7 +30,7 @@ export class BlogRepository {
         $set: { websiteUrl: websiteUrl, name: name, description: description },
       },
     );
-    return result.upsertedCount === 1;
+    return result.modifiedCount === 1;
   }
   async deleteBlog(id: string) {
     return await this.blogModel.findOneAndRemove({ _id: id }).exec();

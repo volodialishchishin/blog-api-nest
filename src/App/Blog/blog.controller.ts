@@ -108,12 +108,6 @@ export class BlogController {
 
     @Put(':id')
     async updateBlog(@Param() params, @Body() createBlogDto: BlogInputModel,@Res() response: Response,) {
-        let blog = await this.blogService.getBlog(params.blogId)
-        if (!blog){
-            response.sendStatus(404)
-            return
-        }
-
         let updateResult  =  await this.blogService.updateBlog(
             createBlogDto.name,
             createBlogDto.websiteUrl,
