@@ -1,24 +1,49 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
+import { LikeType } from '../Types/Like/like.type';
+import { Like, LikeSchema } from './like.schema';
 
-export type BlogDocument = HydratedDocument<Blog>;
+export type PostDocument = HydratedDocument<Post>;
 
 @Schema()
-export class Blog {
-    @Prop({isRequired:true})
-    name:string
+export class ExtendedLikesInfo {
+  @Prop()
+  likesCount: number;
 
-    @Prop({isRequired:true})
-    description:string
+  @Prop()
+  dislikesCount: number;
 
-    @Prop({isRequired:true})
-    websiteUrl:string
+  @Prop()
+  myStatus: LikeType;
 
-    @Prop({isRequired:true})
-    createdAt:string
+  @Prop({ type: [LikeSchema] })
+  newestLikes: Array<Like>;
+}
+export const ExtendedLikesInfoSchema =
+  SchemaFactory.createForClass(ExtendedLikesInfo);
 
-    @Prop({isRequired:true})
-    isMembership:boolean
+@Schema()
+export class Post {
+  @Prop({ isRequired: true })
+  title: string;
+
+  @Prop({ isRequired: true })
+  shortDescription: string;
+
+  @Prop({ isRequired: true })
+  content: string;
+
+  @Prop({ isRequired: true })
+  blogId: string;
+
+  @Prop({ isRequired: true })
+  blogName: string;
+
+  @Prop({ isRequired: true })
+  createdAt: string;
+
+  @Prop({ type: ExtendedLikesInfoSchema })
+  extendedLikesInfo: ExtendedLikesInfo;
 }
 
-export const BlogSchema = SchemaFactory.createForClass(Blog);
+export const PostSchema = SchemaFactory.createForClass(Post);

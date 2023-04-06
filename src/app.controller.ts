@@ -1,12 +1,18 @@
-import { Controller, Get } from '@nestjs/common';
+import {
+  Controller,
+  Delete,
+  Res,
+} from '@nestjs/common';
 import { AppService } from './app.service';
+import { Response } from 'express';
 
-@Controller()
+@Controller('/testing/all-data')
 export class AppController {
   constructor(private readonly appService: AppService) {}
 
-  @Get()
-  getHello(): string {
-    return this.appService.getHello();
+  @Delete()
+  deleteAll(@Res() res: Response) {
+    this.appService.deleteAll();
+    res.sendStatus(204);
   }
 }

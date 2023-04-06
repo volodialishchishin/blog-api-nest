@@ -1,15 +1,16 @@
 import { Types } from 'mongoose';
 
-export type UserViewModel = {
+export type BlogViewModel = {
   id: Types.ObjectId;
-  login: string;
-  email: string;
+  name: string;
+  websiteUrl: string;
   createdAt: string;
+  description: string;
 };
-export type UserViewModelWithQuery = {
+export type BlogViewModelWithQuery = {
   pagesCount: number;
   page: number;
   pageSize: number;
   totalCount: number;
-  items: Array<UserViewModel>;
+  items: Array<BlogViewModel>;
 };

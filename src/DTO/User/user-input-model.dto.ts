@@ -1,13 +1,16 @@
-import { IsNotEmpty, Length, Matches} from 'class-validator';
+import { IsNotEmpty, Length, Matches } from 'class-validator';
 
-export class CreateUserDto {
-    @Length(3,10)
-    @Matches(/^[a-zA-Z0-9_-]*$/)
-    login: string;
+export class UserInputModel {
+  @Length(3, 10)
+  @IsNotEmpty()
+  @Matches(/^[a-zA-Z0-9_-]*$/)
+  login: string;
 
-    @Matches(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/)
-    email: string;
+  @IsNotEmpty()
+  @Matches(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/)
+  email: string;
 
-    @Length(6,20)
-    password: string;
+  @IsNotEmpty()
+  @Length(6, 20)
+  password: string;
 }
