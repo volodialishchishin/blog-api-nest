@@ -21,7 +21,7 @@ export class UserQueryRepository {
   ): Promise<UserViewModelWithQuery> {
     const matchedUsersWithSkip = await this.userModel
       .find({
-        $and: [
+        $or: [
           {
             login: searchLoginTerm
               ? { $regex: searchLoginTerm, $options: 'gi' }

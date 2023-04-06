@@ -39,7 +39,7 @@ export class PostsRepository {
         },
       },
     );
-    return result.matchedCount;
+    return result.modifiedCount;
   }
   async deletePost(id: string): Promise<number> {
     const result = await this.postModel.deleteOne({ _id: id });
@@ -47,6 +47,6 @@ export class PostsRepository {
   }
   async getPost(id: string): Promise<PostViewModel> {
     const result = await this.postModel.findOne({ _id:id }).exec();
-    return this.helpers.postMapperToView(result);
+    return result ? this.helpers.postMapperToView(result):null
   }
 }

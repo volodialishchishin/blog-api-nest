@@ -68,7 +68,6 @@ export class PostController {
   async updatePost(@Param() params, @Body() updatePostDTO: PostInputModel,@Res() response: Response) {
 
     let blog = await this.blogService.getBlog(updatePostDTO.blogId)
-    console.log(this.postQueryRep)
     if (!blog){
       response.sendStatus(404)
       return

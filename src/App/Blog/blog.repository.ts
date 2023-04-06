@@ -30,14 +30,13 @@ export class BlogRepository {
         $set: { websiteUrl: websiteUrl, name: name, description: description },
       },
     );
-    return result.matchedCount === 1;
+    return result.upsertedCount === 1;
   }
   async deleteBlog(id: string) {
     return await this.blogModel.findOneAndRemove({ _id: id }).exec();
   }
   async getBlog(id: string): Promise<BlogViewModel> {
     const blog = await this.blogModel.findOne({ _id: id }).exec();
-    console.log('f')
     return blog ? this.helpers.blogMapperToView(blog) : null;
   }
 }
