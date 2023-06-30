@@ -20,7 +20,7 @@ import { BlogInputModel } from '../../DTO/Blog/blog-input-model';
 import { BlogsService } from '../Blog/blogs.service';
 import { PostService } from './posts.service';
 
-@Controller('posts')
+@Controller('api/posts')
 export class PostController {
   constructor(
     private readonly postService: PostService,

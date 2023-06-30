@@ -2,7 +2,7 @@ import { Controller, Get, Param, Res } from '@nestjs/common';
 import { Response } from 'express';
 import { CommentService } from './comment.service';
 
-@Controller('comments')
+@Controller('api/comments')
 export class CommentController {
   constructor(private readonly commentService: CommentService) {}
 
