@@ -23,12 +23,12 @@ export class UserQueryRepository {
       .find({
         $or: [
           {
-            login: searchLoginTerm
+            'accountData.login': searchLoginTerm
               ? { $regex: searchLoginTerm, $options: 'gi' }
               : { $regex: '.' },
           },
           {
-            email: searchEmailTerm
+            'accountData.email': searchEmailTerm
               ? { $regex: searchEmailTerm, $options: 'gi' }
               : { $regex: '.' },
           },
