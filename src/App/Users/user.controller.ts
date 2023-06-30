@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -7,12 +8,13 @@ import {
   Post,
   Query,
   Req,
-  Res,
-} from '@nestjs/common';
+  Res, UseGuards
+} from "@nestjs/common";
 import { UserService } from './user.service';
 import { UserInputModel } from '../../DTO/User/user-input-model.dto';
 import { Request, Response } from 'express';
 import { UserQueryRepository } from '../../Query/user.query.repository';
+import { BasicAuthGuard } from "../Auth/Guards/basic.auth.guard";
 
 @Controller('users')
 export class UserController {
@@ -22,6 +24,7 @@ export class UserController {
   ) {}
 
   @Get()
+  @UseGuards(BasicAuthGuard)
   async getUsers(
     @Query('sortBy') sortBy,
     @Query('sortDirection') sortDirection,
@@ -44,19 +47,21 @@ export class UserController {
   }
 
   @Post()
+  @UseGuards(BasicAuthGuard)
   async createUser(@Body() createUserDto: UserInputModel) {
+
     return this.userService.createUser(createUserDto);
   }
 
   @Delete(':id')
-  async deleteUser(@Param() params,@Res() response: Response,) {
-    let result =  await this.userService.deleteUser(params.id);
-    if (result)
-    {
-      response.sendStatus(204)
+  @UseGuards(BasicAuthGuard)
+  async deleteUser(@Param() params, @Res() response: Response) {
+    const result = await this.userService.deleteUser(params.id);
+    if (result) {
+      response.sendStatus(204);
     }
-    else{
-      response.sendStatus(404)
+    else {
+      response.sendStatus(404);
     }
   }
 }

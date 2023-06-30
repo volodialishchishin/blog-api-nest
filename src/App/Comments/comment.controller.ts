@@ -1,9 +1,4 @@
-import {
-  Controller,
-  Get,
-  Param,
-  Res,
-} from '@nestjs/common';
+import { Controller, Get, Param, Res } from '@nestjs/common';
 import { Response } from 'express';
 import { CommentService } from './comment.service';
 

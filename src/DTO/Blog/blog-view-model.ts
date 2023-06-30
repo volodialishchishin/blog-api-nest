@@ -6,7 +6,7 @@ export type BlogViewModel = {
   websiteUrl: string;
   createdAt: string;
   description: string;
-  isMembership:boolean;
+  isMembership: boolean;
 };
 export type BlogViewModelWithQuery = {
   pagesCount: number;

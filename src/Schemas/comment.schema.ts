@@ -16,7 +16,7 @@ export const CommentatorInfoSchema =
   SchemaFactory.createForClass(CommentatorInfo);
 
 @Schema()
-export class likesInfo {
+export class LikesInfo {
   @Prop()
   likesCount: number;
 
@@ -40,6 +40,6 @@ export class Comment {
   createdAt: string;
 
   @Prop({ type: LikesInfoSchema })
-  likesInfo: likesInfo;
+  likesInfo: LikesInfo;
 }
 export const CommentSchema = SchemaFactory.createForClass(Comment);

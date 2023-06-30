@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { Helpers } from '../Helpers/helpers';
-import {Comment, CommentDocument} from '../Schemas/comment.schema';
+import { Comment, CommentDocument } from '../Schemas/comment.schema';
 import { CommentViewModelWithQuery } from '../DTO/Comment/comment-view-model';
 
 @Injectable()
@@ -22,7 +22,7 @@ export class CommentQueryRepository {
       .find({ postId: postId })
       .skip((pageNumber - 1) * pageSize)
       .limit(Number(pageSize))
-      .sort([[sortBy,sortDirection]])
+      .sort([[sortBy, sortDirection]])
       .exec();
     const matchedComments = await this.commentModel
       .find({ postId: postId })

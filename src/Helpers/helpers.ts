@@ -11,11 +11,11 @@ import { BlogViewModel } from '../DTO/Blog/blog-view-model';
 export class Helpers {
   public userMapperToView(user: UserDocument): UserViewModel {
     return {
-      email: user.email,
-      createdAt: user.createdAt,
-      login: user.login,
       id: user._id,
-    };
+      email: user.accountData.email,
+      createdAt: user.accountData.createdAt,
+      login:user.accountData.login
+    }
   }
 
   public postMapperToView(post: PostDocument): PostViewModel {
@@ -56,8 +56,8 @@ export class Helpers {
       name: blog.name,
       createdAt: blog.createdAt,
       websiteUrl: blog.websiteUrl,
-      description:blog.description,
-      isMembership: blog.isMembership
+      description: blog.description,
+      isMembership: blog.isMembership,
     };
   }
 }

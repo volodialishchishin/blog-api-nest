@@ -17,8 +17,8 @@ import { UserService } from '../Users/user.service';
 import { PostQueryRepository } from '../../Query/post.query.repository';
 import { PostInputModel } from '../../DTO/Post/post-input-model';
 import { BlogInputModel } from '../../DTO/Blog/blog-input-model';
-import {BlogsService} from "../Blog/blogs.service";
-import {PostService} from "./posts.service";
+import { BlogsService } from '../Blog/blogs.service';
+import { PostService } from './posts.service';
 
 @Controller('posts')
 export class PostController {
@@ -47,65 +47,67 @@ export class PostController {
   }
 
   @Post()
-  async createPost(@Body() createPostDto: PostInputModel,@Res() response: Response,) {
-    let blog = await this.blogService.getBlog(createPostDto.blogId)
-    console.log(this.postQueryRep)
-    if (!blog){
-      response.sendStatus(404)
-      return
+  async createPost(
+    @Body() createPostDto: PostInputModel,
+    @Res() response: Response,
+  ) {
+    const blog = await this.blogService.getBlog(createPostDto.blogId);
+    if (!blog) {
+      response.sendStatus(404);
+      return;
     }
-    let result = await this.postService.createPost(
+    const result = await this.postService.createPost(
       createPostDto.blogId,
       createPostDto.title,
       createPostDto.content,
       createPostDto.shortDescription,
-      blog.name
+      blog.name,
     );
-    response.json(result)
+    response.json(result);
   }
 
   @Put(':id')
-  async updatePost(@Param() params, @Body() updatePostDTO: PostInputModel,@Res() response: Response) {
-
-    let blog = await this.blogService.getBlog(updatePostDTO.blogId)
-    if (!blog){
-      response.sendStatus(404)
-      return
+  async updatePost(
+    @Param() params,
+    @Body() updatePostDTO: PostInputModel,
+    @Res() response: Response,
+  ) {
+    const blog = await this.blogService.getBlog(updatePostDTO.blogId);
+    if (!blog) {
+      response.sendStatus(404);
+      return;
     }
-    let result = await this.postService.updatePost(
+    const result = await this.postService.updatePost(
       updatePostDTO.blogId,
       updatePostDTO.title,
       updatePostDTO.content,
       updatePostDTO.shortDescription,
       params.id,
     );
-    if (result){
-      response.sendStatus(204)
-    }
-    else{
-      response.sendStatus(404)
+    if (result) {
+      response.sendStatus(204);
+    } else {
+      response.sendStatus(404);
     }
   }
 
   @Delete(':id')
   async deletePost(@Param() params, @Res() response: Response) {
-    let deleteResult = await this.postService.deletePost(params.id);
-    if (deleteResult){
-      response.sendStatus(204)
-    }else{
-      response.sendStatus(404)
+    const deleteResult = await this.postService.deletePost(params.id);
+    if (deleteResult) {
+      response.sendStatus(204);
+    } else {
+      response.sendStatus(404);
     }
   }
 
   @Get('/:id')
   async getPostById(@Param() params, @Res() response: Response) {
     const post = await this.postService.getPost(params.id);
-    if (post){
+    if (post) {
       response.json(post);
-    }
-    else{
-      response.sendStatus(404)
-
+    } else {
+      response.sendStatus(404);
     }
   }
 }

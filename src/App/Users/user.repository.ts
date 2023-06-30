@@ -17,9 +17,13 @@ export class UserRepository {
     return this.helpers.userMapperToView(newUser);
   }
 
-  async deleteUser(userId: string):Promise<number> {
-    let result = await this.userModel.deleteOne({ _id: userId }).exec();
-    console.log(result)
-    return result.deletedCount
+  async deleteUser(userId: string): Promise<number> {
+    const result = await this.userModel.deleteOne({ _id: userId }).exec();
+    return result.deletedCount;
+  }
+
+  async getUserByLoginOrEmail(login:string,email:string): Promise<UserDocument> {
+    const result = await this.userModel.findOne({$or:[{'accountData.login':login},{'accountData.email':email}]})
+    return result || null
   }
 }

@@ -3,11 +3,11 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Post, PostDocument } from '../../Schemas/post.schema';
 import { Model } from 'mongoose';
 import { Helpers } from '../../Helpers/helpers';
-import {Injectable} from "@nestjs/common";
-Injectable()
+import { Injectable } from '@nestjs/common';
+Injectable();
 export class PostsRepository {
   constructor(
-      @InjectModel(Post.name) private postModel: Model<PostDocument>,
+    @InjectModel(Post.name) private postModel: Model<PostDocument>,
     public helpers: Helpers,
   ) {}
   async getPosts(): Promise<PostViewModel[]> {
@@ -18,7 +18,6 @@ export class PostsRepository {
   async createPost(post: Post) {
     const createdPost = new this.postModel(post);
     const newPost = await createdPost.save();
-    console.log(newPost)
     return this.helpers.postMapperToView(newPost);
   }
   async updatePost(
@@ -46,7 +45,7 @@ export class PostsRepository {
     return result.deletedCount;
   }
   async getPost(id: string): Promise<PostViewModel> {
-    const result = await this.postModel.findOne({ _id:id }).exec();
-    return result ? this.helpers.postMapperToView(result):null
+    const result = await this.postModel.findOne({ _id: id }).exec();
+    return result ? this.helpers.postMapperToView(result) : null;
   }
 }

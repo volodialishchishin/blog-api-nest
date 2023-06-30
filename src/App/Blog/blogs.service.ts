@@ -2,14 +2,13 @@ import { BlogViewModel } from '../../DTO/Blog/blog-view-model';
 import { BlogRepository } from './blog.repository';
 import { Blog } from '../../Schemas/blog.schema';
 import { BlogInputModel } from '../../DTO/Blog/blog-input-model';
-import {Injectable} from "@nestjs/common";
+import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class BlogsService {
   constructor(private blogRep: BlogRepository) {}
 
   async createBlog(blog: BlogInputModel): Promise<BlogViewModel> {
-    console.log(this.blogRep)
     const newBlog: Blog = {
       name: blog.name,
       websiteUrl: blog.websiteUrl,
@@ -32,8 +31,7 @@ export class BlogsService {
     return this.blogRep.deleteBlog(id);
   }
   async getBlog(id: string): Promise<BlogViewModel | null> {
-    console.log('ffff')
-    let blog = this.blogRep.getBlog(id);
-    return blog
+    const blog = this.blogRep.getBlog(id);
+    return blog;
   }
 }

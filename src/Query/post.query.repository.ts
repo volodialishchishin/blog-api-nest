@@ -23,7 +23,7 @@ export class PostQueryRepository {
       .find()
       .skip((pageNumber - 1) * pageSize)
       .limit(Number(pageSize))
-      .sort([[sortBy,sortDirection]])
+      .sort([[sortBy, sortDirection]])
       .exec();
 
     const matchedPosts = await this.postModel.find().exec();
