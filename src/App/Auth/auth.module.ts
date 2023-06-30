@@ -23,7 +23,7 @@ import { TokenSchema } from '../../Schemas/token.schema';
       inject: [ConfigService],
       useFactory: async (configService: ConfigService) => ({
         secret: configService.get('SECRET'),
-        signOptions: { expiresIn: '60s' },
+        signOptions: { expiresIn: '15m' },
       }),
     }),
     ConfigModule,

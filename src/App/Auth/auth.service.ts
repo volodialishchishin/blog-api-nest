@@ -36,14 +36,14 @@ export class AuthService {
   }
 
   async checkCredentials(login: string, password: string, email: string) {
-    const user = await this.userRep.getUserByLoginOrEmail(login, email);
-    if (!user) return null;
+    const matchedUser = await this.userRep.getUserByLoginOrEmail(login, email);
+    if (!matchedUser) return null;
     const passwordHash = await bcrypt.hash(
       password,
-      user.accountData.passwordSalt,
+      matchedUser.result.accountData.passwordSalt,
     );
-    if (user.accountData.password === passwordHash) {
-      return user;
+    if (matchedUser.result.accountData.password === passwordHash) {
+      return matchedUser.result;
     }
   }
 
@@ -58,7 +58,7 @@ export class AuthService {
     );
     const refreshToken = this.jwtService.sign(
       { user: user.id },
-      { secret: this.configService.get('SECRET'), expiresIn: '70s' },
+      { secret: this.configService.get('SECRET'), expiresIn: '60m' },
     );
     return {
       accessToken,

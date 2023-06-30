@@ -10,11 +10,13 @@ import {
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { JwtAuthGuard } from './Guards/jwt.auth.guard';
-import { BasicAuthGuard } from './Guards/basic.auth.guard';
+import { v4 } from 'uuid';
 import { UserInputModel } from '../../DTO/User/user-input-model.dto';
 import { UserService } from '../Users/user.service';
 import { Response } from 'express';
 import { JwtService } from '@nestjs/jwt';
+import { AuthRepository } from './auth.repository';
+import { MailService } from './Mail/mail.service';
 
 @Controller('auth')
 export class AuthController {
@@ -22,6 +24,8 @@ export class AuthController {
     private readonly authService: AuthService,
     private readonly userService: UserService,
     private readonly jwtService: JwtService,
+    private readonly authRep: AuthRepository,
+    private readonly mailService: MailService,
   ) {}
   @Post('registration')
   async registration(
@@ -33,11 +37,11 @@ export class AuthController {
       userModel?.login,
       userModel?.email,
     );
-    if (isUserExists) {
+    if (isUserExists.result) {
       throw new BadRequestException([
         {
           message: 'User Exists',
-          field: 'emailOrLogin',
+          field: isUserExists.field,
         },
       ]);
     }
@@ -67,6 +71,68 @@ export class AuthController {
     } else {
       response.sendStatus(401);
     }
+  }
+
+  @Post('registration-email-resending')
+  async registrationEmailResending(
+    @Request() req,
+    @Body() userModel: { email: string },
+    @Res() response: Response,
+  ) {
+    const user = await this.userService.getUserByLoginOrEmail(
+      '',
+      userModel.email,
+    );
+    if (user?.result.emailConfirmation?.isConfirmed || !user) {
+      throw new BadRequestException([
+        {
+          message: 'User Alredy Exists',
+          field: 'email',
+        },
+      ]);
+      if (user) {
+        const newCode = v4();
+        await this.userService.updateUser(
+          user.result.id,
+          'emailConfirmation.confirmationCode',
+          newCode,
+        );
+        await this.mailService.sendMailConfirmation(user.result, true, newCode);
+        response.sendStatus(204);
+      } else {
+        response.sendStatus(400);
+      }
+    }
+    return true;
+  }
+
+  @Post('registration-confirmation')
+  async registrationConfirmation(
+    @Request() req,
+    @Body() userModel: { code: string },
+    @Res() response: Response,
+  ) {
+    const user = await this.userService.getUserByField(
+      'emailConfirmation.confirmationCode',
+      userModel.code,
+    );
+    if (
+      !user ||
+      user.emailConfirmation.isConfirmed ||
+      !user.emailConfirmation?.confirmationCode
+    ) {
+      throw new BadRequestException([
+        {
+          message: 'User Alredy Exists',
+          field: 'email',
+        },
+      ]);
+    }
+
+    const status = await this.userService.confirmCode(user, userModel.code);
+    if (status) {
+      response.sendStatus(204);
+    } else response.sendStatus(400);
   }
 
   @UseGuards(JwtAuthGuard)

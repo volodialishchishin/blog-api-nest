@@ -22,13 +22,40 @@ export class UserRepository {
     return result.deletedCount;
   }
 
+  async updateUser(userId: string, field: string, value) {
+    const result = await this.userModel.updateOne(
+      { _id: userId },
+      { $set: { field: value } },
+    );
+    return result.modifiedCount;
+  }
+
   async getUserByLoginOrEmail(
     login: string,
     email: string,
-  ): Promise<UserDocument> {
-    const result = await this.userModel.findOne({
-      $or: [{ 'accountData.login': login }, { 'accountData.email': email }],
+  ): Promise<{ result: UserDocument; field: 'login' | 'email' }> {
+    const resultByLogin = await this.userModel.findOne({
+      'accountData.login': login,
     });
+    const resultByEmail = resultByLogin
+      ? null
+      : await this.userModel.findOne({ 'accountData.email': email });
+    return (
+      {
+        result: resultByLogin || resultByEmail,
+        field: resultByLogin ? 'login' : 'email',
+      } || null
+    );
+  }
+  async getUserByCode(field, value): Promise<UserDocument> {
+    const result = await this.userModel.findOne({ field: value });
     return result || null;
+  }
+  async confirmCode(userId: string) {
+    const result = await this.userModel.updateOne(
+      { id: userId },
+      { $set: { 'emailConfirmation.isConfirmed': true } },
+    );
+    return result.modifiedCount === 1;
   }
 }

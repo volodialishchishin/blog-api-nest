@@ -42,18 +42,19 @@ export class UserQueryRepository {
       .find({
         $or: [
           {
-            login: searchLoginTerm
+            'accountData.login': searchLoginTerm
               ? { $regex: searchLoginTerm, $options: 'gi' }
               : { $regex: '.' },
           },
           {
-            email: searchEmailTerm
+            'accountData.login': searchEmailTerm
               ? { $regex: searchEmailTerm, $options: 'gi' }
               : { $regex: '.' },
           },
         ],
       })
       .exec();
+
     const pagesCount = Math.ceil(matchedUsers.length / pageSize);
     return {
       pagesCount: Number(pagesCount),
