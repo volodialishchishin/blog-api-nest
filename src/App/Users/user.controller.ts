@@ -17,7 +17,7 @@ import { Request, Response } from 'express';
 import { UserQueryRepository } from '../../Query/user.query.repository';
 import { BasicAuthGuard } from '../Auth/Guards/basic.auth.guard';
 
-@Controller('api/users')
+@Controller('users')
 export class UserController {
   constructor(
     private readonly userService: UserService,

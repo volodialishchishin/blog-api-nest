@@ -16,7 +16,7 @@ import { UserService } from '../Users/user.service';
 import { Response } from 'express';
 import { JwtService } from '@nestjs/jwt';
 
-@Controller('api/auth')
+@Controller('auth')
 export class AuthController {
   constructor(
     private readonly authService: AuthService,

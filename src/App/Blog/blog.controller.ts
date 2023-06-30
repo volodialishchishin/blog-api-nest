@@ -18,7 +18,7 @@ import { BlogsService } from './blogs.service';
 import { PostService } from '../Post/posts.service';
 import { BlogPostInputModel } from '../../DTO/Post/post-input-model';
 
-@Controller('api/blogs')
+@Controller('blogs')
 export class BlogController {
   constructor(
     private readonly blogQueryRep: BlogQueryRepository,
