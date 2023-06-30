@@ -1,31 +1,30 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
-import { CommentatorInfo, LikesInfoSchema } from "./comment.schema";
+import { CommentatorInfo, LikesInfoSchema } from './comment.schema';
 
 export type UserDocument = HydratedDocument<User>;
 @Schema()
 export class AccountData {
   @Prop({ isRequired: true })
-  login:string
+  login: string;
   @Prop({ isRequired: true })
-  email:string
+  email: string;
   @Prop({ isRequired: true })
-  createdAt:string
+  createdAt: string;
   @Prop({ isRequired: true })
-  password:string
+  password: string;
   @Prop({ isRequired: true })
-  passwordSalt:string
+  passwordSalt: string;
 }
-export const accountDataSchema =
-  SchemaFactory.createForClass(AccountData);
+export const accountDataSchema = SchemaFactory.createForClass(AccountData);
 
 export class EmailConfirmation {
   @Prop()
-  confirmationCode: string
+  confirmationCode: string;
   @Prop()
-  confirmationDate:Date
+  confirmationDate: Date;
   @Prop()
-  isConfirmed:boolean
+  isConfirmed: boolean;
 }
 
 export const emailConfirmationSchema =
@@ -33,7 +32,7 @@ export const emailConfirmationSchema =
 @Schema()
 export class User {
   @Prop({ type: accountDataSchema })
-  accountData: AccountData
+  accountData: AccountData;
   @Prop({ type: emailConfirmationSchema })
   emailConfirmation: EmailConfirmation;
 }

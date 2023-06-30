@@ -14,8 +14,8 @@ export class Helpers {
       id: user._id,
       email: user.accountData.email,
       createdAt: user.accountData.createdAt,
-      login:user.accountData.login
-    }
+      login: user.accountData.login,
+    };
   }
 
   public postMapperToView(post: PostDocument): PostViewModel {

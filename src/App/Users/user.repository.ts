@@ -22,8 +22,13 @@ export class UserRepository {
     return result.deletedCount;
   }
 
-  async getUserByLoginOrEmail(login:string,email:string): Promise<UserDocument> {
-    const result = await this.userModel.findOne({$or:[{'accountData.login':login},{'accountData.email':email}]})
-    return result || null
+  async getUserByLoginOrEmail(
+    login: string,
+    email: string,
+  ): Promise<UserDocument> {
+    const result = await this.userModel.findOne({
+      $or: [{ 'accountData.login': login }, { 'accountData.email': email }],
+    });
+    return result || null;
   }
 }

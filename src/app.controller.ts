@@ -1,8 +1,4 @@
-import {
-  Controller,
-  Delete,
-  Res,
-} from '@nestjs/common';
+import { Controller, Delete, Res } from '@nestjs/common';
 import { AppService } from './app.service';
 import { Response } from 'express';
 

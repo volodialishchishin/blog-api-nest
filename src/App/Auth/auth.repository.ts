@@ -1,9 +1,9 @@
-import { InjectModel } from "@nestjs/mongoose";
-import { Post } from "../../Schemas/post.schema";
-import { Model } from "mongoose";
-import { Helpers } from "../../Helpers/helpers";
-import { Injectable } from "@nestjs/common";
-import { Token, TokenDocument } from "../../Schemas/token.schema";
+import { InjectModel } from '@nestjs/mongoose';
+import { Post } from '../../Schemas/post.schema';
+import { Model } from 'mongoose';
+import { Helpers } from '../../Helpers/helpers';
+import { Injectable } from '@nestjs/common';
+import { Token, TokenDocument } from '../../Schemas/token.schema';
 
 Injectable();
 export class AuthRepository {
@@ -11,16 +11,19 @@ export class AuthRepository {
     @InjectModel(Token.name) private tokenModel: Model<TokenDocument>,
     public helpers: Helpers,
   ) {}
-  async findTokenByUserId(userId:string) {
+  async findTokenByUserId(userId: string) {
     return this.tokenModel.findOne({ userId: userId });
   }
 
-  async updateToken(userId:string,refreshToken:string){
-    return  this.tokenModel.updateOne({userId: userId},{$set:{refreshToken,lastActiveDate:new Date().toISOString()}})
+  async updateToken(userId: string, refreshToken: string) {
+    return this.tokenModel.updateOne(
+      { userId: userId },
+      { $set: { refreshToken, lastActiveDate: new Date().toISOString() } },
+    );
   }
-  async createToken(token:Token) {
+  async createToken(token: Token) {
     const createdToken = new this.tokenModel(token);
     const newToken = await createdToken.save();
-    return newToken
+    return newToken;
   }
 }

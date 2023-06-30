@@ -4,21 +4,20 @@ import { LikeType } from '../Types/Like/like.type';
 
 export type TokenDocument = HydratedDocument<Token>;
 
-
 @Schema()
 export class Token {
   @Prop()
-  userId: string
+  userId: string;
   @Prop()
-  refreshToken: string
+  refreshToken: string;
   @Prop()
-  ip:string
+  ip: string;
   @Prop()
-  title:string
+  title: string;
   @Prop()
-  lastActiveDate:string
+  lastActiveDate: string;
   @Prop()
-  deviceId:string
+  deviceId: string;
 }
 
 export const TokenSchema = SchemaFactory.createForClass(Token);
