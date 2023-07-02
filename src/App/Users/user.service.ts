@@ -24,7 +24,7 @@ export class UserService {
         passwordSalt: passwordSalt,
         login: user.login,
         email: user.email,
-
+        createdAt: new Date().toISOString(),
       },
       emailConfirmation: {
         confirmationCode: v4(),
@@ -34,7 +34,7 @@ export class UserService {
         }),
         isConfirmed: false,
       },
-      createdAt: new Date().toISOString(),
+
     };
     await this.mailService.sendMailConfirmation(resolvedUser);
     return this.userRep.createUser(resolvedUser);

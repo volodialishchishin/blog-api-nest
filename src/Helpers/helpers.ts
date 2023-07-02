@@ -13,7 +13,7 @@ export class Helpers {
     return {
       id: user._id,
       email: user.accountData.email,
-      createdAt: user.createdAt,
+      createdAt: user.accountData.createdAt,
       login: user.accountData.login,
     };
   }

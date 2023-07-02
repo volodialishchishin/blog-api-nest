@@ -19,6 +19,7 @@ export class UserQueryRepository {
     pageSize = 10,
     sortDirection: 'asc' | 'desc' = 'desc',
   ): Promise<UserViewModelWithQuery> {
+    let sortByField = sortBy? `accountData.${sortBy}` : `accountData.createdAt`
     const matchedUsersWithSkip = await this.userModel
       .find({
         $or: [
@@ -36,7 +37,7 @@ export class UserQueryRepository {
       })
       .skip((pageNumber - 1) * pageSize)
       .limit(Number(pageSize))
-      .sort([[sortBy, sortDirection]])
+      .sort([[sortByField, sortDirection]])
       .exec();
     const matchedUsers = await this.userModel
       .find({
