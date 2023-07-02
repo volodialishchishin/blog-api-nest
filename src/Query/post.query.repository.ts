@@ -33,7 +33,7 @@ export class PostQueryRepository {
       page: Number(pageNumber),
       pageSize: Number(pageSize),
       totalCount: matchedPosts.length,
-      items: matchedUsersWithSkip.map(this.helpers.postMapperToView),
+      items: await Promise.all(matchedUsersWithSkip.map(this.helpers.postMapperToView)),
     };
   }
 }

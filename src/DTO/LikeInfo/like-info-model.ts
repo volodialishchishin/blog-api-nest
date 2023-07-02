@@ -2,8 +2,7 @@ import { LikeInfoViewModelValues } from './like-info-view-model';
 import { Types } from 'mongoose';
 
 export class LikeInfoModel {
-  id: Types.ObjectId;
-  entetyId: string;
+  entityId: string;
   userId: string;
   status: LikeInfoViewModelValues;
   dateAdded: Date;

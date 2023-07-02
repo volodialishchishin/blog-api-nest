@@ -1,9 +1,10 @@
 import { PostViewModel } from '../../DTO/Post/post-view-model';
 import { Post } from '../../Schemas/post.schema';
-import { LikeType } from '../../Types/Like/like.type';
+import { LikeType } from '../../@types/Like/like.type';
 import { PostsRepository } from './posts.repository';
 import { BlogsService } from '../Blog/blogs.service';
 import { Injectable } from '@nestjs/common';
+import { LikeInfoViewModelValues } from "../../DTO/LikeInfo/like-info-view-model";
 
 @Injectable()
 export class PostService {
@@ -55,7 +56,11 @@ export class PostService {
   async deletePost(id: string): Promise<number> {
     return this.postRep.deletePost(id);
   }
-  async getPost(id: string): Promise<PostViewModel> {
-    return this.postRep.getPost(id);
+  async getPost(id: string, userId:string): Promise<PostViewModel> {
+    return this.postRep.getPost(id, userId);
+  }
+
+  async updateLikeStatus(likeStatus: LikeInfoViewModelValues, userId: string, postId: string, login:string) {
+    return this.postRep.updateLikeStatus(likeStatus,userId,postId,login)
   }
 }

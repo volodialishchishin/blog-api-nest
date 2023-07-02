@@ -14,6 +14,7 @@ import { Helpers } from '../../Helpers/helpers';
 import { MailService } from './Mail/mail.service';
 import { AuthRepository } from './auth.repository';
 import { TokenSchema } from '../../Schemas/token.schema';
+import { LikeSchema } from "../../Schemas/like.schema";
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { TokenSchema } from '../../Schemas/token.schema';
     ConfigModule,
     MongooseModule.forFeature([{ name: 'User', schema: UserSchema }]),
     MongooseModule.forFeature([{ name: 'Token', schema: TokenSchema }]),
+    MongooseModule.forFeature([{ name: 'Like', schema: LikeSchema }]),
   ],
   controllers: [AuthController],
   providers: [

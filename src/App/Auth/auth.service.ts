@@ -66,6 +66,15 @@ export class AuthService {
     };
   }
 
+  getUserIdByToken(token: string) {
+    try {
+      const result: any = this.jwtService.verify(token, {secret: this.configService.get('SECRET')})
+      return result
+    }catch (e) {
+      return null
+    }
+  }
+
   async saveToken(userId: string, refreshToken: string, ip: string) {
     const { deviceId } = this.jwtService.verify(refreshToken, {
       secret: this.configService.get('SECRET'),
