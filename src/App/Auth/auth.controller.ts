@@ -83,25 +83,25 @@ export class AuthController {
       '',
       userModel.email,
     );
-    if (user?.result.emailConfirmation?.isConfirmed || !user) {
+    if (user?.result?.emailConfirmation?.isConfirmed || !user.result) {
       throw new BadRequestException([
         {
-          message: 'User Alredy Exists',
+          message: 'User is already confirmed',
           field: 'email',
         },
       ]);
-      if (user) {
-        const newCode = v4();
-        await this.userService.updateUser(
-          user.result.id,
-          'emailConfirmation.confirmationCode',
-          newCode,
-        );
-        await this.mailService.sendMailConfirmation(user.result, true, newCode);
-        response.sendStatus(204);
-      } else {
-        response.sendStatus(400);
-      }
+    }
+    if (user.result) {
+      const newCode = v4();
+      await this.userService.updateUser(
+        user.result.id,
+        'emailConfirmation.confirmationCode',
+        newCode,
+      );
+      await this.mailService.sendMailConfirmation(user.result, true, newCode);
+      response.sendStatus(204);
+    } else {
+      response.sendStatus(400);
     }
     return true;
   }
@@ -124,7 +124,7 @@ export class AuthController {
       throw new BadRequestException([
         {
           message: 'User Alredy Exists',
-          field: 'email',
+          field: 'code',
         },
       ]);
     }
