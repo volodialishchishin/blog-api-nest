@@ -3,12 +3,10 @@ import { User } from '../../../Schemas/user.schema';
 
 export class MailService {
   async sendMailConfirmation(user: User, resend = false, newCode = '') {
-    console.log(user);
     const url = `https://somesite.com/confirm-email?code=${
       resend ? newCode : user.emailConfirmation.confirmationCode
     }`;
 
-    console.log(url);
     const info = await transporter.sendMail({
       from: 'Volodia',
       to: user.accountData.email,
