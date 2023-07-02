@@ -27,6 +27,7 @@ import { BlogRepository } from './App/Blog/blog.repository';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthModule } from './App/Auth/auth.module';
 import { MailService } from './App/Auth/Mail/mail.service';
+import { TokenSchema } from "./Schemas/token.schema";
 
 @Module({
   imports: [
@@ -35,6 +36,7 @@ import { MailService } from './App/Auth/Mail/mail.service';
     MongooseModule.forFeature([{ name: 'Comment', schema: CommentSchema }]),
     MongooseModule.forFeature([{ name: 'Blog', schema: BlogSchema }]),
     MongooseModule.forFeature([{ name: 'Post', schema: PostSchema }]),
+    MongooseModule.forFeature([{ name: 'Token', schema: TokenSchema }]),
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
