@@ -26,7 +26,7 @@ export class BlogQueryRepository {
     const matchedBlogsWithSkip = await this.blogModel
       .find({
         name: searchNameTerm
-          ? { $regex: searchNameTerm, $options: 'gi' }
+          ? { $regex: searchNameTerm, $options: 'i' }
           : { $regex: '.' },
       })
       .skip((pageNumber - 1) * pageSize)
@@ -37,7 +37,7 @@ export class BlogQueryRepository {
     const matchedBlogs = await this.blogModel
       .find({
         name: searchNameTerm
-          ? { $regex: searchNameTerm, $options: 'gi' }
+          ? { $regex: searchNameTerm, $options: 'i' }
           : { $regex: '.' },
       })
       .sort({ sortBy: sortDirection })

@@ -25,12 +25,12 @@ export class UserQueryRepository {
         $or: [
           {
             'accountData.login': searchLoginTerm
-              ? { $regex: searchLoginTerm, $options: 'gi' }
+              ? { $regex: searchLoginTerm, $options: 'i' }
               : { $regex: '.' },
           },
           {
             'accountData.email': searchEmailTerm
-              ? { $regex: searchEmailTerm, $options: 'gi' }
+              ? { $regex: searchEmailTerm, $options: 'i' }
               : { $regex: '.' },
           },
         ],
@@ -44,12 +44,12 @@ export class UserQueryRepository {
         $or: [
           {
             'accountData.login': searchLoginTerm
-              ? { $regex: searchLoginTerm, $options: 'gi' }
+              ? { $regex: searchLoginTerm, $options: 'i' }
               : { $regex: '.' },
           },
           {
             'accountData.login': searchEmailTerm
-              ? { $regex: searchEmailTerm, $options: 'gi' }
+              ? { $regex: searchEmailTerm, $options: 'i' }
               : { $regex: '.' },
           },
         ],
