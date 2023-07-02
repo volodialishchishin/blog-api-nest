@@ -51,13 +51,14 @@ export class UserService {
 
     return result;
   }
-  async getUserByField(field: string, value) {
-    const result = await this.userRep.getUserByCode(field, value);
+  async getUserByField( code:string) {
+    const result = await this.userRep.getUserByCode(code);
 
     return result;
   }
 
   async confirmCode(user: UserDocument, code: string) {
+    console.log(user.emailConfirmation.confirmationCode === code);
     if (user.emailConfirmation.confirmationCode === code) {
       return await this.userRep.confirmCode(user.id);
     } else {

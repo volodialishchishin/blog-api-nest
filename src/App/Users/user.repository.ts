@@ -48,13 +48,13 @@ export class UserRepository {
       } || null
     );
   }
-  async getUserByCode(field, value): Promise<UserDocument> {
-    const result = await this.userModel.findOne({ field: value });
+  async getUserByCode( value:string): Promise<UserDocument> {
+    const result = await this.userModel.findOne({ 'emailConfirmation.confirmationCode': value });
     return result || null;
   }
   async confirmCode(userId: string) {
     const result = await this.userModel.updateOne(
-      { id: userId },
+      { _id: userId },
       { $set: { 'emailConfirmation.isConfirmed': true } },
     );
     return result.modifiedCount === 1;

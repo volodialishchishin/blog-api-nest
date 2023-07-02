@@ -91,7 +91,7 @@ export class AuthController {
         },
       ]);
     }
-    if (user.result) {
+    if (user?.result) {
       const newCode = v4();
       await this.userService.updateUser(
         user.result.id,
@@ -113,9 +113,9 @@ export class AuthController {
     @Res() response: Response,
   ) {
     const user = await this.userService.getUserByField(
-      'emailConfirmation.confirmationCode',
       userModel.code,
     );
+    console.log(!user || user.emailConfirmation.isConfirmed || !user.emailConfirmation?.confirmationCode);
     if (
       !user || user.emailConfirmation.isConfirmed || !user.emailConfirmation?.confirmationCode
     ) {
