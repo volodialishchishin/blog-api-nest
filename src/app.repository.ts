@@ -5,6 +5,8 @@ import { Model } from 'mongoose';
 import { Helpers } from './Helpers/helpers';
 import { Post, PostDocument } from './Schemas/post.schema';
 import { Blog, BlogDocument } from './Schemas/blog.schema';
+import { Comment, CommentDocument } from "./Schemas/comment.schema";
+import { Token, TokenDocument } from "./Schemas/token.schema";
 
 @Injectable()
 export class AppRepository {
@@ -12,6 +14,8 @@ export class AppRepository {
     @InjectModel(User.name) private userModel: Model<UserDocument>,
     @InjectModel(Post.name) private postModel: Model<PostDocument>,
     @InjectModel(Blog.name) private blogModel: Model<BlogDocument>,
+    @InjectModel(Comment.name) private commentModel: Model<CommentDocument>,
+    @InjectModel(Token.name) private tokenModel: Model<TokenDocument>,
     public helpers: Helpers,
   ) {}
 
@@ -19,6 +23,8 @@ export class AppRepository {
     this.userModel.deleteMany({}).exec();
     this.postModel.deleteMany({}).exec();
     this.blogModel.deleteMany({}).exec();
+    this.commentModel.deleteMany({}).exec();
+    this.tokenModel.deleteMany({}).exec();
     return;
   }
 }
