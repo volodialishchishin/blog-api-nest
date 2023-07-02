@@ -49,7 +49,6 @@ export class PostController {
     );
     response.json(blogs);
   }
-  @UseGuards(JwtAuthGuard)
 
   @Post()
   async createPost(
@@ -70,7 +69,6 @@ export class PostController {
     );
     response.json(result);
   }
-  @UseGuards(JwtAuthGuard)
 
   @Put(":id")
   async updatePost(
@@ -96,7 +94,6 @@ export class PostController {
       response.sendStatus(404);
     }
   }
-  @UseGuards(JwtAuthGuard)
 
   @Delete(":id")
   async deletePost(@Param() params, @Res() response: Response) {
@@ -145,7 +142,6 @@ export class PostController {
     }
 
   }
-  @UseGuards(JwtAuthGuard)
 
   @Post("/:id/comments")
 
