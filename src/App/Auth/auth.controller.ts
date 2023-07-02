@@ -91,19 +91,14 @@ export class AuthController {
         },
       ]);
     }
-    if (user?.result) {
-      const newCode = v4();
-      await this.userService.updateUser(
-        user.result.id,
-        'emailConfirmation.confirmationCode',
-        newCode,
-      );
-      await this.mailService.sendMailConfirmation(user.result, true, newCode);
-      response.sendStatus(204);
-    } else {
-      response.sendStatus(400);
-    }
-    return true;
+    const newCode = v4();
+    await this.userService.updateUser(
+      user.result.id,
+      'emailConfirmation.confirmationCode',
+      newCode,
+    );
+    await this.mailService.sendMailConfirmation(user.result, true, newCode);
+    response.sendStatus(204);
   }
 
   @Post('registration-confirmation')

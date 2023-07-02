@@ -26,7 +26,7 @@ export class UserRepository {
   async updateUser(userId: string, field: string, value) {
     const result = await this.userModel.updateOne(
       { _id: userId },
-      { $set: { field: value } },
+      { $set: { 'emailConfirmation.confirmationCode': value } }
     );
     return result.modifiedCount;
   }
