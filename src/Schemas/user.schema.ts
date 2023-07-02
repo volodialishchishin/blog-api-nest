@@ -18,6 +18,7 @@ export class AccountData {
 }
 export const accountDataSchema = SchemaFactory.createForClass(AccountData);
 
+@Schema()
 export class EmailConfirmation {
   @Prop()
   confirmationCode: string;
@@ -28,7 +29,7 @@ export class EmailConfirmation {
 }
 
 export const emailConfirmationSchema =
-  SchemaFactory.createForClass(AccountData);
+  SchemaFactory.createForClass(EmailConfirmation);
 @Schema()
 export class User {
   @Prop({ type: accountDataSchema })

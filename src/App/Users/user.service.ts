@@ -32,7 +32,7 @@ export class UserService {
           hours: 1,
           minutes: 3,
         }),
-        isConfirmed: true,
+        isConfirmed: false,
       },
     };
     await this.mailService.sendMailConfirmation(resolvedUser);

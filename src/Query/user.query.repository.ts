@@ -15,7 +15,7 @@ export class UserQueryRepository {
     searchLoginTerm = '',
     searchEmailTerm = '',
     pageNumber = 1,
-    sortBy = 'createdAt',
+    sortBy = 'accountData.createdAt',
     pageSize = 10,
     sortDirection: 'asc' | 'desc' = 'desc',
   ): Promise<UserViewModelWithQuery> {

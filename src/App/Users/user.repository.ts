@@ -12,6 +12,7 @@ export class UserRepository {
     public helpers: Helpers,
   ) {}
   async createUser(user: User): Promise<UserViewModel> {
+    console.log(user);
     const createdUser = new this.userModel(user);
     const newUser = await createdUser.save();
     return this.helpers.userMapperToView(newUser);

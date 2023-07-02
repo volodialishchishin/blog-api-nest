@@ -117,9 +117,7 @@ export class AuthController {
       userModel.code,
     );
     if (
-      !user ||
-      user.emailConfirmation.isConfirmed ||
-      !user.emailConfirmation?.confirmationCode
+      !user || user.emailConfirmation.isConfirmed || !user.emailConfirmation?.confirmationCode
     ) {
       throw new BadRequestException([
         {
