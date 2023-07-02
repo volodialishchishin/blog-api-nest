@@ -10,8 +10,6 @@ export class AccountData {
   @Prop({ isRequired: true })
   email: string;
   @Prop({ isRequired: true })
-  createdAt: string;
-  @Prop({ isRequired: true })
   password: string;
   @Prop({ isRequired: true })
   passwordSalt: string;
@@ -36,6 +34,8 @@ export class User {
   accountData: AccountData;
   @Prop({ type: emailConfirmationSchema })
   emailConfirmation: EmailConfirmation;
+  @Prop({ isRequired: true })
+  createdAt: string;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
