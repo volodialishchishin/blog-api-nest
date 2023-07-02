@@ -48,14 +48,13 @@ export class UserQueryRepository {
               : { $regex: '.' },
           },
           {
-            'accountData.login': searchEmailTerm
+            'accountData.email': searchEmailTerm
               ? { $regex: searchEmailTerm, $options: 'i' }
               : { $regex: '.' },
           },
         ],
       })
       .exec();
-
     const pagesCount = Math.ceil(matchedUsers.length / pageSize);
     return {
       pagesCount: Number(pagesCount),
