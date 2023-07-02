@@ -1,8 +1,9 @@
-import { Body, Controller, Delete, Get, Param, Put, Req, Res } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, Put, Req, Res, UseGuards } from "@nestjs/common";
 import { Request, Response } from "express";
 import { CommentService } from './comment.service';
 import { AuthService } from "../Auth/auth.service";
 import { LikeInfoViewModelValues } from "../../DTO/LikeInfo/like-info-view-model";
+import { JwtAuthGuard } from "../Auth/Guards/jwt.auth.guard";
 
 @Controller('comments')
 export class CommentController {
@@ -15,6 +16,7 @@ export class CommentController {
     let result = await this.commentService.getComment(params.id, user?.user)
     result ? response.status(200).json(result) : response.sendStatus(404)
   }
+  @UseGuards(JwtAuthGuard)
 
   @Delete(':id')
   async deleteComment(@Param() params, @Res() response: Response, @Req() request:Request) {
@@ -34,6 +36,8 @@ export class CommentController {
       return
     }
   }
+  @UseGuards(JwtAuthGuard)
+
   @Put(':id')
   async updateComment(@Param() params, @Res() response: Response, @Req() request:Request,@Body() commentUpdateDto:{content:string}) {
     let comment = await this.commentService.getComment(params.id, request.context.user.userId)
@@ -51,6 +55,7 @@ export class CommentController {
       return
     }
   }
+  @UseGuards(JwtAuthGuard)
 
   @Put(':id/like-status')
   async updateLikeStatus(@Param() params, @Res() response: Response, @Req() request:Request, @Body() likeUpdateDto:{likeStatus: LikeInfoViewModelValues}) {

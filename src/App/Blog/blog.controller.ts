@@ -9,14 +9,15 @@ import {
   Post,
   Put,
   Query,
-  Res,
-} from '@nestjs/common';
+  Res, UseGuards
+} from "@nestjs/common";
 import { Response } from 'express';
 import { BlogQueryRepository } from '../../Query/blog.query.repository';
 import { BlogInputModel } from '../../DTO/Blog/blog-input-model';
 import { BlogsService } from './blogs.service';
 import { PostService } from '../Post/posts.service';
 import { BlogPostInputModel } from '../../DTO/Post/post-input-model';
+import { JwtAuthGuard } from "../Auth/Guards/jwt.auth.guard";
 
 @Controller('blogs')
 export class BlogController {
@@ -79,11 +80,13 @@ export class BlogController {
       response.sendStatus(404);
     }
   }
+  @UseGuards(JwtAuthGuard)
 
   @Post()
   async createBlog(@Body() createBlogDto: BlogInputModel) {
     return this.blogService.createBlog(createBlogDto);
   }
+  @UseGuards(JwtAuthGuard)
 
   @Post('/:blogId/posts')
   async createPostToBlog(
@@ -105,6 +108,7 @@ export class BlogController {
     );
     response.json(post);
   }
+  @UseGuards(JwtAuthGuard)
 
   @Put(':id')
   async updateBlog(
@@ -124,6 +128,7 @@ export class BlogController {
       response.sendStatus(404);
     }
   }
+  @UseGuards(JwtAuthGuard)
 
   @Delete(':id')
   async deleteBlog(@Param() params, @Res() response: Response) {
