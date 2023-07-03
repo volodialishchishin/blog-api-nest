@@ -9,14 +9,15 @@ import {
   Post,
   Put,
   Query,
-  Res,
-} from '@nestjs/common';
+  Res, UseGuards
+} from "@nestjs/common";
 import { Response } from 'express';
 import { BlogQueryRepository } from '../../Query/blog.query.repository';
 import { BlogInputModel } from '../../DTO/Blog/blog-input-model';
 import { BlogsService } from './blogs.service';
 import { PostService } from '../Post/posts.service';
 import { BlogPostInputModel } from '../../DTO/Post/post-input-model';
+import { JwtAuthGuard } from "../Auth/Guards/jwt.auth.guard";
 
 @Controller('blogs')
 export class BlogController {
@@ -81,11 +82,13 @@ export class BlogController {
   }
 
   @Post()
+  @UseGuards(JwtAuthGuard)
   async createBlog(@Body() createBlogDto: BlogInputModel) {
     return this.blogService.createBlog(createBlogDto);
   }
 
   @Post('/:blogId/posts')
+  @UseGuards(JwtAuthGuard)
   async createPostToBlog(
     @Param() params,
     @Res() response: Response,
@@ -107,6 +110,7 @@ export class BlogController {
   }
 
   @Put(':id')
+  @UseGuards(JwtAuthGuard)
   async updateBlog(
     @Param() params,
     @Body() createBlogDto: BlogInputModel,
@@ -126,6 +130,7 @@ export class BlogController {
   }
 
   @Delete(':id')
+  @UseGuards(JwtAuthGuard)
   async deleteBlog(@Param() params, @Res() response: Response) {
     const blog = await this.blogService.getBlog(params.id);
     if (!blog) {

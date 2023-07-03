@@ -51,6 +51,7 @@ export class PostController {
   }
 
   @Post()
+  @UseGuards(JwtAuthGuard)
   async createPost(
     @Body() createPostDto: PostInputModel,
     @Res() response: Response
@@ -71,6 +72,7 @@ export class PostController {
   }
 
   @Put(":id")
+  @UseGuards(JwtAuthGuard)
   async updatePost(
     @Param() params,
     @Body() updatePostDTO: PostInputModel,
@@ -96,6 +98,7 @@ export class PostController {
   }
 
   @Delete(":id")
+  @UseGuards(JwtAuthGuard)
   async deletePost(@Param() params, @Res() response: Response) {
     const deleteResult = await this.postService.deletePost(params.id);
     if (deleteResult) {
@@ -117,9 +120,10 @@ export class PostController {
     }
   }
 
-  @UseGuards(JwtAuthGuard)
 
-  @Get("/:id/comments")
+
+  @Post("/:id/comments")
+  @UseGuards(JwtAuthGuard)
   async getCommentsForPost(@Req() request: Request, @Param() params, @Body() createCommentDto: {
     content: string
   }, @Res() response: Response) {
@@ -143,7 +147,7 @@ export class PostController {
 
   }
 
-  @Post("/:id/comments")
+  @Get("/:id/comments")
 
   async createCommentForPost(
     @Query("sortBy") sortBy,
@@ -162,8 +166,8 @@ export class PostController {
     }
   }
 
-  @UseGuards(JwtAuthGuard)
   @Put("/:postId/like-status")
+  @UseGuards(JwtAuthGuard)
   async updatePostLikeStatus(@Param() params, @Req() request: Request, @Res() response: Response,  @Body() createCommentDto: {
     likeStatus: LikeInfoViewModelValues
   }) {

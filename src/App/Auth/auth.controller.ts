@@ -128,8 +128,9 @@ export class AuthController {
     } else response.sendStatus(400);
   }
 
-  @UseGuards(JwtAuthGuard)
+
   @Get('profile')
+  @UseGuards(JwtAuthGuard)
   getProfile(@Request() req) {
     return req.user;
   }
