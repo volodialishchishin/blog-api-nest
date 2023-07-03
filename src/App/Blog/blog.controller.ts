@@ -18,6 +18,7 @@ import { BlogsService } from './blogs.service';
 import { PostService } from '../Post/posts.service';
 import { BlogPostInputModel } from '../../DTO/Post/post-input-model';
 import { JwtAuthGuard } from "../Auth/Guards/jwt.auth.guard";
+import { BasicAuthGuard } from "../Auth/Guards/basic.auth.guard";
 
 @Controller('blogs')
 export class BlogController {
@@ -82,13 +83,13 @@ export class BlogController {
   }
 
   @Post()
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(BasicAuthGuard)
   async createBlog(@Body() createBlogDto: BlogInputModel) {
     return this.blogService.createBlog(createBlogDto);
   }
 
   @Post('/:blogId/posts')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(BasicAuthGuard)
   async createPostToBlog(
     @Param() params,
     @Res() response: Response,
@@ -110,7 +111,7 @@ export class BlogController {
   }
 
   @Put(':id')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(BasicAuthGuard)
   async updateBlog(
     @Param() params,
     @Body() createBlogDto: BlogInputModel,
@@ -130,7 +131,7 @@ export class BlogController {
   }
 
   @Delete(':id')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(BasicAuthGuard)
   async deleteBlog(@Param() params, @Res() response: Response) {
     const blog = await this.blogService.getBlog(params.id);
     if (!blog) {

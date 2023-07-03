@@ -19,6 +19,7 @@ import { LikeInfoViewModelValues } from "../../DTO/LikeInfo/like-info-view-model
 import { CommentService } from "../Comments/comment.service";
 import { AuthService } from "../Auth/auth.service";
 import { CommentQueryRepository } from "../../Query/comment.query.repository";
+import { BasicAuthGuard } from "../Auth/Guards/basic.auth.guard";
 
 @Controller("posts")
 export class PostController {
@@ -51,7 +52,7 @@ export class PostController {
   }
 
   @Post()
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(BasicAuthGuard)
   async createPost(
     @Body() createPostDto: PostInputModel,
     @Res() response: Response
@@ -72,7 +73,7 @@ export class PostController {
   }
 
   @Put(":id")
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(BasicAuthGuard)
   async updatePost(
     @Param() params,
     @Body() updatePostDTO: PostInputModel,
@@ -98,7 +99,7 @@ export class PostController {
   }
 
   @Delete(":id")
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(BasicAuthGuard)
   async deletePost(@Param() params, @Res() response: Response) {
     const deleteResult = await this.postService.deletePost(params.id);
     if (deleteResult) {
