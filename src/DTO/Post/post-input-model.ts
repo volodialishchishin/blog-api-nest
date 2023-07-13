@@ -58,12 +58,15 @@ export class PostInputModel {
 }
 export class BlogPostInputModel {
   @Length(1, 30)
+  @Transform(({ value }: TransformFnParams) => value?.trim())
   @IsNotEmpty()
   title: string;
   @Length(1, 100)
+  @Transform(({ value }: TransformFnParams) => value?.trim())
   @IsNotEmpty()
   shortDescription: string;
   @Length(1, 1000)
+  @Transform(({ value }: TransformFnParams) => value?.trim())
   @IsNotEmpty()
   content: string;
 }
