@@ -10,7 +10,7 @@ import {
   Res, UseGuards
 } from "@nestjs/common";
 import { request, Request, Response } from "express";
-import { PostQueryRepository } from "../../Query/post.query.repository";
+import { PostQueryRepository } from "../Query/post.query.repository";
 import { PostInputModel } from "../../DTO/Post/post-input-model";
 import { BlogsService } from "../Blog/blogs.service";
 import { PostService } from "./posts.service";
@@ -18,7 +18,7 @@ import { JwtAuthGuard } from "../Auth/Guards/jwt.auth.guard";
 import { LikeInfoViewModelValues } from "../../DTO/LikeInfo/like-info-view-model";
 import { CommentService } from "../Comments/comment.service";
 import { AuthService } from "../Auth/auth.service";
-import { CommentQueryRepository } from "../../Query/comment.query.repository";
+import { CommentQueryRepository } from "../Query/comment.query.repository";
 import { BasicAuthGuard } from "../Auth/Guards/basic.auth.guard";
 
 @Controller("posts")
@@ -40,15 +40,19 @@ export class PostController {
     @Query("pageNumber") pageNumber,
     @Query("pageSize") pageSize,
     @Query("searchNameTerm") searchNameTerm,
-    @Res() response: Response
+    @Res() response: Response,
+    @Req() request: Request
   ) {
-    const blogs = await this.postQueryRep.getPosts(
+    const authToken = request?.headers?.authorization?.split(' ')[1] || ''
+    const user = await this.authService.getUserIdByToken(authToken)
+    const posts = await this.postQueryRep.getPosts(
       pageNumber,
       sortBy,
       pageSize,
-      sortDirection
+      sortDirection,
+      user?.user
     );
-    response.json(blogs);
+    response.json(posts);
   }
 
   @Post()
@@ -109,10 +113,10 @@ export class PostController {
     }
   }
 
-  @Get("/:id")
+  @Get(":id")
   async getPostById(@Param() params, @Res() response: Response, @Req() request: Request) {
     const authToken = request.headers.authorization?.split(' ')[1] || ''
-    const user = this.authService.getUserIdByToken(authToken)
+    const user = await this.authService.getUserIdByToken(authToken)
     const post = await this.postService.getPost(params.id, user?.user);
     if (post) {
       response.json(post);
@@ -130,14 +134,14 @@ export class PostController {
   }, @Res() response: Response) {
 
     const { content } = createCommentDto;
-    const { context: { user } } = request;
-    let foundPost = await this.postService.getPost(params.id, user.userId);
+    const { userInfo } = request.user;
+    let foundPost = await this.postService.getPost(params.id, userInfo.userId);
     if (!foundPost) {
       response.sendStatus(404);
     } else {
-      let result = await this.commentService.createComment(params.id, content, user.userId, user.login);
+      let result = await this.commentService.createComment(params.id, content, userInfo.userId, userInfo.login);
 
-      let comment = await this.commentService.getComment(result.id, user.userId);
+      let comment = await this.commentService.getComment(result.id, userInfo.userId);
       comment!.likesInfo = {
         myStatus: LikeInfoViewModelValues.none,
         dislikesCount: 0,
@@ -148,9 +152,8 @@ export class PostController {
 
   }
 
-  @Get("/:id/comments")
-
-  async createCommentForPost(
+  @Get("/:postId/comments")
+  async getComments(
     @Query("sortBy") sortBy,
     @Query("sortDirection") sortDirection,
     @Query("pageNumber") pageNumber,
@@ -159,11 +162,10 @@ export class PostController {
     @Param() params, @Res() response: Response, @Req() request) {
     try {
       const authToken = request.headers.authorization?.split(" ")[1] || "";
-      const user = this.authService.getUserIdByToken(authToken);
-      let result = await this.commentsQueryRep.getComments(params.id, pageNumber, sortBy, pageSize, sortDirection, user?.user);
+      const user = await this.authService.getUserIdByToken(authToken);
+      let result = await this.commentsQueryRep.getComments( pageNumber, sortBy, pageSize, sortDirection, params.postId, user?.user);
       result.items.length ? response.status(200).json(result) : response.sendStatus(404);
     } catch (e) {
-      console.log(e);
     }
   }
 
@@ -172,9 +174,8 @@ export class PostController {
   async updatePostLikeStatus(@Param() params, @Req() request: Request, @Res() response: Response,  @Body() createCommentDto: {
     likeStatus: LikeInfoViewModelValues
   }) {
-    const { likeStatus } = createCommentDto
 
-    let result = await this.postService.updateLikeStatus(likeStatus, request.context.user.userId, params.postId, request.context.user.login)
+    let result = await this.postService.updateLikeStatus(createCommentDto.likeStatus, request.user.userInfo.userId, params.postId, request.user.userInfo.login)
     if (result){
       response.sendStatus(204)
     }else{

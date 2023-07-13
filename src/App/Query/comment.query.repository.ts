@@ -2,9 +2,9 @@ import { Injectable } from '@nestjs/common';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { Helpers } from '../Helpers/helpers';
-import { Comment, CommentDocument } from '../Schemas/comment.schema';
-import { CommentViewModelWithQuery } from '../DTO/Comment/comment-view-model';
-import { Like, LikeDocument } from "../Schemas/like.schema";
+import { Comment, CommentDocument } from '../../Schemas/comment.schema';
+import { CommentViewModelWithQuery } from '../../DTO/Comment/comment-view-model';
+import { Like, LikeDocument } from "../../Schemas/like.schema";
 
 @Injectable()
 export class CommentQueryRepository {

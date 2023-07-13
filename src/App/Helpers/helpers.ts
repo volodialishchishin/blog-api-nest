@@ -1,20 +1,23 @@
-import { UserDocument } from '../Schemas/user.schema';
-import { UserViewModel } from '../DTO/User/user-view-model.dto';
-import {  PostDocument } from "../Schemas/post.schema";
-import { PostViewModel } from '../DTO/Post/post-view-model';
-import { LikeInfoViewModelValues } from '../DTO/LikeInfo/like-info-view-model';
-import { CommentDocument } from '../Schemas/comment.schema';
-import { CommentViewModel } from '../DTO/Comment/comment-view-model';
-import { BlogDocument } from '../Schemas/blog.schema';
-import { BlogViewModel } from '../DTO/Blog/blog-view-model';
+import { UserDocument } from '../../Schemas/user.schema';
+import { UserViewModel } from '../../DTO/User/user-view-model.dto';
+import {  PostDocument } from "../../Schemas/post.schema";
+import { PostViewModel } from '../../DTO/Post/post-view-model';
+import { LikeInfoViewModelValues } from '../../DTO/LikeInfo/like-info-view-model';
+import { CommentDocument } from '../../Schemas/comment.schema';
+import { CommentViewModel } from '../../DTO/Comment/comment-view-model';
+import { BlogDocument } from '../../Schemas/blog.schema';
+import { BlogViewModel } from '../../DTO/Blog/blog-view-model';
 import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
-import { Like, LikeDocument } from "../Schemas/like.schema";
+import { Like, LikeDocument } from "../../Schemas/like.schema";
+import { Injectable } from "@nestjs/common";
+import { Token, TokenDocument } from "../../Schemas/token.schema";
 
+Injectable()
 export class Helpers {
 
   constructor(
-    @InjectModel(Like.name) private likeModel: Model<LikeDocument>
+    @InjectModel(Like.name) private likeModel: Model<LikeDocument>,
   ) {}
   public userMapperToView(user: UserDocument): UserViewModel {
     return {
@@ -26,8 +29,8 @@ export class Helpers {
   }
 
   public async postMapperToView(post: PostDocument): Promise<PostViewModel> {
-    let likesCount = await this.likeModel.find({entityId:post.id, status: LikeInfoViewModelValues.like}).exec()
-    let disLikesCount = await this.likeModel.find({entityId:post.id,status: LikeInfoViewModelValues.dislike }).exec()
+    let likesCount = await this.likeModel.find({entityId:post.id,status: LikeInfoViewModelValues.like }).exec()
+    let disLikesCount = await this.likeModel.find({entityId:post.id,status: LikeInfoViewModelValues.dislike }).exec();
     return {
       id: post._id,
       title: post.title,
@@ -54,7 +57,7 @@ export class Helpers {
         userId: comment.userId,
         userLogin: comment.userLogin,
       },
-      id: comment.id,
+      id: comment._id,
       createdAt: comment.createdAt,
       likesInfo:{
         likesCount: likesCount.length,

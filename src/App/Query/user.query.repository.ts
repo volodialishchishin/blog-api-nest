@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { User, UserDocument } from '../Schemas/user.schema';
+import { User, UserDocument } from '../../Schemas/user.schema';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
-import { UserViewModelWithQuery } from '../DTO/User/user-view-model.dto';
+import { UserViewModelWithQuery } from '../../DTO/User/user-view-model.dto';
 import { Helpers } from '../Helpers/helpers';
 
 @Injectable()

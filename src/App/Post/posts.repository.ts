@@ -2,7 +2,7 @@ import { PostViewModel } from '../../DTO/Post/post-view-model';
 import { InjectModel } from '@nestjs/mongoose';
 import { Post, PostDocument } from '../../Schemas/post.schema';
 import { Model } from 'mongoose';
-import { Helpers } from '../../Helpers/helpers';
+import { Helpers } from '../Helpers/helpers';
 import { Injectable } from '@nestjs/common';
 import { Like, LikeDocument } from "../../Schemas/like.schema";
 import { LikeInfoViewModelValues } from "../../DTO/LikeInfo/like-info-view-model";
@@ -50,10 +50,9 @@ export class PostsRepository {
     return result.deletedCount;
   }
   async getPost(id:string ,userId:string): Promise<PostViewModel | undefined> {
-    const result = await this.postModel.findOne({id})
+    const result = await this.postModel.findOne({_id:id}).exec()
     if (result){
       let postToView  = await this.helpers.postMapperToView(result);
-
       if (!userId){
         return postToView
       }
@@ -79,7 +78,7 @@ export class PostsRepository {
 
   }
   async updateLikeStatus(likeStatus: LikeInfoViewModelValues, userId: string, postId: string, login:string) {
-    let post = await this.postModel.findOne({id:postId})
+    let post = await this.postModel.findOne({_id:postId})
     if (!post){
       return false
     }

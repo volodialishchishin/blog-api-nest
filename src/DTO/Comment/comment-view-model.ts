@@ -8,7 +8,7 @@ export type CommentViewModel = {
     userLogin: string;
   };
   content: string;
-  createdAt: Date;
+  createdAt: string;
   likesInfo: LikeInfoViewModel;
 };
 export type CommentViewModelWithQuery = {

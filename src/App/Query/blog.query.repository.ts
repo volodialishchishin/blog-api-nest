@@ -1,13 +1,13 @@
 import { Injectable } from '@nestjs/common';
-import { User, UserDocument } from '../Schemas/user.schema';
+import { User, UserDocument } from '../../Schemas/user.schema';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
-import { UserViewModelWithQuery } from '../DTO/User/user-view-model.dto';
+import { UserViewModelWithQuery } from '../../DTO/User/user-view-model.dto';
 import { Helpers } from '../Helpers/helpers';
-import { Post, PostDocument } from '../Schemas/post.schema';
-import { PostViewModelWithQuery } from '../DTO/Post/post-view-model';
-import { Blog, BlogDocument } from '../Schemas/blog.schema';
-import { BlogViewModelWithQuery } from '../DTO/Blog/blog-view-model';
+import { Post, PostDocument } from '../../Schemas/post.schema';
+import { PostViewModelWithQuery } from '../../DTO/Post/post-view-model';
+import { Blog, BlogDocument } from '../../Schemas/blog.schema';
+import { BlogViewModelWithQuery } from '../../DTO/Blog/blog-view-model';
 
 @Injectable()
 export class BlogQueryRepository {

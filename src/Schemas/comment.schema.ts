@@ -1,6 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
 import { LikeType } from '../@types/Like/like.type';
+import { LikeSchema } from "./like.schema";
 
 export type CommentDocument = HydratedDocument<Comment>;
 
@@ -27,23 +28,14 @@ export class LikesInfo {
   myStatus: LikeType;
 }
 
-export const LikesInfoSchema = SchemaFactory.createForClass(CommentatorInfo);
+export const LikesInfoSchema = SchemaFactory.createForClass(LikesInfo);
 
+@Schema()
 export class Comment {
-  @Prop({ type: CommentatorInfoSchema })
-  commentatorInfo: CommentatorInfo;
-  @Prop()
-  userLogin:string
-  @Prop()
-  content: string;
-  @Prop()
-  userId: string;
-  @Prop()
-  createdAt: Date;
-  @Prop()
-  postId: string;
-
-  @Prop({ type: LikesInfoSchema })
-  likesInfo: LikesInfo;
+  @Prop({ isRequired: true })  userLogin:string
+  @Prop({ isRequired: true })  content: string;
+  @Prop({ isRequired: true })  userId: string;
+  @Prop({ isRequired: true })  createdAt: string;
+  @Prop({ isRequired: true })  postId: string;
 }
 export const CommentSchema = SchemaFactory.createForClass(Comment);

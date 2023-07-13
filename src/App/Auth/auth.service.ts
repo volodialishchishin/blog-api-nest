@@ -66,11 +66,12 @@ export class AuthService {
     };
   }
 
-  getUserIdByToken(token: string) {
+  async getUserIdByToken(token: string) {
     try {
-      const result: any = this.jwtService.verify(token, {secret: this.configService.get('SECRET')})
+      const result: any = await this.jwtService.verifyAsync(token, {secret: 'Ok'})
       return result
     }catch (e) {
+      console.log(e);
       return null
     }
   }

@@ -12,7 +12,7 @@ export class CommentController {
   @Get(':id')
   async getComment(@Param() params, @Res() response: Response, @Req() request:Request) {
     const authToken = request.headers.authorization?.split(' ')[1] || ''
-    const user = this.authService.getUserIdByToken(authToken)
+    const user = await this.authService.getUserIdByToken(authToken)
     let result = await this.commentService.getComment(params.id, user?.user)
     result ? response.status(200).json(result) : response.sendStatus(404)
   }
@@ -20,12 +20,13 @@ export class CommentController {
   @Delete(':id')
   @UseGuards(JwtAuthGuard)
   async deleteComment(@Param() params, @Res() response: Response, @Req() request:Request) {
-    let comment = await this.commentService.getComment(params.id, request.context.user.userId)
+    const { user = {} } = request
+    let comment = await this.commentService.getComment(params.id, request.user.userInfo.userId)
     if (!comment) {
       response.sendStatus(404)
       return
     }
-    if (comment.commentatorInfo.userId !== request.context.user.userId) {
+    if (comment.commentatorInfo.userId !== request.user.userInfo.userId) {
       response.sendStatus(403)
       return
     }
@@ -39,12 +40,12 @@ export class CommentController {
   @Put(':id')
   @UseGuards(JwtAuthGuard)
   async updateComment(@Param() params, @Res() response: Response, @Req() request:Request,@Body() commentUpdateDto:{content:string}) {
-    let comment = await this.commentService.getComment(params.id, request.context.user.userId)
+    let comment = await this.commentService.getComment(params.id, request.user.userInfo.userId)
     if (!comment) {
       response.sendStatus(404)
       return
     }
-    if (comment.commentatorInfo.userId !== request.context.user.userId) {
+    if (comment.commentatorInfo.userId !== request.user.userInfo.userId) {
       response.sendStatus(403)
       return
     }
@@ -58,8 +59,8 @@ export class CommentController {
   @Put(':id/like-status')
   @UseGuards(JwtAuthGuard)
   async updateLikeStatus(@Param() params, @Res() response: Response, @Req() request:Request, @Body() likeUpdateDto:{likeStatus: LikeInfoViewModelValues}) {
-
-    let result = await this.commentService.updateLikeStatus(likeUpdateDto.likeStatus, request.context.user.userId, params.id, request.context.user.login)
+    console.log(likeUpdateDto.likeStatus, request.user.userInfo.userId, params.id, request.user.userInfo.login);
+    let result = await this.commentService.updateLikeStatus(likeUpdateDto.likeStatus, request.user.userInfo.userId, params.id, request.user.userInfo.login)
     if (result){
       response.sendStatus(204)
     }else{

@@ -1,6 +1,6 @@
 import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
-import { Helpers } from "../../Helpers/helpers";
+import { Helpers } from "../Helpers/helpers";
 import { Injectable } from "@nestjs/common";
 import { Token, TokenDocument } from "../../Schemas/token.schema";
 

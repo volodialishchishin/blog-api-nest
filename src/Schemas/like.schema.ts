@@ -29,4 +29,4 @@ export class Like {
   userLogin:string
 }
 
-export const LikeSchema = SchemaFactory.createForClass(LikeInfo);
+export const LikeSchema = SchemaFactory.createForClass(Like);

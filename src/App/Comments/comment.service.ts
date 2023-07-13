@@ -15,7 +15,7 @@ export class CommentService {
       content,
       userId,
       userLogin,
-      createdAt: new Date(),
+      createdAt: new Date().toISOString(),
       postId,
     }
     let result = await this.commentRep.createComment(resolvedComment)

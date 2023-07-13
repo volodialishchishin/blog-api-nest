@@ -12,7 +12,7 @@ import {
   Res, UseGuards
 } from "@nestjs/common";
 import { Response } from 'express';
-import { BlogQueryRepository } from '../../Query/blog.query.repository';
+import { BlogQueryRepository } from '../Query/blog.query.repository';
 import { BlogInputModel } from '../../DTO/Blog/blog-input-model';
 import { BlogsService } from './blogs.service';
 import { PostService } from '../Post/posts.service';

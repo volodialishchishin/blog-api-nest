@@ -10,7 +10,7 @@ import { UserService } from '../Users/user.service';
 import { UserRepository } from '../Users/user.repository';
 import { MongooseModule } from '@nestjs/mongoose';
 import { UserSchema } from '../../Schemas/user.schema';
-import { Helpers } from '../../Helpers/helpers';
+import { Helpers } from '../Helpers/helpers';
 import { MailService } from './Mail/mail.service';
 import { AuthRepository } from './auth.repository';
 import { TokenSchema } from '../../Schemas/token.schema';

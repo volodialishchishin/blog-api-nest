@@ -2,7 +2,7 @@ import { BlogViewModel } from '../../DTO/Blog/blog-view-model';
 import { InjectModel } from '@nestjs/mongoose';
 import { User, UserDocument } from '../../Schemas/user.schema';
 import { Model } from 'mongoose';
-import { Helpers } from '../../Helpers/helpers';
+import { Helpers } from '../Helpers/helpers';
 import { Injectable } from '@nestjs/common';
 import { Blog, BlogDocument } from '../../Schemas/blog.schema';
 

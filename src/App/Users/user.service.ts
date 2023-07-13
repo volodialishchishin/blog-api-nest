@@ -59,7 +59,6 @@ export class UserService {
   }
 
   async confirmCode(user: UserDocument, code: string) {
-    console.log(user.emailConfirmation.confirmationCode === code);
     if (user.emailConfirmation.confirmationCode === code) {
       return await this.userRep.confirmCode(user.id);
     } else {

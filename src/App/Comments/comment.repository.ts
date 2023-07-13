@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { User, UserDocument } from '../../Schemas/user.schema';
 import { Model } from 'mongoose';
-import { Helpers } from '../../Helpers/helpers';
+import { Helpers } from '../Helpers/helpers';
 import { UserViewModel } from '../../DTO/User/user-view-model.dto';
 import { Comment, CommentDocument } from '../../Schemas/comment.schema';
 import { CommentViewModel } from '../../DTO/Comment/comment-view-model';
@@ -35,14 +35,14 @@ export class CommentRepository {
     );
     return result.deletedCount === 1
   }
-  async createComment(comment): Promise<CommentViewModel> {
+  async createComment(comment:Comment): Promise<CommentViewModel> {
     const createdComment = new this.commentModel(comment);
     const newComment = await createdComment.save();
     return this.helpers.commentsMapperToView(newComment);
   }
 
   async getComment(id: string, userId:string) {
-    const comment = await this.commentModel.findOne({id})
+    const comment = await this.commentModel.findOne({_id:id})
     if (comment){
       let commentToView  = await this.helpers.commentsMapperToView(comment);
 
@@ -60,11 +60,12 @@ export class CommentRepository {
     }
   }
   async updateLikeStatus(likeStatus: LikeInfoViewModelValues, userId: string, commentId: string, login:string) {
-    let comment = await this.commentModel.findOne({id:commentId})
+    console.log(likeStatus,userId,commentId,login);
+    let comment = await this.commentModel.findOne({_id:commentId})
     if (!comment){
       return false
     }
-    const like = await this.likeModel.findOne({entetyId:commentId,userId})
+    const like = await this.likeModel.findOne({entityId:commentId,userId})
     if (!like){
       const status:LikeInfoModel = {
         entityId:commentId,
@@ -78,7 +79,7 @@ export class CommentRepository {
     }
     else{
       if (likeStatus === LikeInfoViewModelValues.none){
-        await this.likeModel.deleteOne({userId:like.userId,entetyId:like.entityId})
+        await this.likeModel.deleteOne({userId:like.userId,entityId:like.entityId})
       }else{
         await this.likeModel.updateOne({entityId:commentId,userId},{$set:{status:likeStatus}})
       }
