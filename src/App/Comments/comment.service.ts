@@ -34,7 +34,7 @@ export class CommentService {
   async deleteComment(id:string): Promise<boolean> {
     return  this.commentRep.deleteComment(id)
   }
-  async updateLikeStatus(likeStatus: LikeInfoViewModelValues, userId: string, commentId: string, login:string) {
+  async updateLikeStatus(likeStatus, userId: string, commentId: string, login:string) {
     return this.commentRep.updateLikeStatus(likeStatus,userId,commentId,login)
   }
 }

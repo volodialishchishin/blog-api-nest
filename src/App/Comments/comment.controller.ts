@@ -4,6 +4,8 @@ import { CommentService } from './comment.service';
 import { AuthService } from "../Auth/auth.service";
 import { LikeInfoViewModelValues } from "../../DTO/LikeInfo/like-info-view-model";
 import { JwtAuthGuard } from "../Auth/Guards/jwt.auth.guard";
+import { CommentInputModel } from "../../DTO/Comment/comment-input-model";
+import { LikeInputModel } from "../../DTO/LikeInfo/like-input-model";
 
 @Controller('comments')
 export class CommentController {
@@ -20,7 +22,6 @@ export class CommentController {
   @Delete(':id')
   @UseGuards(JwtAuthGuard)
   async deleteComment(@Param() params, @Res() response: Response, @Req() request:Request) {
-    const { user = {} } = request
     let comment = await this.commentService.getComment(params.id, request.user.userInfo.userId)
     if (!comment) {
       response.sendStatus(404)
@@ -31,15 +32,18 @@ export class CommentController {
       return
     }
 
-    let deleteStatus = await this.commentService.deleteComment(request.params.commentId)
+
+    let deleteStatus = await this.commentService.deleteComment(request.params.id)
+    console.log(deleteStatus);
     if (deleteStatus) {
       response.sendStatus(204)
       return
     }
+    response.sendStatus(404)
   }
   @Put(':id')
   @UseGuards(JwtAuthGuard)
-  async updateComment(@Param() params, @Res() response: Response, @Req() request:Request,@Body() commentUpdateDto:{content:string}) {
+  async updateComment(@Param() params, @Res() response: Response, @Req() request:Request,@Body() commentUpdateDto:CommentInputModel) {
     let comment = await this.commentService.getComment(params.id, request.user.userInfo.userId)
     if (!comment) {
       response.sendStatus(404)
@@ -58,7 +62,7 @@ export class CommentController {
 
   @Put(':id/like-status')
   @UseGuards(JwtAuthGuard)
-  async updateLikeStatus(@Param() params, @Res() response: Response, @Req() request:Request, @Body() likeUpdateDto:{likeStatus: LikeInfoViewModelValues}) {
+  async updateLikeStatus(@Param() params, @Res() response: Response, @Req() request:Request, @Body() likeUpdateDto:LikeInputModel) {
     console.log(likeUpdateDto.likeStatus, request.user.userInfo.userId, params.id, request.user.userInfo.login);
     let result = await this.commentService.updateLikeStatus(likeUpdateDto.likeStatus, request.user.userInfo.userId, params.id, request.user.userInfo.login)
     if (result){

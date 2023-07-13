@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule, RequestMethod } from "@nestjs/common";
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { MongooseModule } from '@nestjs/mongoose';
@@ -29,6 +29,8 @@ import { AuthModule } from './App/Auth/auth.module';
 import { MailService } from './App/Auth/Mail/mail.service';
 import { TokenSchema } from "./Schemas/token.schema";
 import { LikeSchema } from "./Schemas/like.schema";
+import { blogExisting } from "./Middewares/blog-existing.middleware";
+import { isBlogExists } from "./DTO/Post/post-input-model";
 
 @Module({
   imports: [
@@ -72,7 +74,9 @@ import { LikeSchema } from "./Schemas/like.schema";
     PostsRepository,
     BlogRepository,
     MailService,
+    isBlogExists
   ],
   exports: [UserService, UserRepository],
 })
-export class AppModule {}
+export class AppModule {
+}

@@ -1,4 +1,39 @@
-import { IsNotEmpty, Length } from 'class-validator';
+import {
+  registerDecorator,
+  ValidationOptions,
+  ValidatorConstraint,
+  ValidatorConstraintInterface,
+  ValidationArguments, Length, IsNotEmpty
+} from "class-validator";
+import { BlogsService } from "../../App/Blog/blogs.service";
+import { Injectable } from "@nestjs/common";
+
+
+
+@ValidatorConstraint({ async: true })
+@Injectable()
+export class isBlogExists implements ValidatorConstraintInterface {
+  constructor(    private readonly blogService: BlogsService,
+  ) {
+  }
+  validate(blogId: any, args: ValidationArguments) {
+    return this.blogService.getBlog(blogId).then(blog => {
+      return !!blog;
+    });
+  }
+}
+
+export function isBlogIdValid(validationOptions?: ValidationOptions) {
+  return function (object: Object, propertyName: string) {
+    registerDecorator({
+      target: object.constructor,
+      propertyName: propertyName,
+      options: validationOptions,
+      constraints: [],
+      validator: isBlogExists,
+    });
+  };
+}
 
 export class PostInputModel {
   @Length(1, 30)
@@ -10,7 +45,11 @@ export class PostInputModel {
   @Length(1, 1000)
   @IsNotEmpty()
   content: string;
+
   @IsNotEmpty()
+  @isBlogIdValid({
+    message: 'Text must be longer than the title',
+  })
   blogId: string;
 }
 export class BlogPostInputModel {

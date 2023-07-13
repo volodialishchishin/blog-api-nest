@@ -20,6 +20,8 @@ import { CommentService } from "../Comments/comment.service";
 import { AuthService } from "../Auth/auth.service";
 import { CommentQueryRepository } from "../Query/comment.query.repository";
 import { BasicAuthGuard } from "../Auth/Guards/basic.auth.guard";
+import { CommentInputModel } from "../../DTO/Comment/comment-input-model";
+import { LikeInputModel } from "../../DTO/LikeInfo/like-input-model";
 
 @Controller("posts")
 export class PostController {
@@ -74,6 +76,7 @@ export class PostController {
       blog.name
     );
     response.json(result);
+
   }
 
   @Put(":id")
@@ -129,9 +132,7 @@ export class PostController {
 
   @Post("/:id/comments")
   @UseGuards(JwtAuthGuard)
-  async getCommentsForPost(@Req() request: Request, @Param() params, @Body() createCommentDto: {
-    content: string
-  }, @Res() response: Response) {
+  async getCommentsForPost(@Req() request: Request, @Param() params, @Body() createCommentDto: CommentInputModel, @Res() response: Response) {
 
     const { content } = createCommentDto;
     const { userInfo } = request.user;
@@ -171,11 +172,9 @@ export class PostController {
 
   @Put("/:postId/like-status")
   @UseGuards(JwtAuthGuard)
-  async updatePostLikeStatus(@Param() params, @Req() request: Request, @Res() response: Response,  @Body() createCommentDto: {
-    likeStatus: LikeInfoViewModelValues
-  }) {
+  async updatePostLikeStatus(@Param() params, @Req() request: Request, @Res() response: Response,  @Body() likeInputModel: LikeInputModel) {
 
-    let result = await this.postService.updateLikeStatus(createCommentDto.likeStatus, request.user.userInfo.userId, params.postId, request.user.userInfo.login)
+    let result = await this.postService.updateLikeStatus(likeInputModel.likeStatus, request.user.userInfo.userId, params.postId, request.user.userInfo.login)
     if (result){
       response.sendStatus(204)
     }else{

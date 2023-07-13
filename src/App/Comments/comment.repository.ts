@@ -30,9 +30,10 @@ export class CommentRepository {
     return result.matchedCount === 1
   }
   async deleteComment(id:string):Promise<boolean>{
+    console.log(id);
     let result = await this.commentModel.deleteOne(
       { _id : id }
-    );
+    ).exec();
     return result.deletedCount === 1
   }
   async createComment(comment:Comment): Promise<CommentViewModel> {

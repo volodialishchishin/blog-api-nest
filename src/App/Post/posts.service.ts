@@ -60,7 +60,7 @@ export class PostService {
     return this.postRep.getPost(id, userId);
   }
 
-  async updateLikeStatus(likeStatus: LikeInfoViewModelValues, userId: string, postId: string, login:string) {
+  async updateLikeStatus(likeStatus, userId: string, postId: string, login:string) {
     return this.postRep.updateLikeStatus(likeStatus,userId,postId,login)
   }
 }

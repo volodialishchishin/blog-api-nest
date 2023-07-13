@@ -30,7 +30,7 @@ export class PostQueryRepository {
       .sort([[sortBy, sortDirection]])
       .exec();
 
-    const matchedPosts = await this.postModel.find().exec();
+    const matchedPosts = await this.postModel.find({}).skip((pageNumber - 1) * pageSize).limit(Number(pageSize)).sort([[sortBy, sortDirection]]).exec()
     const pagesCount = Math.ceil(matchedPosts.length / pageSize);
     const matchedPostsWithLikes = await Promise.all(matchedPosts.map(async post=>{
       const mappedPost = await this.helpers.postMapperToView(post)
