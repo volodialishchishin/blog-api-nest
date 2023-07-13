@@ -7,6 +7,7 @@ import {
 } from "class-validator";
 import { BlogsService } from "../../App/Blog/blogs.service";
 import { Injectable } from "@nestjs/common";
+import { Transform, TransformFnParams } from "class-transformer";
 
 
 
@@ -38,12 +39,15 @@ export function isBlogIdValid(validationOptions?: ValidationOptions) {
 export class PostInputModel {
   @Length(1, 30)
   @IsNotEmpty()
+  @Transform(({ value }: TransformFnParams) => value?.trim())
   title: string;
   @Length(1, 100)
   @IsNotEmpty()
+  @Transform(({ value }: TransformFnParams) => value?.trim())
   shortDescription: string;
   @Length(1, 1000)
   @IsNotEmpty()
+  @Transform(({ value }: TransformFnParams) => value?.trim())
   content: string;
 
   @IsNotEmpty()

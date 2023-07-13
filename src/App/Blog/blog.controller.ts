@@ -8,10 +8,10 @@ import {
   Param,
   Post,
   Put,
-  Query,
+  Query, Req,
   Res, UseGuards
 } from "@nestjs/common";
-import { Response } from 'express';
+import { Request, Response } from "express";
 import { BlogQueryRepository } from '../Query/blog.query.repository';
 import { BlogInputModel } from '../../DTO/Blog/blog-input-model';
 import { BlogsService } from './blogs.service';
@@ -19,6 +19,7 @@ import { PostService } from '../Post/posts.service';
 import { BlogPostInputModel } from '../../DTO/Post/post-input-model';
 import { JwtAuthGuard } from "../Auth/Guards/jwt.auth.guard";
 import { BasicAuthGuard } from "../Auth/Guards/basic.auth.guard";
+import { AuthService } from "../Auth/auth.service";
 
 @Controller('blogs')
 export class BlogController {
@@ -26,6 +27,7 @@ export class BlogController {
     private readonly blogQueryRep: BlogQueryRepository,
     private readonly blogService: BlogsService,
     private readonly postService: PostService,
+    private readonly authService: AuthService
   ) {}
 
   @Get()
@@ -56,18 +58,25 @@ export class BlogController {
     @Query('pageSize') pageSize,
     @Query('searchNameTerm') searchNameTerm,
     @Res() response: Response,
+    @Req() request: Request
+
   ) {
     const blog = await this.blogService.getBlog(params.blogId);
     if (!blog) {
       response.sendStatus(404);
       return;
     }
+
+    const authToken = request?.headers?.authorization?.split(' ')[1] || ''
+    const user = await this.authService.getUserIdByToken(authToken)
+
     const posts = await this.blogQueryRep.getPostsRelatedToBlog(
       pageNumber,
       sortBy,
       pageSize,
       sortDirection,
       params.blogId,
+      user?.user
     );
     response.json(posts);
   }
