@@ -2,7 +2,7 @@ import { Controller, Delete, Get, Injectable, Param, Req, Res } from "@nestjs/co
 import { Request, Response } from "express";
 import { securityService } from "./security.service";
 
-@Controller('devices')
+@Controller('security/devices')
 export class SecurityController{
 
   constructor(private readonly securityService:securityService ) {

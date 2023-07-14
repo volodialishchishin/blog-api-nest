@@ -202,7 +202,7 @@ export class AuthController {
       }
       if (tokens) {
         response.cookie('refreshToken', tokens.refreshToken, {secure: true, httpOnly: true})
-        return response.json({accessToken: tokens.accessToken});
+        return response.status(200).json({accessToken: tokens.accessToken});
       }
 
     } catch (e) {
