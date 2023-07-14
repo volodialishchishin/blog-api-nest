@@ -43,6 +43,7 @@ export class AuthRepository {
     return result.modifiedCount === 1
   }
   async createToken(token: Token) {
+    console.log(token);
     const createdToken = new this.tokenModel(token);
     return await createdToken.save();
   }

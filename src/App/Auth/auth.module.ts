@@ -17,6 +17,9 @@ import { TokenSchema } from '../../Schemas/token.schema';
 import { LikeSchema } from "../../Schemas/like.schema";
 import { ThrottlerModule } from "@nestjs/throttler";
 import { RecoveryPassword, RecoveryPasswordSchema } from "../../Schemas/recovery-password.schema";
+import { securityService } from "./Security/security.service";
+import { securityRepository } from "./Security/security.repository";
+import { SecurityController } from "./Security/security.controller";
 
 @Module({
   imports: [
@@ -39,7 +42,7 @@ import { RecoveryPassword, RecoveryPasswordSchema } from "../../Schemas/recovery
     MongooseModule.forFeature([{ name: 'Like', schema: LikeSchema }]),
     MongooseModule.forFeature([{ name: 'RecoveryPassword', schema: RecoveryPasswordSchema }]),
   ],
-  controllers: [AuthController],
+  controllers: [AuthController, SecurityController],
   providers: [
     AuthService,
     BasicStrategy,
@@ -49,6 +52,8 @@ import { RecoveryPassword, RecoveryPasswordSchema } from "../../Schemas/recovery
     Helpers,
     MailService,
     AuthRepository,
+    securityService,
+    securityRepository,
   ],
   exports: [AuthService],
 })

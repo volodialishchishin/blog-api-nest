@@ -32,10 +32,11 @@ import { LikeSchema } from "./Schemas/like.schema";
 import { blogExisting } from "./Middewares/blog-existing.middleware";
 import { isBlogExists } from "./DTO/Post/post-input-model";
 import { ThrottlerModule } from "@nestjs/throttler";
-import { securityService } from "./App/Security/security.service";
-import { securityRepository } from "./App/Security/security.repository";
-import { SecurityController } from "./App/Security/security.controller";
+import { securityService } from "./App/Auth/Security/security.service";
+import { securityRepository } from "./App/Auth/Security/security.repository";
+import { SecurityController } from "./App/Auth/Security/security.controller";
 import { RecoveryPasswordSchema } from "./Schemas/recovery-password.schema";
+import { JwtModule, JwtService } from "@nestjs/jwt";
 
 @Module({
   imports: [
@@ -54,22 +55,20 @@ import { RecoveryPasswordSchema } from "./Schemas/recovery-password.schema";
       inject: [ConfigService],
     }),
     AuthModule,
+    JwtModule
   ],
   controllers: [
     AppController,
     UserController,
     CommentController,
     PostController,
-    BlogController,
-    SecurityController
+    BlogController
   ],
   providers: [
     AppService,
     Helpers,
     UserService,
     UserRepository,
-    securityService,
-    securityRepository,
     UserQueryRepository,
     AppRepository,
     PostQueryRepository,
@@ -83,6 +82,7 @@ import { RecoveryPasswordSchema } from "./Schemas/recovery-password.schema";
     BlogRepository,
     MailService,
     isBlogExists,
+    JwtService
   ],
   exports: [UserService, UserRepository, Helpers],
 })

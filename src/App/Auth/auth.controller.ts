@@ -66,7 +66,8 @@ export class AuthController {
       userModel.loginOrEmail,
     );
     if (user && req.headers['user-agent']) {
-      const token = this.authService.generateTokens(user);
+      let deviceId = v4()
+      const token = this.authService.generateTokens(user,deviceId);
       await this.authService.saveToken(user.id, token.refreshToken, req.ip);
       response.cookie('refreshToken', token.refreshToken, {
         secure: true,
@@ -191,7 +192,8 @@ export class AuthController {
     @Res() response: Response
   ) {
     try {
-      const {refreshToken} = req.cookies;
+      console.log(req.cookies);
+      const {refresh:refreshToken} = req.cookies;
       let tokens;
       console.log('13231');
       console.log(refreshToken);
@@ -217,7 +219,7 @@ export class AuthController {
     @Res() response: Response,
   ) {
     try {
-      const {refreshToken} = req.cookies;
+      const {refresh:refreshToken} = req.cookies;
       await this.authService.logout(refreshToken);
       response.clearCookie('refreshToken');
       response.sendStatus(204);

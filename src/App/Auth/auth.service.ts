@@ -29,6 +29,9 @@ export class AuthService {
     }
     return null;
   }
+  extractDataFromRefreshToken(refreshToken){
+
+  }
 
   async login(user: any) {
     const payload = { username: user.username, sub: user.userId };
@@ -97,6 +100,7 @@ export class AuthService {
     const { deviceId } = await this.jwtService.verifyAsync(refreshToken, {
       secret: this.configService.get('SECRET'),
     });
+    console.log(deviceId);
     const tokenData = await this.authRepository.findTokenByUserId(userId);
     if (tokenData) {
       const status = await this.authRepository.updateToken(
@@ -118,10 +122,11 @@ export class AuthService {
   async refresh(refreshToken: string,device:string,ip:string) {
     const userData = await this.validateRefreshToken(refreshToken);
     const tokenFromDb = await this.authRepository.getRefreshToken(refreshToken)
+    console.log(userData, tokenFromDb);
     if (!userData || !tokenFromDb) {
       throw new Error();
     }
-    const user = await this.userRep.getUserByCode(userData.user);
+    const user = await this.userRep.getUserById(userData.user);
     const tokens = this.generateTokens(user,userData.deviceId);
     await this.saveToken(user.id, tokens.refreshToken, ip);
     return {...tokens}
@@ -135,11 +140,13 @@ export class AuthService {
         deviceId
       };
     } catch (e) {
+      console.log(e);
       return null;
     }
   }
 
   async logout(refreshToken: string) {
+    const { user, deviceId } =  await this.jwtService.verifyAsync<{user:string, deviceId:string}>(refreshToken, {secret: process.env.SECRET || "Ok" })
     const tokenData = await this.authRepository.deleteToken(refreshToken)
     if (!tokenData){
       throw new Error()

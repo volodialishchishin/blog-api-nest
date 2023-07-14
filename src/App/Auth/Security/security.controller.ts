@@ -10,10 +10,12 @@ export class SecurityController{
   @Get()
   async getSessions(@Res() response:Response, @Req() request: Request ){
     try {
-      const {refreshToken} = request.cookies;
+      const {refresh:refreshToken} = request.cookies;
+      console.log(refreshToken);
       let sessions = await this.securityService.getSessions(refreshToken)
       response.status(200).json(sessions)
     } catch (e) {
+      console.log(e);
       response.sendStatus(401)
     }
   }
