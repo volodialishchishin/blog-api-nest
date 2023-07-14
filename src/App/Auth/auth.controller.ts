@@ -183,17 +183,18 @@ export class AuthController {
       response.sendStatus(204)
     }
   }
-  @UseGuards(ThrottlerGuard)
 
+  @UseGuards(ThrottlerGuard)
   @Post('refresh-token')
   async refreshToken(
     @Req() req,
-    @Body() recoveryInfo: { email:string},
-    @Res() response: Response,
+    @Res() response: Response
   ) {
     try {
       const {refreshToken} = req.cookies;
       let tokens;
+      console.log('13231');
+      console.log(refreshToken);
       if (req.headers["user-agent"]) {
         tokens = await this.authService.refresh(refreshToken, req.headers["user-agent"], req.ip);
       }
@@ -203,6 +204,7 @@ export class AuthController {
       }
 
     } catch (e) {
+      console.log(e);
       response.sendStatus(401)
     }
   }
@@ -225,7 +227,7 @@ export class AuthController {
   }
 
 
-  @Get('profile')
+  @Get('me')
   @UseGuards(JwtAuthGuard)
   getProfile(@Request() request) {
     return request.user.userInfo;

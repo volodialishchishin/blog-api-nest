@@ -32,6 +32,9 @@ import { LikeSchema } from "./Schemas/like.schema";
 import { blogExisting } from "./Middewares/blog-existing.middleware";
 import { isBlogExists } from "./DTO/Post/post-input-model";
 import { ThrottlerModule } from "@nestjs/throttler";
+import { securityService } from "./App/Security/security.service";
+import { securityRepository } from "./App/Security/security.repository";
+import { SecurityController } from "./App/Security/security.controller";
 
 @Module({
   imports: [
@@ -57,12 +60,15 @@ import { ThrottlerModule } from "@nestjs/throttler";
     CommentController,
     PostController,
     BlogController,
+    SecurityController
   ],
   providers: [
     AppService,
     UserService,
     UserRepository,
     Helpers,
+    securityService,
+    securityRepository,
     UserQueryRepository,
     AppRepository,
     PostQueryRepository,
