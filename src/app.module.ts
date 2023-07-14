@@ -35,6 +35,7 @@ import { ThrottlerModule } from "@nestjs/throttler";
 import { securityService } from "./App/Security/security.service";
 import { securityRepository } from "./App/Security/security.repository";
 import { SecurityController } from "./App/Security/security.controller";
+import { RecoveryPasswordSchema } from "./Schemas/recovery-password.schema";
 
 @Module({
   imports: [
@@ -64,9 +65,9 @@ import { SecurityController } from "./App/Security/security.controller";
   ],
   providers: [
     AppService,
+    Helpers,
     UserService,
     UserRepository,
-    Helpers,
     securityService,
     securityRepository,
     UserQueryRepository,
@@ -81,9 +82,9 @@ import { SecurityController } from "./App/Security/security.controller";
     PostsRepository,
     BlogRepository,
     MailService,
-    isBlogExists
+    isBlogExists,
   ],
-  exports: [UserService, UserRepository],
+  exports: [UserService, UserRepository, Helpers],
 })
 export class AppModule {
 }
