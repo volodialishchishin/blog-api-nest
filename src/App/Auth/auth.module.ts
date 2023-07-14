@@ -30,7 +30,7 @@ import { RecoveryPassword, RecoveryPasswordSchema } from "../../Schemas/recovery
       inject: [ConfigService],
       useFactory: async (configService: ConfigService) => ({
         secret: configService.get('SECRET'),
-        signOptions: { expiresIn: '1m' },
+        signOptions: { expiresIn: '10s' },
       }),
     }),
     ConfigModule,
