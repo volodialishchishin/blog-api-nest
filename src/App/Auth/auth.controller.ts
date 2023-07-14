@@ -193,7 +193,7 @@ export class AuthController {
   ) {
     try {
       console.log(req.cookies);
-      const {refresh:refreshToken} = req.cookies;
+      const {refreshToken} = req.cookies;
       let tokens;
       console.log('13231');
       console.log(refreshToken);
@@ -219,7 +219,7 @@ export class AuthController {
     @Res() response: Response,
   ) {
     try {
-      const {refresh:refreshToken} = req.cookies;
+      const {refreshToken} = req.cookies;
       await this.authService.logout(refreshToken);
       response.clearCookie('refreshToken');
       response.sendStatus(204);
