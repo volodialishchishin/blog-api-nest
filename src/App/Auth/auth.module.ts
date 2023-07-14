@@ -15,22 +15,29 @@ import { MailService } from './Mail/mail.service';
 import { AuthRepository } from './auth.repository';
 import { TokenSchema } from '../../Schemas/token.schema';
 import { LikeSchema } from "../../Schemas/like.schema";
+import { ThrottlerModule } from "@nestjs/throttler";
+import { RecoveryPassword, RecoveryPasswordSchema } from "../../Schemas/recovery-password.schema";
 
 @Module({
   imports: [
+    ThrottlerModule.forRoot({
+      ttl: 10,
+      limit: 5,
+    }),
     PassportModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: async (configService: ConfigService) => ({
         secret: configService.get('SECRET'),
-        signOptions: { expiresIn: '15m' },
+        signOptions: { expiresIn: '120m' },
       }),
     }),
     ConfigModule,
     MongooseModule.forFeature([{ name: 'User', schema: UserSchema }]),
     MongooseModule.forFeature([{ name: 'Token', schema: TokenSchema }]),
     MongooseModule.forFeature([{ name: 'Like', schema: LikeSchema }]),
+    MongooseModule.forFeature([{ name: 'RecoveryPassword', schema: RecoveryPasswordSchema }]),
   ],
   controllers: [AuthController],
   providers: [

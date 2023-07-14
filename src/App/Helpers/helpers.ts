@@ -77,4 +77,13 @@ export class Helpers {
       isMembership: blog.isMembership,
     };
   }
+
+  deviceMapperToView (token:Token) {
+    return {
+      deviceId:token.deviceId,
+      lastActiveDate:token.lastActiveDate,
+      ip:token.ip,
+      title:token.title
+    }
+  }
 }

@@ -1,0 +1,49 @@
+import {Helpers} from "../helpers/helpers";
+import { InjectModel } from "@nestjs/mongoose";
+import { Token, TokenDocument } from "../../Schemas/token.schema";
+import { Model } from "mongoose";
+import { RecoveryPassword, recoveryPasswordDocument } from "../../Schemas/recovery-password.schema";
+import { User } from "../../Schemas/user.schema";
+
+export class securityRepository  {
+
+    constructor(
+      @InjectModel(Token.name) private tokenModel: Model<TokenDocument>,
+      @InjectModel(User.name) private userModel: Model<User>,
+      public helpers: Helpers,
+    ) {}
+    async getSessions(userId:string) {
+        let devices =  await this.tokenModel.find({userId}).exec()
+        return devices.map(this.helpers.deviceMapperToView)
+    }
+    async deleteSessions(userId:string, deviceId:string) {
+        return this.tokenModel.deleteMany({userId, deviceId:{$ne:deviceId}})
+    }
+    async deleteSession(userId:string,id:string) {
+        console.log('userId:',userId,'device:id', id)
+        try {
+            await this.getSession(userId,id)
+            return await this.tokenModel.deleteOne({userId:userId,deviceId:id})
+        }
+        catch (e:any) {
+            throw new Error(e.message)
+        }
+
+    }
+    async getSession(userId:string,id:string): Promise<Token> {
+        let session  =  await this.tokenModel.findOne({deviceId:id})
+        if (!session){
+            throw new Error('404')
+        }
+        else{
+            if (session?.userId !== userId){
+                throw new Error('403')
+            }
+            else{
+                return session
+            }
+        }
+
+
+    }
+}

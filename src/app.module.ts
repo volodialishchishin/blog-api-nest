@@ -31,6 +31,7 @@ import { TokenSchema } from "./Schemas/token.schema";
 import { LikeSchema } from "./Schemas/like.schema";
 import { blogExisting } from "./Middewares/blog-existing.middleware";
 import { isBlogExists } from "./DTO/Post/post-input-model";
+import { ThrottlerModule } from "@nestjs/throttler";
 
 @Module({
   imports: [

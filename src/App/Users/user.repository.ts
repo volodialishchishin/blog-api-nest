@@ -52,6 +52,10 @@ export class UserRepository {
     const result = await this.userModel.findOne({ 'emailConfirmation.confirmationCode': value });
     return result || null;
   }
+  async getUserByCId( id:string): Promise<UserDocument> {
+    const result = await this.userModel.findOne({ _id:id });
+    return result || null;
+  }
   async confirmCode(userId: string) {
     const result = await this.userModel.updateOne(
       { _id: userId },

@@ -29,6 +29,7 @@
     "@nestjs/passport": "^9.0.3",
     "@nestjs/platform-express": "^9.4.2",
     "@nestjs/swagger": "^6.3.0",
+    "@nestjs/throttler": "^4.2.1",
     "@types/bcrypt": "^5.0.0",
     "@types/date-fns": "^2.6.0",
     "@types/dotenv": "^8.2.0",

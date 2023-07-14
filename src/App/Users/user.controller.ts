@@ -16,6 +16,8 @@ import { UserInputModel } from '../../DTO/User/user-input-model.dto';
 import { Request, Response } from 'express';
 import { UserQueryRepository } from '../Query/user.query.repository';
 import { BasicAuthGuard } from '../Auth/Guards/basic.auth.guard';
+import { SkipThrottle } from "@nestjs/throttler";
+@SkipThrottle()
 
 @Controller('users')
 export class UserController {

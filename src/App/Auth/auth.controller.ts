@@ -3,11 +3,11 @@ import {
   Body,
   Controller,
   Get,
-  Post,
+  Post, Req,
   Request,
   Res,
-  UseGuards,
-} from '@nestjs/common';
+  UseGuards
+} from "@nestjs/common";
 import { AuthService } from './auth.service';
 import { JwtAuthGuard } from './Guards/jwt.auth.guard';
 import { v4 } from 'uuid';
@@ -17,6 +17,7 @@ import { Response } from 'express';
 import { JwtService } from '@nestjs/jwt';
 import { AuthRepository } from './auth.repository';
 import { MailService } from './Mail/mail.service';
+import { Throttle, ThrottlerGuard } from "@nestjs/throttler";
 
 @Controller('auth')
 export class AuthController {
@@ -27,6 +28,8 @@ export class AuthController {
     private readonly authRep: AuthRepository,
     private readonly mailService: MailService,
   ) {}
+  @UseGuards(ThrottlerGuard)
+
   @Post('registration')
   async registration(
     @Request() req,
@@ -49,6 +52,8 @@ export class AuthController {
     response.sendStatus(204);
   }
 
+
+  @UseGuards(ThrottlerGuard)
   @Post('login')
   async login(
     @Request() req,
@@ -72,6 +77,7 @@ export class AuthController {
       response.sendStatus(401);
     }
   }
+  @UseGuards(ThrottlerGuard)
 
   @Post('registration-email-resending')
   async registrationEmailResending(
@@ -101,6 +107,9 @@ export class AuthController {
     response.sendStatus(204);
   }
 
+
+  @UseGuards(ThrottlerGuard)
+
   @Post('registration-confirmation')
   async registrationConfirmation(
     @Request() req,
@@ -126,11 +135,99 @@ export class AuthController {
       response.sendStatus(204);
     } else response.sendStatus(400);
   }
+  @UseGuards(ThrottlerGuard)
+
+  @Post('new-password')
+  async newPassword(
+    @Request() req,
+    @Body() recoveryInfo: { newPassword:string, recoveryCode:string },
+    @Res() response: Response,
+  ) {
+    const {newPassword,recoveryCode} = req.body
+    const user =  await this.authService.getUserByRecoveryCode(recoveryCode)
+    if (user){
+      let updateStatus = this.authService.processPasswordRecovery(newPassword, user.id.toString())
+      if (updateStatus){
+        response.sendStatus(204)
+      }
+      else{
+        response.sendStatus(400)
+      }
+    }
+    else{
+      throw new BadRequestException([
+        {
+          message: 'incorrect recovery code',
+          field: 'recoveryCode',
+        },
+      ]);
+    }
+  }
+  @UseGuards(ThrottlerGuard)
+
+  @Post('password-recovery')
+  async passwordRecovery(
+    @Request() req,
+    @Body() recoveryInfo: { email:string},
+    @Res() response: Response,
+  ) {
+    const {email} = req.body
+    try {
+      const user = await this.userService.getUserByLoginOrEmail('', email)
+      let code = v4()
+      await this.mailService.sendRecoveryPasswordCode(user.result, false, code)
+      await this.authService.savePasswordRecoveryCode(user.result.id, code)
+      response.sendStatus(204)
+    }
+    catch (e){
+      response.sendStatus(204)
+    }
+  }
+  @UseGuards(ThrottlerGuard)
+
+  @Post('refresh-token')
+  async refreshToken(
+    @Req() req,
+    @Body() recoveryInfo: { email:string},
+    @Res() response: Response,
+  ) {
+    try {
+      const {refreshToken} = req.cookies;
+      let tokens;
+      if (req.headers["user-agent"]) {
+        tokens = await this.authService.refresh(refreshToken, req.headers["user-agent"], req.ip);
+      }
+      if (tokens) {
+        response.cookie('refreshToken', tokens.refreshToken, {secure: true, httpOnly: true})
+        return response.json({accessToken: tokens.accessToken});
+      }
+
+    } catch (e) {
+      response.sendStatus(401)
+    }
+  }
+  @UseGuards(ThrottlerGuard)
+
+  @Post('logout')
+  async logout(
+    @Req() req,
+    @Body() recoveryInfo: { email:string},
+    @Res() response: Response,
+  ) {
+    try {
+      const {refreshToken} = req.cookies;
+      await this.authService.logout(refreshToken);
+      response.clearCookie('refreshToken');
+      response.sendStatus(204);
+    } catch (e) {
+      response.sendStatus(401)
+    }
+  }
 
 
   @Get('profile')
   @UseGuards(JwtAuthGuard)
-  getProfile(@Request() req) {
-    return req.user;
+  getProfile(@Request() request) {
+    return request.user.userInfo;
   }
 }

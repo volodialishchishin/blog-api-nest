@@ -20,7 +20,9 @@ import { BlogPostInputModel } from '../../DTO/Post/post-input-model';
 import { JwtAuthGuard } from "../Auth/Guards/jwt.auth.guard";
 import { BasicAuthGuard } from "../Auth/Guards/basic.auth.guard";
 import { AuthService } from "../Auth/auth.service";
+import { SkipThrottle } from "@nestjs/throttler";
 
+@SkipThrottle()
 @Controller('blogs')
 export class BlogController {
   constructor(

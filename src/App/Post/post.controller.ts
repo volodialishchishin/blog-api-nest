@@ -22,6 +22,8 @@ import { CommentQueryRepository } from "../Query/comment.query.repository";
 import { BasicAuthGuard } from "../Auth/Guards/basic.auth.guard";
 import { CommentInputModel } from "../../DTO/Comment/comment-input-model";
 import { LikeInputModel } from "../../DTO/LikeInfo/like-input-model";
+import { SkipThrottle } from "@nestjs/throttler";
+@SkipThrottle()
 
 @Controller("posts")
 export class PostController {

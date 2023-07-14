@@ -6,7 +6,10 @@ import { LikeInfoViewModelValues } from "../../DTO/LikeInfo/like-info-view-model
 import { JwtAuthGuard } from "../Auth/Guards/jwt.auth.guard";
 import { CommentInputModel } from "../../DTO/Comment/comment-input-model";
 import { LikeInputModel } from "../../DTO/LikeInfo/like-input-model";
+import { SkipThrottle } from "@nestjs/throttler";
 
+
+@SkipThrottle()
 @Controller('comments')
 export class CommentController {
   constructor(private readonly commentService: CommentService, private readonly authService:AuthService) {}

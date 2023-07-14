@@ -7,6 +7,8 @@ import jwt from 'jsonwebtoken';
 import { ConfigService } from '@nestjs/config';
 import { config } from 'rxjs';
 import { AuthRepository } from './auth.repository';
+import { ObjectId } from "mongoose";
+import { v4 } from 'uuid';
 
 @Injectable()
 export class AuthService {
@@ -47,7 +49,7 @@ export class AuthService {
     }
   }
 
-  generateTokens(user: UserDocument) {
+  generateTokens(user: UserDocument, deviceId?:string) {
     const accessToken = this.jwtService.sign(
       {
         user: user.id,
@@ -57,13 +59,17 @@ export class AuthService {
       { secret: this.configService.get('SECRET') },
     );
     const refreshToken = this.jwtService.sign(
-      { user: user.id },
-      { secret: this.configService.get('SECRET'), expiresIn: '60m' },
+      { user: user.id, deviceId:deviceId },
+      { secret: this.configService.get('SECRET'), expiresIn: '120m' },
     );
     return {
       accessToken,
       refreshToken,
     };
+  }
+
+  async getUserByRecoveryCode(code: string) {
+    return await this.authRepository.getUserByRecoveryCode(code)
   }
 
   async getUserIdByToken(token: string) {
@@ -76,8 +82,19 @@ export class AuthService {
     }
   }
 
+  async processPasswordRecovery(newPassword:string, userId: string) {
+    const passwordSalt = await bcrypt.genSalt(10);
+    const passwordHash = await bcrypt.hash(newPassword, passwordSalt);
+    let updateStatus = await this.authRepository.updateUserPassword(userId,passwordHash,passwordSalt)
+    return updateStatus
+  }
+
+  async savePasswordRecoveryCode(userId:string, code) {
+    return this.authRepository.savePasswordRecoveryCode(userId,code)
+  }
+
   async saveToken(userId: string, refreshToken: string, ip: string) {
-    const { deviceId } = this.jwtService.verify(refreshToken, {
+    const { deviceId } = await this.jwtService.verifyAsync(refreshToken, {
       secret: this.configService.get('SECRET'),
     });
     const tokenData = await this.authRepository.findTokenByUserId(userId);
@@ -96,5 +113,37 @@ export class AuthService {
       refreshToken,
       lastActiveDate: new Date().toISOString(),
     });
+  }
+
+  async refresh(refreshToken: string,device:string,ip:string) {
+    const userData = await this.validateRefreshToken(refreshToken);
+    const tokenFromDb = await this.authRepository.getRefreshToken(refreshToken)
+    if (!userData || !tokenFromDb) {
+      throw new Error();
+    }
+    const user = await this.userRep.getUserByCode(userData.user);
+    const tokens = this.generateTokens(user,userData.deviceId);
+    await this.saveToken(user.id, tokens.refreshToken, ip);
+    return {...tokens}
+  }
+  async validateRefreshToken(refreshToken: string) {
+    try {
+      const { user, deviceId } =  await this.jwtService.verifyAsync<{user:string, deviceId:string}>(refreshToken, {secret: process.env.SECRET || "Ok" })
+
+      return {
+        user,
+        deviceId
+      };
+    } catch (e) {
+      return null;
+    }
+  }
+
+  async logout(refreshToken: string) {
+    const tokenData = await this.authRepository.deleteToken(refreshToken)
+    if (!tokenData){
+      throw new Error()
+    }
+    return tokenData;
   }
 }
