@@ -80,7 +80,6 @@ export class AuthService {
       const result: any = await this.jwtService.verifyAsync(token, {secret: 'Ok'})
       return result
     }catch (e) {
-      console.log(e);
       return null
     }
   }
@@ -100,14 +99,16 @@ export class AuthService {
     const { deviceId } = await this.jwtService.verifyAsync(refreshToken, {
       secret: this.configService.get('SECRET'),
     });
-    const tokenData = await this.authRepository.findTokenByUserId(userId);
+    const tokenData = await this.authRepository.findTokenByUserId(userId, deviceId);
     if (tokenData && tokenData.deviceId === deviceId) {
+      console.log('we are here');
       const status = await this.authRepository.updateToken(
         userId,
         refreshToken,
       );
       return status.modifiedCount;
     }
+    console.log('we are there');
     return await this.authRepository.createToken({
       deviceId,
       ip,
@@ -121,7 +122,6 @@ export class AuthService {
   async refresh(refreshToken: string,device:string,ip:string) {
     const userData = await this.validateRefreshToken(refreshToken);
     const tokenFromDb = await this.authRepository.getRefreshToken(refreshToken)
-    console.log(userData, tokenFromDb);
     if (!userData || !tokenFromDb) {
       throw new Error();
     }
@@ -139,7 +139,6 @@ export class AuthService {
         deviceId
       };
     } catch (e) {
-      console.log(e);
       return null;
     }
   }

@@ -15,8 +15,8 @@ export class AuthRepository {
     @InjectModel(User.name) private userModel: Model<User>,
     public helpers: Helpers,
   ) {}
-  async findTokenByUserId(userId: string) {
-    return this.tokenModel.findOne({ userId: userId });
+  async findTokenByUserId(userId: string , deviceId:string) {
+    return this.tokenModel.findOne({ userId: userId, deviceId:deviceId});
   }
 
   async getRefreshToken(token: string) {
@@ -43,7 +43,6 @@ export class AuthRepository {
     return result.modifiedCount === 1
   }
   async createToken(token: Token) {
-    console.log(token);
     const createdToken = new this.tokenModel(token);
     return await createdToken.save();
   }

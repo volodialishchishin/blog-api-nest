@@ -12,7 +12,6 @@ export class securityService {
     ) {
     }
     async getSessions(refreshToken: string) {
-        console.log(this.jwtService);
         const { user, deviceId } =  await this.jwtService.verifyAsync<{user:string, deviceId:string}>(refreshToken, {secret: process.env.SECRET || "Ok" })
         return await this.securityRepository.getSessions(user)
     }

@@ -192,11 +192,8 @@ export class AuthController {
     @Res() response: Response
   ) {
     try {
-      console.log(req.cookies);
-      const {refreshToken} = req.cookies;
+      const {token:refreshToken} = req.cookies;
       let tokens;
-      console.log('13231');
-      console.log(refreshToken);
       if (req.headers["user-agent"]) {
         tokens = await this.authService.refresh(refreshToken, req.headers["user-agent"], req.ip);
       }
@@ -206,7 +203,6 @@ export class AuthController {
       }
 
     } catch (e) {
-      console.log(e);
       response.sendStatus(401)
     }
   }
@@ -219,7 +215,7 @@ export class AuthController {
     @Res() response: Response,
   ) {
     try {
-      const {refreshToken} = req.cookies;
+      const {token:refreshToken} = req.cookies;
       await this.authService.logout(refreshToken);
       response.clearCookie('refreshToken');
       response.sendStatus(204);

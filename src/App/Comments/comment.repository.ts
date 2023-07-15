@@ -30,7 +30,6 @@ export class CommentRepository {
     return result.matchedCount === 1
   }
   async deleteComment(id:string):Promise<boolean>{
-    console.log(id);
     let result = await this.commentModel.deleteOne(
       { _id : id }
     ).exec();
@@ -61,7 +60,6 @@ export class CommentRepository {
     }
   }
   async updateLikeStatus(likeStatus: LikeInfoViewModelValues, userId: string, commentId: string, login:string) {
-    console.log(likeStatus,userId,commentId,login);
     let comment = await this.commentModel.findOne({_id:commentId})
     if (!comment){
       return false

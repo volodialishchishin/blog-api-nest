@@ -37,7 +37,6 @@ export class CommentController {
 
 
     let deleteStatus = await this.commentService.deleteComment(request.params.id)
-    console.log(deleteStatus);
     if (deleteStatus) {
       response.sendStatus(204)
       return
@@ -66,7 +65,6 @@ export class CommentController {
   @Put(':id/like-status')
   @UseGuards(JwtAuthGuard)
   async updateLikeStatus(@Param() params, @Res() response: Response, @Req() request:Request, @Body() likeUpdateDto:LikeInputModel) {
-    console.log(likeUpdateDto.likeStatus, request.user.userInfo.userId, params.id, request.user.userInfo.login);
     let result = await this.commentService.updateLikeStatus(likeUpdateDto.likeStatus, request.user.userInfo.userId, params.id, request.user.userInfo.login)
     if (result){
       response.sendStatus(204)
