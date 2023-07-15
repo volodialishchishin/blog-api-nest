@@ -105,6 +105,7 @@ export class AuthService {
       const status = await this.authRepository.updateToken(
         userId,
         refreshToken,
+        deviceId
       );
       return status.modifiedCount;
     }

@@ -26,9 +26,9 @@ export class AuthRepository {
     return this.helpers.userMapperToView(await this.recoveryPasswordModel.findOne({ code: recoveryCode }))
   }
 
-  async updateToken(userId: string, refreshToken: string) {
+  async updateToken(userId: string, refreshToken: string,deviceId:string) {
     return this.tokenModel.updateOne(
-      { userId: userId },
+      { userId: userId , deviceId},
       { $set: { refreshToken, lastActiveDate: new Date().toISOString() } },
     );
   }
