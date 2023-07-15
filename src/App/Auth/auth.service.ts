@@ -100,9 +100,8 @@ export class AuthService {
     const { deviceId } = await this.jwtService.verifyAsync(refreshToken, {
       secret: this.configService.get('SECRET'),
     });
-    console.log(deviceId);
     const tokenData = await this.authRepository.findTokenByUserId(userId);
-    if (tokenData) {
+    if (tokenData && tokenData.deviceId === deviceId) {
       const status = await this.authRepository.updateToken(
         userId,
         refreshToken,
