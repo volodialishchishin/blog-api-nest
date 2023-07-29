@@ -36,6 +36,7 @@ export class UserController {
     @Query('pageSize') pageSize,
     @Query('searchLoginTerm') searchLoginTerm,
     @Query('searchEmailTerm') searchEmailTerm,
+    @Query('banStatus') banStatus,
     @Req() request: Request,
     @Res() response: Response,
   ) {
@@ -46,6 +47,7 @@ export class UserController {
       sortBy,
       pageSize,
       sortDirection,
+      banStatus
     );
     response.json(users);
   }
@@ -83,8 +85,7 @@ export class UserController {
       return
     } else {
       let banUserStatus = await this.userService.unbanUser(
-        params.id,
-        banInputModel.banReason,
+        params.id
       );
       banUserStatus ? response.sendStatus(204) : response.sendStatus(404);
       return

@@ -177,7 +177,7 @@ export class BlogBloggerController {
     response.json(posts);
   }
 
-  @Put('/:blogId/:posts/postId')
+  @Put('/:blogId/posts/:postId')
   @UseGuards(JwtAuthGuard)
   async updatePost(
     @Param() params,

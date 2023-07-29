@@ -84,11 +84,11 @@ export class UserService {
     await this.authRep.deleteAllTokens(userId);
     return !!(banStatus);
   }
-  async unbanUser(userId: string, banReason: string) {
+  async unbanUser(userId: string) {
     return this.userRep.updateUserBanStatus(
       userId,
-      banReason,
-      new Date().toISOString(),
+      null,
+     null,
       false,
     );
   }

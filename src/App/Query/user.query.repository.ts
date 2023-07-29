@@ -18,12 +18,24 @@ export class UserQueryRepository {
     sortBy = 'createdAt',
     pageSize = 10,
     sortDirection: 'asc' | 'desc' = 'desc',
+    banStatus: string
   ): Promise<UserViewModelWithQuery> {
-    let sortByField = sortBy
-      ? `accountData.${sortBy}`
-      : `accountData.createdAt`;
-    const matchedUsersWithSkip = await this.userModel
-      .find({
+    let filterObject:any = {
+      $or: [
+        {
+          'accountData.login': searchLoginTerm
+            ? { $regex: searchLoginTerm, $options: 'i' }
+            : { $regex: '.' },
+        },
+        {
+          'accountData.email': searchEmailTerm
+            ? { $regex: searchEmailTerm, $options: 'i' }
+            : { $regex: '.' },
+        },
+      ]
+    }
+    if (banStatus === 'notBanned'){
+       filterObject = {
         $or: [
           {
             'accountData.login': searchLoginTerm
@@ -36,26 +48,37 @@ export class UserQueryRepository {
               : { $regex: '.' },
           },
         ],
-      })
+        "banInfo.isBanned": false
+      }
+    }
+    else if( banStatus === 'banned'){
+       filterObject = {
+        $or: [
+          {
+            'accountData.login': searchLoginTerm
+              ? { $regex: searchLoginTerm, $options: 'i' }
+              : { $regex: '.' },
+          },
+          {
+            'accountData.email': searchEmailTerm
+              ? { $regex: searchEmailTerm, $options: 'i' }
+              : { $regex: '.' },
+          },
+        ],
+        'banInfo.isBanned': true
+      }
+    }
+    let sortByField = sortBy
+      ? `accountData.${sortBy}`
+      : `accountData.createdAt`;
+    const matchedUsersWithSkip = await this.userModel
+      .find()
       .skip((pageNumber - 1) * pageSize)
       .limit(Number(pageSize))
       .sort([[sortByField, sortDirection]])
       .exec();
     const matchedUsers = await this.userModel
-      .find({
-        $or: [
-          {
-            'accountData.login': searchLoginTerm
-              ? { $regex: searchLoginTerm, $options: 'i' }
-              : { $regex: '.' },
-          },
-          {
-            'accountData.email': searchEmailTerm
-              ? { $regex: searchEmailTerm, $options: 'i' }
-              : { $regex: '.' },
-          },
-        ],
-      })
+      .find(filterObject)
       .exec();
     const pagesCount = Math.ceil(matchedUsers.length / pageSize);
     return {

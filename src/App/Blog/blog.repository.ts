@@ -41,7 +41,7 @@ export class BlogRepository {
   }
   async checkIfBlogBelongsToUser(id, userId: string) {
     const blog = await this.blogModel.findOne({ _id: id, userId });
-    return userId === blog.userId;
+    return userId === blog?.userId;
   }
 
   async bindBlog(id, userId: string):Promise<boolean> {

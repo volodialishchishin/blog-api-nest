@@ -8,6 +8,7 @@ import { Blog, BlogDocument } from './Schemas/blog.schema';
 import { Comment, CommentDocument } from './Schemas/comment.schema';
 import { Token, TokenDocument } from './Schemas/token.schema';
 import { Like, LikeDocument } from './Schemas/like.schema';
+import { RecoveryPassword, recoveryPasswordDocument } from "./Schemas/recovery-password.schema";
 
 @Injectable()
 export class AppRepository {
@@ -18,6 +19,7 @@ export class AppRepository {
     @InjectModel(Comment.name) private commentModel: Model<CommentDocument>,
     @InjectModel(Token.name) private tokenModel: Model<TokenDocument>,
     @InjectModel(Like.name) private likeModel: Model<LikeDocument>,
+    @InjectModel(RecoveryPassword.name) private recoveryPasswords: Model<recoveryPasswordDocument>,
     public helpers: Helpers,
   ) {}
 
