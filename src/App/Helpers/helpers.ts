@@ -115,7 +115,7 @@ export class Helpers {
       isMembership: blog.isMembership,
       blogOwnerInfo: {
         userId: blog.userId,
-        userLogin: blog.userId,
+        userLogin: blog.userLogin,
       },
     };
   }

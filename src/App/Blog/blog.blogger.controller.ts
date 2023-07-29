@@ -36,7 +36,7 @@ export class BlogBloggerController {
     private readonly postService: PostService,
     private readonly authService: AuthService,
   ) {}
-  @Post('blogger')
+  @Post()
   @UseGuards(JwtAuthGuard)
   async createBlog(
     @Body() createBlogDto: BlogInputModel,

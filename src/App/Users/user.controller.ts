@@ -80,13 +80,14 @@ export class UserController {
         banInputModel.banReason,
       );
       banUserStatus ? response.sendStatus(204) : response.sendStatus(404);
+      return
     } else {
       let banUserStatus = await this.userService.unbanUser(
         params.id,
         banInputModel.banReason,
       );
       banUserStatus ? response.sendStatus(204) : response.sendStatus(404);
+      return
     }
-    response.sendStatus(400)
   }
 }

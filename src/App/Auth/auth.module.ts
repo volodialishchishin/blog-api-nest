@@ -37,7 +37,7 @@ import { CommentSchema } from '../../Schemas/comment.schema';
       inject: [ConfigService],
       useFactory: async (configService: ConfigService) => ({
         secret: configService.get('SECRET'),
-        signOptions: { expiresIn: '5m' },
+        signOptions: { expiresIn: '60m' },
       }),
     }),
     ConfigModule,

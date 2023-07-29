@@ -22,7 +22,7 @@ export class CommentQueryRepository {
     sortDirection: 'asc' | 'desc' = 'desc',
     postId: string,
     userId: string,
-  ): Promise<CommentViewModelWithQuery> {
+  ) {
     let matchedComments = await this.commentModel
       .find({ postId: postId })
       .skip((pageNumber - 1) * pageSize)
@@ -33,7 +33,7 @@ export class CommentQueryRepository {
     const pagesCount = Math.ceil(allComments.length / pageSize);
     const matchedCommentsWithLikes = await Promise.all(
       matchedComments.map(async (comment) => {
-        if (comment.isUserBanned) return null;
+        if (comment.isUserBanned) return;
         const mappedComment = await this.helpers.commentsMapperToView(comment);
         if (!userId) {
           return mappedComment;
@@ -57,7 +57,7 @@ export class CommentQueryRepository {
       page: Number(pageNumber),
       pageSize: Number(pageSize),
       totalCount: allComments.length,
-      items: matchedCommentsWithLikes,
+      items: matchedCommentsWithLikes.filter(Boolean),
     };
   }
 }

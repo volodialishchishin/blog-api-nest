@@ -28,25 +28,26 @@ export class BlogQueryRepository {
     userId?: string,
     role?: string,
   ): Promise<BlogViewModelWithQuery> {
+    console.log(userId);
+    let findFilter = userId ? {
+      name: searchNameTerm
+        ? { $regex: searchNameTerm, $options: 'i' }
+        : { $regex: '.' },
+      userId: userId,
+    }: {
+      name: searchNameTerm
+        ? { $regex: searchNameTerm, $options: 'i' }
+        : { $regex: '.' }
+    }
     const matchedBlogsWithSkip = await this.blogModel
-      .find({
-        name: searchNameTerm
-          ? { $regex: searchNameTerm, $options: 'i' }
-          : { $regex: '.' },
-        userId: userId || '',
-      })
+      .find(findFilter)
       .skip((pageNumber - 1) * pageSize)
       .limit(Number(pageSize))
       .sort([[sortBy, sortDirection]])
       .exec();
 
     const matchedBlogs = await this.blogModel
-      .find({
-        name: searchNameTerm
-          ? { $regex: searchNameTerm, $options: 'i' }
-          : { $regex: '.' },
-        userId: userId || '',
-      })
+      .find(findFilter)
       .sort({ sortBy: sortDirection })
       .exec();
     const pagesCount = Math.ceil(matchedBlogs.length / pageSize);
