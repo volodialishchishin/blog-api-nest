@@ -22,7 +22,11 @@ export class Helpers {
       email: user.accountData.email,
       createdAt: user.accountData.createdAt,
       login: user.accountData.login,
-      banInfo: user.banInfo,
+      banInfo: {
+        isBanned: user.banInfo.isBanned,
+        banReason: user.banInfo.banReason,
+        banDate: user.banInfo.banDate
+      }
     };
   }
 

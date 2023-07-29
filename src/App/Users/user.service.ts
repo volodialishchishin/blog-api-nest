@@ -37,8 +37,8 @@ export class UserService {
         isConfirmed: false,
       },
       banInfo: {
-        banDate: '',
-        banReason: '',
+        banDate: null,
+        banReason: null,
         isBanned: false,
       },
     };

@@ -87,5 +87,6 @@ export class UserController {
       );
       banUserStatus ? response.sendStatus(204) : response.sendStatus(404);
     }
+    response.sendStatus(400)
   }
 }
