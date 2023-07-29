@@ -29,7 +29,7 @@ import { SkipThrottle } from '@nestjs/throttler';
 
 @SkipThrottle()
 @Controller('sa/blogs')
-export class BlogBloggerController {
+export class BlogSaController {
   constructor(
     private readonly blogQueryRep: BlogQueryRepository,
     private readonly blogService: BlogsService,

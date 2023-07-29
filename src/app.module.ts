@@ -44,6 +44,7 @@ import { RecoveryPasswordSchema } from './Schemas/recovery-password.schema';
 import { JwtModule, JwtService } from '@nestjs/jwt';
 import { BlogBloggerController } from './App/Blog/blog.blogger.controller';
 import { AuthRepository } from './App/Auth/auth.repository';
+import { BlogSaController } from "./App/Blog/blog.sa.controller";
 
 @Module({
   imports: [
@@ -73,6 +74,8 @@ import { AuthRepository } from './App/Auth/auth.repository';
     CommentController,
     PostController,
     BlogController,
+    BlogBloggerController,
+    BlogSaController
   ],
   providers: [
     AppService,
@@ -93,7 +96,6 @@ import { AuthRepository } from './App/Auth/auth.repository';
     MailService,
     isBlogExists,
     JwtService,
-    BlogBloggerController,
     AuthRepository,
   ],
   exports: [UserService, UserRepository, Helpers],
