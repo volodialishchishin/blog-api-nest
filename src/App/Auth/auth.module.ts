@@ -28,8 +28,8 @@ import { CommentSchema } from '../../Schemas/comment.schema';
 @Module({
   imports: [
     ThrottlerModule.forRoot({
-      ttl: 10,
-      limit: 5,
+      ttl: 24214234,
+      limit: 423412432144213421,
     }),
     PassportModule,
     JwtModule.registerAsync({
@@ -37,7 +37,7 @@ import { CommentSchema } from '../../Schemas/comment.schema';
       inject: [ConfigService],
       useFactory: async (configService: ConfigService) => ({
         secret: configService.get('SECRET'),
-        signOptions: { expiresIn: '10s' },
+        signOptions: { expiresIn: '5m' },
       }),
     }),
     ConfigModule,
