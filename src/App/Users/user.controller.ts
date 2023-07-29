@@ -6,6 +6,7 @@ import {
   Get,
   Param,
   Post,
+  Put,
   Query,
   Req,
   Res,
@@ -16,10 +17,10 @@ import { UserInputModel } from '../../DTO/User/user-input-model.dto';
 import { Request, Response } from 'express';
 import { UserQueryRepository } from '../Query/user.query.repository';
 import { BasicAuthGuard } from '../Auth/Guards/basic.auth.guard';
-import { SkipThrottle } from "@nestjs/throttler";
+import { SkipThrottle } from '@nestjs/throttler';
+import { BanInputModelDto } from '../../DTO/User/ban-input-model.dto';
 @SkipThrottle()
-
-@Controller('users')
+@Controller('/sa/users')
 export class UserController {
   constructor(
     private readonly userService: UserService,
@@ -63,6 +64,28 @@ export class UserController {
       response.sendStatus(204);
     } else {
       response.sendStatus(404);
+    }
+  }
+
+  @Put('/:id/ban')
+  @UseGuards(BasicAuthGuard)
+  async banUser(
+    @Param() params,
+    @Res() response: Response,
+    @Body() banInputModel: BanInputModelDto,
+  ) {
+    if (banInputModel.isBanned) {
+      let banUserStatus = await this.userService.banUser(
+        params.id,
+        banInputModel.banReason,
+      );
+      banUserStatus ? response.sendStatus(204) : response.sendStatus(404);
+    } else {
+      let banUserStatus = await this.userService.unbanUser(
+        params.id,
+        banInputModel.banReason,
+      );
+      banUserStatus ? response.sendStatus(204) : response.sendStatus(404);
     }
   }
 }

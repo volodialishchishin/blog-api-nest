@@ -1,6 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
 import { CommentatorInfo, LikesInfoSchema } from './comment.schema';
+import { Ban, BanSchema } from './ban.schema';
 
 export type UserDocument = HydratedDocument<User>;
 @Schema()
@@ -36,6 +37,8 @@ export class User {
   accountData: AccountData;
   @Prop({ type: emailConfirmationSchema })
   emailConfirmation: EmailConfirmation;
+  @Prop({ type: BanSchema })
+  banInfo: Ban;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

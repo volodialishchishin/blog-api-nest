@@ -7,6 +7,10 @@ export type BlogViewModel = {
   createdAt: string;
   description: string;
   isMembership: boolean;
+  blogOwnerInfo?: {
+    userId: string;
+    userLogin: string;
+  };
 };
 export type BlogViewModelWithQuery = {
   pagesCount: number;

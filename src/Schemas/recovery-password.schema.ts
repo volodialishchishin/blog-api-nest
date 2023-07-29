@@ -6,9 +6,10 @@ export type recoveryPasswordDocument = HydratedDocument<RecoveryPassword>;
 @Schema()
 export class RecoveryPassword {
   @Prop({ isRequired: true })
-  userId:string
+  userId: string;
   @Prop({ isRequired: true })
-  code:string
+  code: string;
 }
 
-export const RecoveryPasswordSchema = SchemaFactory.createForClass(RecoveryPassword);
+export const RecoveryPasswordSchema =
+  SchemaFactory.createForClass(RecoveryPassword);

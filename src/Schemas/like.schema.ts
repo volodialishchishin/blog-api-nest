@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
-import { LikeInfoViewModelValues } from "../DTO/LikeInfo/like-info-view-model";
+import { LikeInfoViewModelValues } from '../DTO/LikeInfo/like-info-view-model';
 
 export type LikeDocument = HydratedDocument<Like>;
 
@@ -18,15 +18,17 @@ export class LikeInfo {
 @Schema()
 export class Like {
   @Prop()
-  entityId:string
+  entityId: string;
   @Prop()
-  userId:string
+  userId: string;
   @Prop()
-  status:LikeInfoViewModelValues
+  status: LikeInfoViewModelValues;
   @Prop()
-  dateAdded: Date
+  dateAdded: Date;
   @Prop()
-  userLogin:string
+  userLogin: string;
+  @Prop()
+  isUserBanned: boolean;
 }
 
 export const LikeSchema = SchemaFactory.createForClass(Like);

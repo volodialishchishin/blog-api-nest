@@ -3,11 +3,12 @@ import {
   Body,
   Controller,
   Get,
-  Post, Req,
+  Post,
+  Req,
   Request,
   Res,
-  UseGuards
-} from "@nestjs/common";
+  UseGuards,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { JwtAuthGuard } from './Guards/jwt.auth.guard';
 import { v4 } from 'uuid';
@@ -17,7 +18,7 @@ import { Response } from 'express';
 import { JwtService } from '@nestjs/jwt';
 import { AuthRepository } from './auth.repository';
 import { MailService } from './Mail/mail.service';
-import { Throttle, ThrottlerGuard } from "@nestjs/throttler";
+import { Throttle, ThrottlerGuard } from '@nestjs/throttler';
 
 @Controller('auth')
 export class AuthController {
@@ -29,7 +30,6 @@ export class AuthController {
     private readonly mailService: MailService,
   ) {}
   @UseGuards(ThrottlerGuard)
-
   @Post('registration')
   async registration(
     @Request() req,
@@ -52,7 +52,6 @@ export class AuthController {
     response.sendStatus(204);
   }
 
-
   @UseGuards(ThrottlerGuard)
   @Post('login')
   async login(
@@ -66,8 +65,8 @@ export class AuthController {
       userModel.loginOrEmail,
     );
     if (user && req.headers['user-agent']) {
-      let deviceId = v4()
-      const token = this.authService.generateTokens(user,deviceId);
+      let deviceId = v4();
+      const token = this.authService.generateTokens(user, deviceId);
       await this.authService.saveToken(user.id, token.refreshToken, req.ip);
       response.cookie('refreshToken', token.refreshToken, {
         secure: true,
@@ -79,7 +78,6 @@ export class AuthController {
     }
   }
   @UseGuards(ThrottlerGuard)
-
   @Post('registration-email-resending')
   async registrationEmailResending(
     @Request() req,
@@ -108,20 +106,18 @@ export class AuthController {
     response.sendStatus(204);
   }
 
-
   @UseGuards(ThrottlerGuard)
-
   @Post('registration-confirmation')
   async registrationConfirmation(
     @Request() req,
     @Body() userModel: { code: string },
     @Res() response: Response,
   ) {
-    const user = await this.userService.getUserByField(
-      userModel.code,
-    );
+    const user = await this.userService.getUserByField(userModel.code);
     if (
-      !user || user.emailConfirmation.isConfirmed || !user.emailConfirmation?.confirmationCode
+      !user ||
+      user.emailConfirmation.isConfirmed ||
+      !user.emailConfirmation?.confirmationCode
     ) {
       throw new BadRequestException([
         {
@@ -137,25 +133,25 @@ export class AuthController {
     } else response.sendStatus(400);
   }
   @UseGuards(ThrottlerGuard)
-
   @Post('new-password')
   async newPassword(
     @Request() req,
-    @Body() recoveryInfo: { newPassword:string, recoveryCode:string },
+    @Body() recoveryInfo: { newPassword: string; recoveryCode: string },
     @Res() response: Response,
   ) {
-    const {newPassword,recoveryCode} = req.body
-    const user =  await this.authService.getUserByRecoveryCode(recoveryCode)
-    if (user){
-      let updateStatus = this.authService.processPasswordRecovery(newPassword, user.id.toString())
-      if (updateStatus){
-        response.sendStatus(204)
+    const { newPassword, recoveryCode } = req.body;
+    const user = await this.authService.getUserByRecoveryCode(recoveryCode);
+    if (user) {
+      let updateStatus = this.authService.processPasswordRecovery(
+        newPassword,
+        user.id.toString(),
+      );
+      if (updateStatus) {
+        response.sendStatus(204);
+      } else {
+        response.sendStatus(400);
       }
-      else{
-        response.sendStatus(400)
-      }
-    }
-    else{
+    } else {
       throw new BadRequestException([
         {
           message: 'incorrect recovery code',
@@ -165,65 +161,64 @@ export class AuthController {
     }
   }
   @UseGuards(ThrottlerGuard)
-
   @Post('password-recovery')
   async passwordRecovery(
     @Request() req,
-    @Body() recoveryInfo: { email:string},
+    @Body() recoveryInfo: { email: string },
     @Res() response: Response,
   ) {
-    const {email} = req.body
+    const { email } = req.body;
     try {
-      const user = await this.userService.getUserByLoginOrEmail('', email)
-      let code = v4()
-      await this.mailService.sendRecoveryPasswordCode(user.result, false, code)
-      await this.authService.savePasswordRecoveryCode(user.result.id, code)
-      response.sendStatus(204)
-    }
-    catch (e){
-      response.sendStatus(204)
+      const user = await this.userService.getUserByLoginOrEmail('', email);
+      let code = v4();
+      await this.mailService.sendRecoveryPasswordCode(user.result, false, code);
+      await this.authService.savePasswordRecoveryCode(user.result.id, code);
+      response.sendStatus(204);
+    } catch (e) {
+      response.sendStatus(204);
     }
   }
 
   @UseGuards(ThrottlerGuard)
   @Post('refresh-token')
-  async refreshToken(
-    @Req() req,
-    @Res() response: Response
-  ) {
+  async refreshToken(@Req() req, @Res() response: Response) {
     try {
-      const {refreshToken} = req.cookies;
+      const { refreshToken } = req.cookies;
       let tokens;
-      if (req.headers["user-agent"]) {
-        tokens = await this.authService.refresh(refreshToken, req.headers["user-agent"], req.ip);
+      if (req.headers['user-agent']) {
+        tokens = await this.authService.refresh(
+          refreshToken,
+          req.headers['user-agent'],
+          req.ip,
+        );
       }
       if (tokens) {
-        response.cookie('refreshToken', tokens.refreshToken, {secure: true, httpOnly: true})
-        return response.status(200).json({accessToken: tokens.accessToken});
+        response.cookie('refreshToken', tokens.refreshToken, {
+          secure: true,
+          httpOnly: true,
+        });
+        return response.status(200).json({ accessToken: tokens.accessToken });
       }
-
     } catch (e) {
-      response.sendStatus(401)
+      response.sendStatus(401);
     }
   }
   @UseGuards(ThrottlerGuard)
-
   @Post('logout')
   async logout(
     @Req() req,
-    @Body() recoveryInfo: { email:string},
+    @Body() recoveryInfo: { email: string },
     @Res() response: Response,
   ) {
     try {
-      const {refreshToken} = req.cookies;
+      const { refreshToken } = req.cookies;
       await this.authService.logout(refreshToken);
       response.clearCookie('refreshToken');
       response.sendStatus(204);
     } catch (e) {
-      response.sendStatus(401)
+      response.sendStatus(401);
     }
   }
-
 
   @Get('me')
   @UseGuards(JwtAuthGuard)

@@ -1,5 +1,5 @@
 import { IsNotEmpty, Length, Matches } from 'class-validator';
-import { Transform, TransformFnParams } from "class-transformer";
+import { Transform, TransformFnParams } from 'class-transformer';
 
 export class BlogInputModel {
   @Length(1, 15)

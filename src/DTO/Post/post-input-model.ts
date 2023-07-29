@@ -3,22 +3,20 @@ import {
   ValidationOptions,
   ValidatorConstraint,
   ValidatorConstraintInterface,
-  ValidationArguments, Length, IsNotEmpty
-} from "class-validator";
-import { BlogsService } from "../../App/Blog/blogs.service";
-import { Injectable } from "@nestjs/common";
-import { Transform, TransformFnParams } from "class-transformer";
-
-
+  ValidationArguments,
+  Length,
+  IsNotEmpty,
+} from 'class-validator';
+import { BlogsService } from '../../App/Blog/blogs.service';
+import { Injectable } from '@nestjs/common';
+import { Transform, TransformFnParams } from 'class-transformer';
 
 @ValidatorConstraint({ async: true })
 @Injectable()
 export class isBlogExists implements ValidatorConstraintInterface {
-  constructor(    private readonly blogService: BlogsService,
-  ) {
-  }
+  constructor(private readonly blogService: BlogsService) {}
   validate(blogId: any, args: ValidationArguments) {
-    return this.blogService.getBlog(blogId).then(blog => {
+    return this.blogService.getBlog(blogId).then((blog) => {
       return !!blog;
     });
   }

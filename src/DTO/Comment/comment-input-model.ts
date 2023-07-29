@@ -1,8 +1,5 @@
-
 import { IsNotEmpty, Length } from 'class-validator';
-import { Transform, TransformFnParams } from "class-transformer";
-
-;
+import { Transform, TransformFnParams } from 'class-transformer';
 
 export class CommentInputModel {
   @Length(20, 300)

@@ -6,8 +6,8 @@ import { UserViewModelWithQuery } from '../../DTO/User/user-view-model.dto';
 import { Helpers } from '../Helpers/helpers';
 import { Post, PostDocument } from '../../Schemas/post.schema';
 import { PostViewModelWithQuery } from '../../DTO/Post/post-view-model';
-import { Like, LikeDocument } from "../../Schemas/like.schema";
-import { LikeInfoViewModelValues } from "../../DTO/LikeInfo/like-info-view-model";
+import { Like, LikeDocument } from '../../Schemas/like.schema';
+import { LikeInfoViewModelValues } from '../../DTO/LikeInfo/like-info-view-model';
 
 @Injectable()
 export class PostQueryRepository {
@@ -21,7 +21,7 @@ export class PostQueryRepository {
     sortBy = 'createdAt',
     pageSize = 10,
     sortDirection: 'asc' | 'desc' = 'desc',
-    userId:string
+    userId: string,
   ): Promise<PostViewModelWithQuery> {
     const matchedPostsWithSkip = await this.postModel
       .find()
@@ -30,38 +30,51 @@ export class PostQueryRepository {
       .sort([[sortBy, sortDirection]])
       .exec();
 
-    const matchedPosts = await this.postModel.find({}).skip((pageNumber - 1) * pageSize).limit(Number(pageSize)).sort([[sortBy, sortDirection]]).exec()
+    const matchedPosts = await this.postModel
+      .find({})
+      .skip((pageNumber - 1) * pageSize)
+      .limit(Number(pageSize))
+      .sort([[sortBy, sortDirection]])
+      .exec();
     const pagesCount = Math.ceil(matchedPosts.length / pageSize);
-    const matchedPostsWithLikes = await Promise.all(matchedPosts.map(async post=>{
-      const mappedPost = await this.helpers.postMapperToView(post)
-      let lastLikes = await this.likeModel.find({entityId:post.id, status: LikeInfoViewModelValues.like}).sort({dateAdded:-1}).limit(3).exec()
-      mappedPost.extendedLikesInfo.newestLikes = lastLikes.map(e => {
-        return {
-          addedAt: e.dateAdded,
-          userId: e.userId,
-          login: e.userLogin
+    const matchedPostsWithLikes = await Promise.all(
+      matchedPosts.map(async (post) => {
+        const mappedPost = await this.helpers.postMapperToView(post);
+        let lastLikes = await this.likeModel
+          .find({ entityId: post.id, status: LikeInfoViewModelValues.like })
+          .sort({ dateAdded: -1 })
+          .limit(3)
+          .exec();
+        mappedPost.extendedLikesInfo.newestLikes = lastLikes.map((e) => {
+          return {
+            addedAt: e.dateAdded,
+            userId: e.userId,
+            login: e.userLogin,
+          };
+        });
+        if (!userId) {
+          return mappedPost;
         }
-      })
-      if (!userId){
-        return mappedPost
-      }
 
-      let myLikeForComment = await this.likeModel.findOne({
-        userId,
-        entityId:post.id
-      }).exec()
-      if (myLikeForComment){
-        mappedPost.extendedLikesInfo.myStatus = myLikeForComment.status
-        return mappedPost
-      }
-      return mappedPost
-    }))
+        let myLikeForComment = await this.likeModel
+          .findOne({
+            userId,
+            entityId: post.id,
+          })
+          .exec();
+        if (myLikeForComment) {
+          mappedPost.extendedLikesInfo.myStatus = myLikeForComment.status;
+          return mappedPost;
+        }
+        return mappedPost;
+      }),
+    );
     return {
       pagesCount: Number(pagesCount),
       page: Number(pageNumber),
       pageSize: Number(pageSize),
       totalCount: matchedPosts.length,
-      items: matchedPostsWithLikes
+      items: matchedPostsWithLikes,
     };
   }
 }

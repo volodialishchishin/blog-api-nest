@@ -1,4 +1,9 @@
-import { MiddlewareConsumer, Module, NestModule, RequestMethod } from "@nestjs/common";
+import {
+  MiddlewareConsumer,
+  Module,
+  NestModule,
+  RequestMethod,
+} from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { MongooseModule } from '@nestjs/mongoose';
@@ -27,16 +32,18 @@ import { BlogRepository } from './App/Blog/blog.repository';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthModule } from './App/Auth/auth.module';
 import { MailService } from './App/Auth/Mail/mail.service';
-import { TokenSchema } from "./Schemas/token.schema";
-import { LikeSchema } from "./Schemas/like.schema";
-import { blogExisting } from "./Middewares/blog-existing.middleware";
-import { isBlogExists } from "./DTO/Post/post-input-model";
-import { ThrottlerModule } from "@nestjs/throttler";
-import { securityService } from "./App/Auth/Security/security.service";
-import { securityRepository } from "./App/Auth/Security/security.repository";
-import { SecurityController } from "./App/Auth/Security/security.controller";
-import { RecoveryPasswordSchema } from "./Schemas/recovery-password.schema";
-import { JwtModule, JwtService } from "@nestjs/jwt";
+import { TokenSchema } from './Schemas/token.schema';
+import { LikeSchema } from './Schemas/like.schema';
+import { blogExisting } from './Middewares/blog-existing.middleware';
+import { isBlogExists } from './DTO/Post/post-input-model';
+import { ThrottlerModule } from '@nestjs/throttler';
+import { securityService } from './App/Auth/Security/security.service';
+import { securityRepository } from './App/Auth/Security/security.repository';
+import { SecurityController } from './App/Auth/Security/security.controller';
+import { RecoveryPasswordSchema } from './Schemas/recovery-password.schema';
+import { JwtModule, JwtService } from '@nestjs/jwt';
+import { BlogBloggerController } from './App/Blog/blog.blogger.controller';
+import { AuthRepository } from './App/Auth/auth.repository';
 
 @Module({
   imports: [
@@ -47,6 +54,9 @@ import { JwtModule, JwtService } from "@nestjs/jwt";
     MongooseModule.forFeature([{ name: 'Post', schema: PostSchema }]),
     MongooseModule.forFeature([{ name: 'Like', schema: LikeSchema }]),
     MongooseModule.forFeature([{ name: 'Token', schema: TokenSchema }]),
+    MongooseModule.forFeature([
+      { name: 'RecoveryPassword', schema: RecoveryPasswordSchema },
+    ]),
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
@@ -55,14 +65,14 @@ import { JwtModule, JwtService } from "@nestjs/jwt";
       inject: [ConfigService],
     }),
     AuthModule,
-    JwtModule
+    JwtModule,
   ],
   controllers: [
     AppController,
     UserController,
     CommentController,
     PostController,
-    BlogController
+    BlogController,
   ],
   providers: [
     AppService,
@@ -82,9 +92,10 @@ import { JwtModule, JwtService } from "@nestjs/jwt";
     BlogRepository,
     MailService,
     isBlogExists,
-    JwtService
+    JwtService,
+    BlogBloggerController,
+    AuthRepository,
   ],
   exports: [UserService, UserRepository, Helpers],
 })
-export class AppModule {
-}
+export class AppModule {}

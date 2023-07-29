@@ -5,6 +5,11 @@ export type UserViewModel = {
   login: string;
   email: string;
   createdAt: string;
+  banInfo: {
+    isBanned: boolean;
+    banDate: string;
+    banReason: string;
+  };
 };
 export type UserViewModelWithQuery = {
   pagesCount: number;

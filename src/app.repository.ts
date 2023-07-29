@@ -5,9 +5,9 @@ import { Model } from 'mongoose';
 import { Helpers } from './App/Helpers/helpers';
 import { Post, PostDocument } from './Schemas/post.schema';
 import { Blog, BlogDocument } from './Schemas/blog.schema';
-import { Comment, CommentDocument } from "./Schemas/comment.schema";
-import { Token, TokenDocument } from "./Schemas/token.schema";
-import { Like, LikeDocument } from "./Schemas/like.schema";
+import { Comment, CommentDocument } from './Schemas/comment.schema';
+import { Token, TokenDocument } from './Schemas/token.schema';
+import { Like, LikeDocument } from './Schemas/like.schema';
 
 @Injectable()
 export class AppRepository {

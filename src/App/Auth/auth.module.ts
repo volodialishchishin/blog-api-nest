@@ -14,12 +14,16 @@ import { Helpers } from '../Helpers/helpers';
 import { MailService } from './Mail/mail.service';
 import { AuthRepository } from './auth.repository';
 import { TokenSchema } from '../../Schemas/token.schema';
-import { LikeSchema } from "../../Schemas/like.schema";
-import { ThrottlerModule } from "@nestjs/throttler";
-import { RecoveryPassword, RecoveryPasswordSchema } from "../../Schemas/recovery-password.schema";
-import { securityService } from "./Security/security.service";
-import { securityRepository } from "./Security/security.repository";
-import { SecurityController } from "./Security/security.controller";
+import { LikeSchema } from '../../Schemas/like.schema';
+import { ThrottlerModule } from '@nestjs/throttler';
+import {
+  RecoveryPassword,
+  RecoveryPasswordSchema,
+} from '../../Schemas/recovery-password.schema';
+import { securityService } from './Security/security.service';
+import { securityRepository } from './Security/security.repository';
+import { SecurityController } from './Security/security.controller';
+import { CommentSchema } from '../../Schemas/comment.schema';
 
 @Module({
   imports: [
@@ -40,7 +44,10 @@ import { SecurityController } from "./Security/security.controller";
     MongooseModule.forFeature([{ name: 'User', schema: UserSchema }]),
     MongooseModule.forFeature([{ name: 'Token', schema: TokenSchema }]),
     MongooseModule.forFeature([{ name: 'Like', schema: LikeSchema }]),
-    MongooseModule.forFeature([{ name: 'RecoveryPassword', schema: RecoveryPasswordSchema }]),
+    MongooseModule.forFeature([
+      { name: 'RecoveryPassword', schema: RecoveryPasswordSchema },
+    ]),
+    MongooseModule.forFeature([{ name: 'Comment', schema: CommentSchema }]),
   ],
   controllers: [AuthController, SecurityController],
   providers: [

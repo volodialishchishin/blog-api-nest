@@ -1,18 +1,20 @@
 import { Injectable } from '@nestjs/common';
 import { UserRepository } from './user.repository';
 import { UserInputModel } from '../../DTO/User/user-input-model.dto';
-import { UserViewModel } from '../../DTO/User/user-view-model.dto';
 import { User, UserDocument } from '../../Schemas/user.schema';
 import { v4 } from 'uuid';
 import * as dateFns from 'date-fns';
 import * as bcrypt from 'bcrypt';
-import { MailerService } from '@nestjs-modules/mailer';
 import { MailService } from '../Auth/Mail/mail.service';
+import { AuthRepository } from '../Auth/auth.repository';
+import { CommentRepository } from '../Comments/comment.repository';
+
 @Injectable()
 export class UserService {
   constructor(
     private userRep: UserRepository,
     private mailService: MailService,
+    private authRep: AuthRepository,
   ) {}
 
   async createUser(user: UserInputModel) {
@@ -34,7 +36,11 @@ export class UserService {
         }),
         isConfirmed: false,
       },
-
+      banInfo: {
+        banDate: '',
+        banReason: '',
+        isBanned: false,
+      },
     };
     await this.mailService.sendMailConfirmation(resolvedUser);
     return this.userRep.createUser(resolvedUser);
@@ -52,7 +58,7 @@ export class UserService {
 
     return result;
   }
-  async getUserByField( code:string) {
+  async getUserByField(code: string) {
     const result = await this.userRep.getUserByCode(code);
 
     return result;
@@ -64,5 +70,24 @@ export class UserService {
     } else {
       return null;
     }
+  }
+
+  async banUser(userId: string, banReason: string) {
+    let banStatus = await this.userRep.updateUserBanStatus(
+      userId,
+      banReason,
+      new Date().toISOString(),
+      true,
+    );
+    let deleteState = await this.authRep.deleteAllTokens(userId);
+    return !!(banStatus && deleteState);
+  }
+  async unbanUser(userId: string, banReason: string) {
+    return this.userRep.updateUserBanStatus(
+      userId,
+      banReason,
+      new Date().toISOString(),
+      false,
+    );
   }
 }

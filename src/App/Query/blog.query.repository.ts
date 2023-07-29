@@ -8,8 +8,8 @@ import { Post, PostDocument } from '../../Schemas/post.schema';
 import { PostViewModelWithQuery } from '../../DTO/Post/post-view-model';
 import { Blog, BlogDocument } from '../../Schemas/blog.schema';
 import { BlogViewModelWithQuery } from '../../DTO/Blog/blog-view-model';
-import { LikeInfoViewModelValues } from "../../DTO/LikeInfo/like-info-view-model";
-import { Like, LikeDocument } from "../../Schemas/like.schema";
+import { LikeInfoViewModelValues } from '../../DTO/LikeInfo/like-info-view-model';
+import { Like, LikeDocument } from '../../Schemas/like.schema';
 
 @Injectable()
 export class BlogQueryRepository {
@@ -20,6 +20,46 @@ export class BlogQueryRepository {
     public helpers: Helpers,
   ) {}
   async getBlogs(
+    searchNameTerm = '',
+    pageNumber = 1,
+    sortBy = 'createdAt',
+    pageSize = 10,
+    sortDirection: 'asc' | 'desc' = 'desc',
+    userId?: string,
+    role?: string,
+  ): Promise<BlogViewModelWithQuery> {
+    const matchedBlogsWithSkip = await this.blogModel
+      .find({
+        name: searchNameTerm
+          ? { $regex: searchNameTerm, $options: 'i' }
+          : { $regex: '.' },
+        userId: userId || '',
+      })
+      .skip((pageNumber - 1) * pageSize)
+      .limit(Number(pageSize))
+      .sort([[sortBy, sortDirection]])
+      .exec();
+
+    const matchedBlogs = await this.blogModel
+      .find({
+        name: searchNameTerm
+          ? { $regex: searchNameTerm, $options: 'i' }
+          : { $regex: '.' },
+        userId: userId || '',
+      })
+      .sort({ sortBy: sortDirection })
+      .exec();
+    const pagesCount = Math.ceil(matchedBlogs.length / pageSize);
+    return {
+      pagesCount: Number(pagesCount),
+      page: Number(pageNumber),
+      pageSize: Number(pageSize),
+      totalCount: matchedBlogs.length,
+      items: matchedBlogsWithSkip.map(this.helpers.blogMapperToView),
+    };
+  }
+
+  async getBlogsSa(
     searchNameTerm = '',
     pageNumber = 1,
     sortBy = 'createdAt',
@@ -51,7 +91,7 @@ export class BlogQueryRepository {
       page: Number(pageNumber),
       pageSize: Number(pageSize),
       totalCount: matchedBlogs.length,
-      items: matchedBlogsWithSkip.map(this.helpers.blogMapperToView),
+      items: matchedBlogsWithSkip.map(this.helpers.blogMapperToViewSa),
     };
   }
 
@@ -61,40 +101,53 @@ export class BlogQueryRepository {
     pageSize = 10,
     sortDirection: 'asc' | 'desc' = 'desc',
     blogId: string,
-    userId
+    userId,
   ): Promise<PostViewModelWithQuery> {
-    const matchedPosts = await this.postModel.find({blogId:blogId}).skip((pageNumber - 1) * pageSize).limit(Number(pageSize)).sort([[sortBy, sortDirection]]).exec()
+    const matchedPosts = await this.postModel
+      .find({ blogId: blogId })
+      .skip((pageNumber - 1) * pageSize)
+      .limit(Number(pageSize))
+      .sort([[sortBy, sortDirection]])
+      .exec();
     const pagesCount = Math.ceil(matchedPosts.length / pageSize);
-    const matchedPostsWithLikes = await Promise.all(matchedPosts.map(async post=>{
-      const mappedPost = await this.helpers.postMapperToView(post)
-      let lastLikes = await this.likeModel.find({entityId:post.id, status: LikeInfoViewModelValues.like}).sort({dateAdded:-1}).limit(3).exec()
-      mappedPost.extendedLikesInfo.newestLikes = lastLikes.map(e => {
-        return {
-          addedAt: e.dateAdded,
-          userId: e.userId,
-          login: e.userLogin
+    const matchedPostsWithLikes = await Promise.all(
+      matchedPosts.map(async (post) => {
+        const mappedPost = await this.helpers.postMapperToView(post);
+        let lastLikes = await this.likeModel
+          .find({ entityId: post.id, status: LikeInfoViewModelValues.like })
+          .sort({ dateAdded: -1 })
+          .limit(3)
+          .exec();
+        mappedPost.extendedLikesInfo.newestLikes = lastLikes.map((e) => {
+          return {
+            addedAt: e.dateAdded,
+            userId: e.userId,
+            login: e.userLogin,
+          };
+        });
+        if (!userId) {
+          return mappedPost;
         }
-      })
-      if (!userId){
-        return mappedPost
-      }
 
-      let myLikeForComment = await this.likeModel.findOne({
-        userId,
-        entityId:post.id
-      }).exec()
-      if (myLikeForComment){
-        mappedPost.extendedLikesInfo.myStatus = myLikeForComment.status
-        return mappedPost
-      }
-      return mappedPost
-    }))
+        let myLikeForComment = await this.likeModel
+          .findOne({
+            userId,
+            entityId: post.id,
+          })
+          .exec();
+        if (myLikeForComment) {
+          mappedPost.extendedLikesInfo.myStatus = myLikeForComment.status;
+          return mappedPost;
+        }
+        return mappedPost;
+      }),
+    );
     return {
       pagesCount: Number(pagesCount),
       page: Number(pageNumber),
       pageSize: Number(pageSize),
       totalCount: matchedPosts.length,
-      items: matchedPostsWithLikes
+      items: matchedPostsWithLikes,
     };
   }
 }

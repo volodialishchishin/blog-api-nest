@@ -39,4 +39,15 @@ export class BlogRepository {
     const blog = await this.blogModel.findOne({ _id: id }).exec();
     return blog ? this.helpers.blogMapperToView(blog) : null;
   }
+  async checkIfBlogBelongsToUser(id, userId: string) {
+    const blog = await this.blogModel.findOne({ _id: id, userId });
+    return userId === blog.userId;
+  }
+
+  async bindBlog(id, userId: string):Promise<boolean> {
+    const blog = await this.blogModel.findOne({ _id: id });
+    if (!blog.userId) return false
+    let updateBlogStatus = await this.blogModel.updateOne({_id:id},{$set:{userId:userId}})
+    return updateBlogStatus.modifiedCount === 1;
+  }
 }
