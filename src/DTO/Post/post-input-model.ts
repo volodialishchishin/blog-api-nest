@@ -54,6 +54,21 @@ export class PostInputModel {
   })
   blogId: string;
 }
+
+export class updateInputModel {
+  @Length(1, 30)
+  @IsNotEmpty()
+  @Transform(({ value }: TransformFnParams) => value?.trim())
+  title: string;
+  @Length(1, 100)
+  @IsNotEmpty()
+  @Transform(({ value }: TransformFnParams) => value?.trim())
+  shortDescription: string;
+  @Length(1, 1000)
+  @IsNotEmpty()
+  @Transform(({ value }: TransformFnParams) => value?.trim())
+  content: string;
+}
 export class BlogPostInputModel {
   @Length(1, 30)
   @Transform(({ value }: TransformFnParams) => value?.trim())

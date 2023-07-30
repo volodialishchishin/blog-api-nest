@@ -76,6 +76,7 @@ export class UserController {
     @Res() response: Response,
     @Body() banInputModel: BanInputModelDto,
   ) {
+    console.log('3123');
     if (banInputModel.isBanned) {
       let banUserStatus = await this.userService.banUser(
         params.id,

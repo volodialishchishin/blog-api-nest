@@ -20,8 +20,8 @@ import { BlogsService } from './blogs.service';
 import { PostService } from '../Post/posts.service';
 import {
   BlogPostInputModel,
-  PostInputModel,
-} from '../../DTO/Post/post-input-model';
+  PostInputModel, updateInputModel
+} from "../../DTO/Post/post-input-model";
 import { JwtAuthGuard } from '../Auth/Guards/jwt.auth.guard';
 import { BasicAuthGuard } from '../Auth/Guards/basic.auth.guard';
 import { AuthService } from '../Auth/auth.service';
@@ -81,6 +81,11 @@ export class BlogBloggerController {
     @Res() response: Response,
     @Req() request: Request,
   ) {
+    const blog = await this.blogService.getBlog(params.id);
+    if (!blog) {
+      response.sendStatus(404);
+      return;
+    }
     let userAccess = await this.blogService.checkIfBlogBelongsToUser(
       params.id,
       request.user.userInfo.userId,
@@ -107,15 +112,16 @@ export class BlogBloggerController {
     @Req() request: Request,
   ) {
     const blog = await this.blogService.getBlog(params.id);
+    if (!blog) {
+      response.sendStatus(404);
+      return;
+    }
     let userAccess = await this.blogService.checkIfBlogBelongsToUser(
       params.id,
       request.user.userInfo.userId,
     );
     if (!userAccess) response.sendStatus(403);
-    if (!blog) {
-      response.sendStatus(404);
-      return;
-    }
+
     response.sendStatus(204);
     return this.blogService.deleteBlog(params.id);
   }
@@ -181,7 +187,7 @@ export class BlogBloggerController {
   @UseGuards(JwtAuthGuard)
   async updatePost(
     @Param() params,
-    @Body() updatePostDTO: PostInputModel,
+    @Body() updatePostDTO: updateInputModel,
     @Res() response: Response,
     @Req() request: Request,
   ) {

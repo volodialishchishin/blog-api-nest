@@ -42,6 +42,7 @@ export class CommentRepository {
   async getComment(id: string, userId: string) {
     const comment = await this.commentModel.findOne({ _id: id });
     if (comment) {
+      if (comment.isUserBanned)return null
       let commentToView = await this.helpers.commentsMapperToView(comment);
 
       if (!userId) {

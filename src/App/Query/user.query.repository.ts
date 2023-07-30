@@ -72,7 +72,7 @@ export class UserQueryRepository {
       ? `accountData.${sortBy}`
       : `accountData.createdAt`;
     const matchedUsersWithSkip = await this.userModel
-      .find()
+      .find(filterObject)
       .skip((pageNumber - 1) * pageSize)
       .limit(Number(pageSize))
       .sort([[sortByField, sortDirection]])
