@@ -65,6 +65,7 @@ export class PostController {
     @Res() response: Response,
     @Req() request: Request,
   ) {
+    console.log('312');
     const authToken = request.headers.authorization?.split(' ')[1] || '';
     const user = await this.authService.getUserIdByToken(authToken);
     const post = await this.postService.getPost(params.id, user?.user);

@@ -222,6 +222,11 @@ export class BlogBloggerController {
     @Res() response: Response,
     @Req() request: Request,
   ) {
+    const blog = await this.blogService.getBlog(params.blogId);
+    if (!blog) {
+      response.sendStatus(404);
+      return;
+    }
     let userAccess = await this.blogService.checkIfBlogBelongsToUser(
       params.blogId,
       request.user.userInfo.userId,

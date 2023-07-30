@@ -53,13 +53,12 @@ export class PostsRepository {
     id: string,
     userId: string,
   ): Promise<PostViewModel | undefined> {
+    console.log(id);
     const result = await this.postModel.findOne({ _id: id }).exec();
+    console.log(result);
     if (result) {
       let postToView = await this.helpers.postMapperToView(result);
-      if (!userId) {
-        return postToView;
-      }
-      let likeStatus = await this.likeModel.findOne({ userId, entityId: id });
+
       let lastLikes = await this.likeModel
         .find({ entityId: id, status: LikeInfoViewModelValues.like })
         .sort({ dateAdded: -1 })
@@ -72,6 +71,10 @@ export class PostsRepository {
           login: e.userLogin,
         };
       });
+      if (!userId) {
+        return postToView;
+      }
+      let likeStatus = await this.likeModel.findOne({ userId, entityId: id });
       if (likeStatus) {
         postToView.extendedLikesInfo.myStatus =
           likeStatus?.status || LikeInfoViewModelValues.none;
