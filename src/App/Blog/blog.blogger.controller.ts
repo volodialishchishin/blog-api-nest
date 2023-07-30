@@ -54,15 +54,16 @@ export class BlogBloggerController {
     @Req() request: Request,
   ) {
     const blog = await this.blogService.getBlog(params.blogId);
+
+    if (!blog) {
+      response.sendStatus(404);
+      return;
+    }
     let userAccess = await this.blogService.checkIfBlogBelongsToUser(
       params.blogId,
       request.user.userInfo.userId,
     );
     if (!userAccess) response.sendStatus(403);
-    if (!blog) {
-      response.sendStatus(404);
-      return;
-    }
     const post = await this.postService.createPost(
       params.blogId,
       createPostDto.title,

@@ -1,12 +1,12 @@
-import { PostViewModel } from '../../DTO/Post/post-view-model';
-import { InjectModel } from '@nestjs/mongoose';
-import { Post, PostDocument } from '../../Schemas/post.schema';
-import { Model } from 'mongoose';
-import { Helpers } from '../Helpers/helpers';
-import { Injectable } from '@nestjs/common';
-import { Like, LikeDocument } from '../../Schemas/like.schema';
-import { LikeInfoViewModelValues } from '../../DTO/LikeInfo/like-info-view-model';
-import { LikeInfoModel } from '../../DTO/LikeInfo/like-info-model';
+import { PostViewModel } from "../../DTO/Post/post-view-model";
+import { InjectModel } from "@nestjs/mongoose";
+import { Post, PostDocument } from "../../Schemas/post.schema";
+import { Model } from "mongoose";
+import { Helpers } from "../Helpers/helpers";
+import { Injectable } from "@nestjs/common";
+import { Like, LikeDocument } from "../../Schemas/like.schema";
+import { LikeInfoViewModelValues } from "../../DTO/LikeInfo/like-info-view-model";
+
 Injectable();
 export class PostsRepository {
   constructor(
@@ -64,7 +64,7 @@ export class PostsRepository {
         .sort({ dateAdded: -1 })
         .limit(3)
         .exec();
-      let mappedLastLikes = lastLikes.map((e) => {
+      postToView.extendedLikesInfo.newestLikes = lastLikes.map((e) => {
         return {
           addedAt: e.dateAdded,
           userId: e.userId,
@@ -79,7 +79,6 @@ export class PostsRepository {
         postToView.extendedLikesInfo.myStatus =
           likeStatus?.status || LikeInfoViewModelValues.none;
       }
-      postToView.extendedLikesInfo.newestLikes = mappedLastLikes;
       return postToView;
     } else {
       return undefined;
