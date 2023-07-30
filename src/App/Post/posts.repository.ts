@@ -60,7 +60,7 @@ export class PostsRepository {
       let postToView = await this.helpers.postMapperToView(result);
 
       let lastLikes = await this.likeModel
-        .find({ entityId: id, status: LikeInfoViewModelValues.like })
+        .find({ entityId: id, status: LikeInfoViewModelValues.like , isUserBanned:false})
         .sort({ dateAdded: -1 })
         .limit(3)
         .exec();
