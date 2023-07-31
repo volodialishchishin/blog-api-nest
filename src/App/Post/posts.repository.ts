@@ -6,12 +6,14 @@ import { Helpers } from '../Helpers/helpers';
 import { Injectable } from '@nestjs/common';
 import { Like, LikeDocument } from '../../Schemas/like.schema';
 import { LikeInfoViewModelValues } from '../../DTO/LikeInfo/like-info-view-model';
+import { Blog, BlogDocument } from "../../Schemas/blog.schema";
 
 Injectable();
 export class PostsRepository {
   constructor(
     @InjectModel(Post.name) private postModel: Model<PostDocument>,
     @InjectModel(Like.name) private likeModel: Model<LikeDocument>,
+    @InjectModel(Blog.name) private blogModel: Model<BlogDocument>,
     public helpers: Helpers,
   ) {}
   async getPosts(): Promise<PostViewModel[]> {
@@ -52,8 +54,10 @@ export class PostsRepository {
   async getPost(
     id: string,
     userId: string,
-  ): Promise<PostViewModel | undefined> {
+  ): Promise<PostViewModel | null> {
     const result = await this.postModel.findOne({ _id: id }).exec();
+    let blog = await this.blogModel.findOne({_id:result.blogId})
+    if (blog.isBanned) return null
     if (result) {
       let postToView = await this.helpers.postMapperToView(result);
 

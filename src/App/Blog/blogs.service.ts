@@ -50,6 +50,6 @@ export class BlogsService {
     return this.blogRep.updateBanStatusOfBlog(blogId, new Date().toISOString(), true);
   }
   async unbanBlog(blogId: string): Promise<boolean> {
-    return this.blogRep.updateBanStatusOfBlog(blogId, new Date().toISOString(), false)
+    return this.blogRep.updateBanStatusOfBlog(blogId, null, false)
   }
 }

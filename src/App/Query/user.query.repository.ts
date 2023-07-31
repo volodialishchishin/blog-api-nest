@@ -105,7 +105,7 @@ export class UserQueryRepository {
     let sortByField = sortBy
       ? `accountData.${sortBy}`
       : `accountData.createdAt`;
-    const bannedUserWithSkip = await this.bannedUsersForModel
+    const bannedUser = await this.bannedUsersForModel
       .find({
         userLogin:searchLoginTerm
           ? { $regex: searchLoginTerm, $options: 'i' }
@@ -113,7 +113,7 @@ export class UserQueryRepository {
         blogId:blogId
       })
       .exec();
-    const bannedUser = await this.bannedUsersForModel
+    const bannedUserWithSkip = await this.bannedUsersForModel
       .find({
         userLogin:searchLoginTerm
           ? { $regex: searchLoginTerm, $options: 'i' }
