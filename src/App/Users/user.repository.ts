@@ -108,7 +108,7 @@ export class UserRepository {
     banDate: string,
   ): Promise<boolean> {
     let user = await this.getUserById(userId);
-    console.log(userId);
+    if (!user) return null
 
     const createdBan = new this.bannedUsersForModel({
       userId,

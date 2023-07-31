@@ -102,6 +102,9 @@ export class UserQueryRepository {
     sortDirection: 'asc' | 'desc' = 'desc',
     blogId: string
   ) {
+    if (sortBy==='login'){
+      sortBy = 'userLogin'
+    }
     let sortByField = sortBy
       ? `accountData.${sortBy}`
       : `accountData.createdAt`;
@@ -115,7 +118,7 @@ export class UserQueryRepository {
       .exec();
     const bannedUserWithSkip = await this.bannedUsersForModel
       .find({
-        userLogin:searchLoginTerm
+        userLogin: searchLoginTerm
           ? { $regex: searchLoginTerm, $options: 'i' }
           : { $regex: '.' },
         blogId:blogId
