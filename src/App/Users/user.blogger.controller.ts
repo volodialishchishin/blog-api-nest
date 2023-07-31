@@ -31,8 +31,8 @@ export class UserBloggerController {
     private readonly userQueryRep: UserQueryRepository,
   ) {}
 
-  @Get('/:blogId')
-  @UseGuards(BasicAuthGuard)
+  @Get('blog/:blogId')
+  @UseGuards(JwtAuthGuard)
   async getUsers(
     @Query('sortBy') sortBy,
     @Query('sortDirection') sortDirection,

@@ -36,7 +36,7 @@ export class BlogRepository {
     return await this.blogModel.findOneAndRemove({ _id: id }).exec();
   }
   async getBlog(id: string): Promise<BlogViewModel> {
-    const blog = await this.blogModel.findOne({ _id: id }).exec();
+    const blog = await this.blogModel.findOne({ _id: id, isBanned:false }).exec();
     return blog ? this.helpers.blogMapperToView(blog) : null;
   }
   async checkIfBlogBelongsToUser(id, userId: string) {
