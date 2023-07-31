@@ -69,7 +69,7 @@ export class BlogSaController {
     response.sendStatus(400);
   }
 
-  @Put('/:blogId')
+  @Put('/:blogId/ban')
   @UseGuards(BasicAuthGuard)
   async banBlog(
     @Param() params,
