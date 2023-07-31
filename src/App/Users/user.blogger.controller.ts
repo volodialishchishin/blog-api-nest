@@ -66,7 +66,7 @@ export class UserBloggerController {
     @Body() banInputModel: BanUserForBlogInputModelDto,
   ) {
     let accessToBan = await this.userService.checkIfUserHasAccessToBan(request.user.userInfo.userId, banInputModel.blogId)
-    if (accessToBan) response.sendStatus(403)
+    if (!accessToBan) response.sendStatus(403)
     if (banInputModel.isBanned) {
       console.log('3123');
       let banUserStatus = await this.userService.banUserForBlog(
