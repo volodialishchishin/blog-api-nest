@@ -44,7 +44,12 @@ import { RecoveryPasswordSchema } from './Schemas/recovery-password.schema';
 import { JwtModule, JwtService } from '@nestjs/jwt';
 import { BlogBloggerController } from './App/Blog/blog.blogger.controller';
 import { AuthRepository } from './App/Auth/auth.repository';
-import { BlogSaController } from "./App/Blog/blog.sa.controller";
+import { BlogSaController } from './App/Blog/blog.sa.controller';
+import {
+  BannedUsersForBlog,
+  BannedUsersForBlogSchema,
+} from './Schemas/banned-users-for-blog.schema';
+import { UserBloggerController } from "./App/Users/user.blogger.controller";
 
 @Module({
   imports: [
@@ -55,6 +60,9 @@ import { BlogSaController } from "./App/Blog/blog.sa.controller";
     MongooseModule.forFeature([{ name: 'Post', schema: PostSchema }]),
     MongooseModule.forFeature([{ name: 'Like', schema: LikeSchema }]),
     MongooseModule.forFeature([{ name: 'Token', schema: TokenSchema }]),
+    MongooseModule.forFeature([
+      { name: 'BannedUsersForBlog', schema: BannedUsersForBlogSchema },
+    ]),
     MongooseModule.forFeature([
       { name: 'RecoveryPassword', schema: RecoveryPasswordSchema },
     ]),
@@ -75,7 +83,8 @@ import { BlogSaController } from "./App/Blog/blog.sa.controller";
     PostController,
     BlogController,
     BlogBloggerController,
-    BlogSaController
+    BlogSaController,
+    UserBloggerController
   ],
   providers: [
     AppService,

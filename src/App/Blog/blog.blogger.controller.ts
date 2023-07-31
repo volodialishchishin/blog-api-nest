@@ -20,18 +20,21 @@ import { BlogsService } from './blogs.service';
 import { PostService } from '../Post/posts.service';
 import {
   BlogPostInputModel,
-  PostInputModel, updateInputModel
-} from "../../DTO/Post/post-input-model";
+  PostInputModel,
+  updateInputModel,
+} from '../../DTO/Post/post-input-model';
 import { JwtAuthGuard } from '../Auth/Guards/jwt.auth.guard';
 import { BasicAuthGuard } from '../Auth/Guards/basic.auth.guard';
 import { AuthService } from '../Auth/auth.service';
 import { SkipThrottle } from '@nestjs/throttler';
+import { CommentQueryRepository } from "../Query/comment.query.repository";
 
 @SkipThrottle()
 @Controller('blogger/blogs')
 export class BlogBloggerController {
   constructor(
     private readonly blogQueryRep: BlogQueryRepository,
+    private readonly commentQueryRep: CommentQueryRepository,
     private readonly blogService: BlogsService,
     private readonly postService: PostService,
     private readonly authService: AuthService,
@@ -70,6 +73,7 @@ export class BlogBloggerController {
       createPostDto.content,
       createPostDto.shortDescription,
       blog.name,
+      request.user.userInfo.userId
     );
     response.json(post);
   }
@@ -236,6 +240,31 @@ export class BlogBloggerController {
     const deleteResult = await this.postService.deletePost(params.postId);
     if (deleteResult) {
       response.sendStatus(204);
+    } else {
+      response.sendStatus(404);
+    }
+  }
+
+  @Get('blogs/comments')
+  @UseGuards(JwtAuthGuard)
+  async getAllComments(
+    @Param() params,
+    @Res() response: Response,
+    @Req() request: Request,
+    @Query('sortBy') sortBy,
+    @Query('sortDirection') sortDirection,
+    @Query('pageNumber') pageNumber,
+    @Query('pageSize') pageSize,
+  ) {
+    const comments = await this.commentQueryRep.getAllCommentsForBlog(
+      pageNumber,
+      sortBy,
+      pageSize,
+      sortDirection,
+      request.user.userInfo.userId
+    );
+    if (comments.items.length) {
+      response.json(comments);
     } else {
       response.sendStatus(404);
     }

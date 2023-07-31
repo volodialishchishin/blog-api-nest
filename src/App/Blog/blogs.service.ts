@@ -1,8 +1,8 @@
-import { BlogViewModel } from "../../DTO/Blog/blog-view-model";
-import { BlogRepository } from "./blog.repository";
-import { Blog } from "../../Schemas/blog.schema";
-import { BlogInputModel } from "../../DTO/Blog/blog-input-model";
-import { Injectable } from "@nestjs/common";
+import { BlogViewModel } from '../../DTO/Blog/blog-view-model';
+import { BlogRepository } from './blog.repository';
+import { Blog } from '../../Schemas/blog.schema';
+import { BlogInputModel } from '../../DTO/Blog/blog-input-model';
+import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class BlogsService {
@@ -17,6 +17,8 @@ export class BlogsService {
       description: blog.description,
       userId: user.userId,
       userLogin: user.login,
+      isBanned:false,
+      banDate:null
     };
     return this.blogRep.createBlog(newBlog);
   }
@@ -41,7 +43,13 @@ export class BlogsService {
     return blog;
   }
 
-  async bindBlog(blogId:string, userId:string): Promise<boolean> {
-    return this.blogRep.bindBlog(blogId, userId)
+  async bindBlog(blogId: string, userId: string): Promise<boolean> {
+    return this.blogRep.bindBlog(blogId, userId);
+  }
+  async banBlog(blogId: string): Promise<boolean> {
+    return this.blogRep.updateBanStatusOfBlog(blogId, new Date().toISOString(), true);
+  }
+  async unbanBlog(blogId: string): Promise<boolean> {
+    return this.blogRep.updateBanStatusOfBlog(blogId, new Date().toISOString(), false)
   }
 }

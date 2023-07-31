@@ -97,16 +97,7 @@ export class PostController {
         userInfo.login,
       );
 
-      let comment = await this.commentService.getComment(
-        result.id,
-        userInfo.userId,
-      );
-      comment!.likesInfo = {
-        myStatus: LikeInfoViewModelValues.none,
-        dislikesCount: 0,
-        likesCount: 0,
-      };
-      response.status(201).json(comment);
+      result ? response.status(201).json(result) : response.sendStatus(404);
     }
   }
 

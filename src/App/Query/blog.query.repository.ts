@@ -29,16 +29,21 @@ export class BlogQueryRepository {
     role?: string,
   ): Promise<BlogViewModelWithQuery> {
     console.log(userId);
-    let findFilter = userId ? {
-      name: searchNameTerm
-        ? { $regex: searchNameTerm, $options: 'i' }
-        : { $regex: '.' },
-      userId: userId,
-    }: {
-      name: searchNameTerm
-        ? { $regex: searchNameTerm, $options: 'i' }
-        : { $regex: '.' }
-    }
+    let findFilter = userId
+      ? {
+        name: searchNameTerm
+          ? { $regex: searchNameTerm, $options: 'i' }
+          : { $regex: '.' },
+        userId: userId,
+        isBanned:false
+      }
+      : {
+          name: searchNameTerm
+            ? { $regex: searchNameTerm, $options: 'i' }
+            : { $regex: '.' },
+          isBanned:false
+
+      };
     const matchedBlogsWithSkip = await this.blogModel
       .find(findFilter)
       .skip((pageNumber - 1) * pageSize)
@@ -104,15 +109,25 @@ export class BlogQueryRepository {
     blogId: string,
     userId,
   ): Promise<PostViewModelWithQuery> {
-    const matchedPosts = await this.postModel
+    let  matchedPostsWithSkip = await this.postModel
       .find({ blogId: blogId })
       .skip((pageNumber - 1) * pageSize)
       .limit(Number(pageSize))
       .sort([[sortBy, sortDirection]])
       .exec();
+
+    const matchedPosts = await this.postModel
+      .find({})
+      .exec();
+
+    matchedPostsWithSkip = await Promise.all(matchedPostsWithSkip.filter(async post=>{
+      let blog = await this.blogModel.findOne({_id:post.blogId})
+      return !blog.isBanned;
+    }))
+
     const pagesCount = Math.ceil(matchedPosts.length / pageSize);
     const matchedPostsWithLikes = await Promise.all(
-      matchedPosts.map(async (post) => {
+      matchedPostsWithSkip.map(async (post) => {
         const mappedPost = await this.helpers.postMapperToView(post);
         let lastLikes = await this.likeModel
           .find({ entityId: post.id, status: LikeInfoViewModelValues.like })
@@ -151,4 +166,6 @@ export class BlogQueryRepository {
       items: matchedPostsWithLikes,
     };
   }
+
+
 }

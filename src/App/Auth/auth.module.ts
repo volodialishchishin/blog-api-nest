@@ -24,6 +24,7 @@ import { securityService } from './Security/security.service';
 import { securityRepository } from './Security/security.repository';
 import { SecurityController } from './Security/security.controller';
 import { CommentSchema } from '../../Schemas/comment.schema';
+import { BannedUsersForBlogSchema } from '../../Schemas/banned-users-for-blog.schema';
 
 @Module({
   imports: [
@@ -46,6 +47,9 @@ import { CommentSchema } from '../../Schemas/comment.schema';
     MongooseModule.forFeature([{ name: 'Like', schema: LikeSchema }]),
     MongooseModule.forFeature([
       { name: 'RecoveryPassword', schema: RecoveryPasswordSchema },
+    ]),
+    MongooseModule.forFeature([
+      { name: 'BannedUsersForBlog', schema: BannedUsersForBlogSchema },
     ]),
     MongooseModule.forFeature([{ name: 'Comment', schema: CommentSchema }]),
   ],

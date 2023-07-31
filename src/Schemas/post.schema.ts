@@ -42,6 +42,9 @@ export class Post {
   @Prop({ isRequired: true })
   createdAt: string;
 
+  @Prop({ isRequired: true })
+  blogOwnerId: string;
+
   @Prop({ type: ExtendedLikesInfoSchema })
   extendedLikesInfo: ExtendedLikesInfo;
 }

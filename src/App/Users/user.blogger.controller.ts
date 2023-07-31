@@ -18,16 +18,19 @@ import { Request, Response } from 'express';
 import { UserQueryRepository } from '../Query/user.query.repository';
 import { BasicAuthGuard } from '../Auth/Guards/basic.auth.guard';
 import { SkipThrottle } from '@nestjs/throttler';
-import { BanInputModelDto } from '../../DTO/User/ban-input-model.dto';
+import {
+  BanInputModelDto,
+  BanUserForBlogInputModelDto,
+} from '../../DTO/User/ban-input-model.dto';
 @SkipThrottle()
-@Controller('/sa/users')
-export class UserController {
+@Controller('/blogger/users')
+export class UserBloggerController {
   constructor(
     private readonly userService: UserService,
     private readonly userQueryRep: UserQueryRepository,
   ) {}
 
-  @Get()
+  @Get('/:blogId')
   @UseGuards(BasicAuthGuard)
   async getUsers(
     @Query('sortBy') sortBy,
@@ -37,36 +40,19 @@ export class UserController {
     @Query('searchLoginTerm') searchLoginTerm,
     @Query('searchEmailTerm') searchEmailTerm,
     @Query('banStatus') banStatus,
+    @Param() params,
     @Req() request: Request,
     @Res() response: Response,
   ) {
-    const users = await this.userQueryRep.getUsers(
+    const users = await this.userQueryRep.getBannedUsersForBlog(
       searchLoginTerm,
-      searchEmailTerm,
       pageNumber,
       sortBy,
       pageSize,
       sortDirection,
-      banStatus,
+      params.blogId
     );
-    response.json(users);
-  }
-
-  @Post()
-  @UseGuards(BasicAuthGuard)
-  async createUser(@Body() createUserDto: UserInputModel) {
-    return this.userService.createUser(createUserDto);
-  }
-
-  @Delete(':id')
-  @UseGuards(BasicAuthGuard)
-  async deleteUser(@Param() params, @Res() response: Response) {
-    const result = await this.userService.deleteUser(params.id);
-    if (result) {
-      response.sendStatus(204);
-    } else {
-      response.sendStatus(404);
-    }
+    users.items.length? response.json(users):response.sendStatus(404)
   }
 
   @Put('/:id/ban')
@@ -74,17 +60,21 @@ export class UserController {
   async banUser(
     @Param() params,
     @Res() response: Response,
-    @Body() banInputModel: BanInputModelDto,
+    @Body() banInputModel: BanUserForBlogInputModelDto,
   ) {
     if (banInputModel.isBanned) {
-      let banUserStatus = await this.userService.banUser(
+      let banUserStatus = await this.userService.banUserForBlog(
         params.id,
+        banInputModel.blogId,
         banInputModel.banReason,
       );
       banUserStatus ? response.sendStatus(204) : response.sendStatus(404);
       return;
     } else {
-      let banUserStatus = await this.userService.unbanUser(params.id);
+      let banUserStatus = await this.userService.unbanUserForBlog(
+        params.id,
+        banInputModel.blogId,
+      );
       banUserStatus ? response.sendStatus(204) : response.sendStatus(404);
       return;
     }

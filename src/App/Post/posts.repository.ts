@@ -1,11 +1,11 @@
-import { PostViewModel } from "../../DTO/Post/post-view-model";
-import { InjectModel } from "@nestjs/mongoose";
-import { Post, PostDocument } from "../../Schemas/post.schema";
-import { Model } from "mongoose";
-import { Helpers } from "../Helpers/helpers";
-import { Injectable } from "@nestjs/common";
-import { Like, LikeDocument } from "../../Schemas/like.schema";
-import { LikeInfoViewModelValues } from "../../DTO/LikeInfo/like-info-view-model";
+import { PostViewModel } from '../../DTO/Post/post-view-model';
+import { InjectModel } from '@nestjs/mongoose';
+import { Post, PostDocument } from '../../Schemas/post.schema';
+import { Model } from 'mongoose';
+import { Helpers } from '../Helpers/helpers';
+import { Injectable } from '@nestjs/common';
+import { Like, LikeDocument } from '../../Schemas/like.schema';
+import { LikeInfoViewModelValues } from '../../DTO/LikeInfo/like-info-view-model';
 
 Injectable();
 export class PostsRepository {
@@ -53,14 +53,16 @@ export class PostsRepository {
     id: string,
     userId: string,
   ): Promise<PostViewModel | undefined> {
-    console.log(id);
     const result = await this.postModel.findOne({ _id: id }).exec();
-    console.log(result);
     if (result) {
       let postToView = await this.helpers.postMapperToView(result);
 
       let lastLikes = await this.likeModel
-        .find({ entityId: id, status: LikeInfoViewModelValues.like , isUserBanned:false})
+        .find({
+          entityId: id,
+          status: LikeInfoViewModelValues.like,
+          isUserBanned: false,
+        })
         .sort({ dateAdded: -1 })
         .limit(3)
         .exec();
@@ -83,6 +85,14 @@ export class PostsRepository {
     } else {
       return undefined;
     }
+  }
+
+  async getPostDocument(
+    id: string,
+  ): Promise<PostDocument> {
+    console.log(id);
+    const result = await this.postModel.findOne({ _id: id }).exec();
+    return result
   }
   async updateLikeStatus(
     likeStatus: LikeInfoViewModelValues,

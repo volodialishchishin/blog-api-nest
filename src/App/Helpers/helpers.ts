@@ -6,7 +6,7 @@ import { LikeInfoViewModelValues } from '../../DTO/LikeInfo/like-info-view-model
 import { CommentDocument } from '../../Schemas/comment.schema';
 import { CommentViewModel } from '../../DTO/Comment/comment-view-model';
 import { BlogDocument } from '../../Schemas/blog.schema';
-import { BlogViewModel } from '../../DTO/Blog/blog-view-model';
+import { BlogViewModel, BlogViewModelSA } from "../../DTO/Blog/blog-view-model";
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Like, LikeDocument } from '../../Schemas/like.schema';
@@ -25,8 +25,8 @@ export class Helpers {
       banInfo: {
         isBanned: user.banInfo.isBanned,
         banReason: user.banInfo.banReason,
-        banDate: user.banInfo.banDate
-      }
+        banDate: user.banInfo.banDate,
+      },
     };
   }
 
@@ -105,7 +105,7 @@ export class Helpers {
       isMembership: blog.isMembership,
     };
   }
-  public blogMapperToViewSa(blog: BlogDocument): BlogViewModel {
+  public blogMapperToViewSa(blog: BlogDocument): BlogViewModelSA {
     return {
       id: blog._id,
       name: blog.name,
@@ -117,6 +117,10 @@ export class Helpers {
         userId: blog.userId,
         userLogin: blog.userLogin,
       },
+      banInfo:{
+        isBanned: blog.isBanned,
+        banDate: blog.banDate
+      }
     };
   }
 

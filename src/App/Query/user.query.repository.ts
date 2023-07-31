@@ -4,12 +4,16 @@ import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { UserViewModelWithQuery } from '../../DTO/User/user-view-model.dto';
 import { Helpers } from '../Helpers/helpers';
+import { BannedUsersForBlog, BannedUsersForBlogDocument } from "../../Schemas/banned-users-for-blog.schema";
 
 @Injectable()
 export class UserQueryRepository {
   constructor(
     @InjectModel(User.name) private userModel: Model<UserDocument>,
-    public helpers: Helpers,
+    @InjectModel(BannedUsersForBlog.name)
+    private bannedUsersForModel: Model<BannedUsersForBlogDocument>,
+    public helpers: Helpers
+
   ) {}
   async getUsers(
     searchLoginTerm = '',
@@ -87,6 +91,56 @@ export class UserQueryRepository {
       pageSize: Number(pageSize),
       totalCount: matchedUsers.length,
       items: matchedUsersWithSkip.map(this.helpers.userMapperToView),
+    };
+  }
+
+  async getBannedUsersForBlog(
+    searchLoginTerm = '',
+    pageNumber = 1,
+    sortBy = 'createdAt',
+    pageSize = 10,
+    sortDirection: 'asc' | 'desc' = 'desc',
+    blogId: string
+  ) {
+    let sortByField = sortBy
+      ? `accountData.${sortBy}`
+      : `accountData.createdAt`;
+    const bannedUserWithSkip = await this.bannedUsersForModel
+      .find({
+        userLogin:searchLoginTerm
+          ? { $regex: searchLoginTerm, $options: 'i' }
+          : { $regex: '.' },
+        blogId:blogId
+      })
+      .exec();
+    const bannedUser = await this.bannedUsersForModel
+      .find({
+        userLogin:searchLoginTerm
+          ? { $regex: searchLoginTerm, $options: 'i' }
+          : { $regex: '.' },
+        blogId:blogId
+      })
+      .skip((pageNumber - 1) * pageSize)
+      .limit(Number(pageSize))
+      .sort([[sortByField, sortDirection]])
+      .exec();
+    const pagesCount = Math.ceil(bannedUser.length / pageSize);
+    return {
+      pagesCount: Number(pagesCount),
+      page: Number(pageNumber),
+      pageSize: Number(pageSize),
+      totalCount: bannedUser.length,
+      items: bannedUserWithSkip.map(user=>{
+        return{
+          id:user.userId,
+          login:user.userLogin,
+          banInfo:{
+            isBanned: true,
+            banDate: user.banDate,
+            banReason: user.banReason
+          }
+        }
+      })
     };
   }
 }

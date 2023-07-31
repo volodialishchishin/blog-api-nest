@@ -12,6 +12,23 @@ export type BlogViewModel = {
     userLogin: string;
   };
 };
+
+export type BlogViewModelSA = {
+  id: Types.ObjectId;
+  name: string;
+  websiteUrl: string;
+  createdAt: string;
+  description: string;
+  isMembership: boolean;
+  blogOwnerInfo?: {
+    userId: string;
+    userLogin: string;
+  };
+  banInfo:{
+    isBanned: boolean
+    banDate: string
+  }
+};
 export type BlogViewModelWithQuery = {
   pagesCount: number;
   page: number;

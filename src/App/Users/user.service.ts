@@ -73,23 +73,29 @@ export class UserService {
   }
 
   async banUser(userId: string, banReason: string) {
-    console.log(userId,banReason);
     let banStatus = await this.userRep.updateUserBanStatus(
       userId,
       banReason,
       new Date().toISOString(),
       true,
     );
-    console.log(banStatus);
     await this.authRep.deleteAllTokens(userId);
-    return !!(banStatus);
+    return !!banStatus;
   }
   async unbanUser(userId: string) {
-    return this.userRep.updateUserBanStatus(
+    return this.userRep.updateUserBanStatus(userId, null, null, false);
+  }
+
+  async banUserForBlog(userId: string, blogId: string, banReason: string) {
+    let banStatus = await this.userRep.banUserForBlog(
       userId,
-      null,
-     null,
-      false,
+      blogId,
+      banReason,
+      new Date().toISOString(),
     );
+    return banStatus;
+  }
+  async unbanUserForBlog(userId: string, blogId: string) {
+    return this.userRep.unbanUserForBlog(userId, blogId);
   }
 }

@@ -6,6 +6,10 @@ import { Helpers } from '../Helpers/helpers';
 import { UserViewModel } from '../../DTO/User/user-view-model.dto';
 import { Like, LikeDocument } from '../../Schemas/like.schema';
 import { Comment, CommentDocument } from '../../Schemas/comment.schema';
+import {
+  BannedUsersForBlog,
+  BannedUsersForBlogDocument,
+} from '../../Schemas/banned-users-for-blog.schema';
 
 @Injectable()
 export class UserRepository {
@@ -13,6 +17,8 @@ export class UserRepository {
     @InjectModel(User.name) private userModel: Model<UserDocument>,
     @InjectModel(Like.name) private likeModel: Model<LikeDocument>,
     @InjectModel(Comment.name) private commentModel: Model<CommentDocument>,
+    @InjectModel(BannedUsersForBlog.name)
+    private bannedUsersForModel: Model<BannedUsersForBlogDocument>,
     public helpers: Helpers,
   ) {}
   async createUser(user: User): Promise<UserViewModel> {
@@ -93,5 +99,37 @@ export class UserRepository {
       { $set: { isUserBanned: banStatus } },
     );
     return updateStatus.modifiedCount === 1;
+  }
+
+  async banUserForBlog(
+    userId: string,
+    blogId: string,
+    banReason: string,
+    banDate: string,
+  ): Promise<boolean> {
+    let user = await this.getUserById(userId);
+
+    const createdBan = new this.bannedUsersForModel({
+      userId,
+      userLogin: user.accountData.login,
+      blogId,
+      banReason,
+      banDate,
+    });
+    const ban = await createdBan.save();
+    return !!ban;
+  }
+
+  async unbanUserForBlog(userId: string, blogId: string): Promise<boolean> {
+    let deleteResult = await this.bannedUsersForModel.deleteOne({
+      userId,
+      blogId,
+    });
+    return deleteResult.deletedCount === 1;
+  }
+
+  async isUserBanned(userId: string, blogId: string) {
+    let userBan = await this.bannedUsersForModel.findOne({ userId, blogId });
+    return userBan ? userBan : null;
   }
 }

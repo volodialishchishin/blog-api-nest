@@ -38,5 +38,7 @@ export class Comment {
   @Prop({ isRequired: true }) createdAt: string;
   @Prop({ isRequired: true }) postId: string;
   @Prop({ isRequired: true }) isUserBanned: boolean;
+  @Prop({ isRequired: true }) blogId: string;
+  @Prop({ isRequired: true }) blogOwnerId: string;
 }
 export const CommentSchema = SchemaFactory.createForClass(Comment);

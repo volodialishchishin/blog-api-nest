@@ -20,6 +20,7 @@ export class PostService {
     content: string,
     shortDescription: string,
     blogName: string,
+    userId:string
   ): Promise<PostViewModel> {
     let newPost: Post;
     newPost = {
@@ -28,6 +29,7 @@ export class PostService {
       content,
       blogId,
       title,
+      blogOwnerId:userId,
       extendedLikesInfo: {
         dislikesCount: 0,
         likesCount: 0,

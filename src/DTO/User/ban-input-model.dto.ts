@@ -8,3 +8,14 @@ export class BanInputModelDto {
   @IsNotEmpty()
   isBanned: boolean;
 }
+export class BanUserForBlogInputModelDto {
+  @Length(20)
+  @IsNotEmpty()
+  banReason: string;
+
+  @IsNotEmpty()
+  isBanned: boolean;
+
+  @IsNotEmpty()
+  blogId: string;
+}

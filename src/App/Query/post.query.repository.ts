@@ -8,12 +8,14 @@ import { Post, PostDocument } from '../../Schemas/post.schema';
 import { PostViewModelWithQuery } from '../../DTO/Post/post-view-model';
 import { Like, LikeDocument } from '../../Schemas/like.schema';
 import { LikeInfoViewModelValues } from '../../DTO/LikeInfo/like-info-view-model';
+import { Blog, BlogDocument } from "../../Schemas/blog.schema";
 
 @Injectable()
 export class PostQueryRepository {
   constructor(
     @InjectModel(Post.name) private postModel: Model<PostDocument>,
     @InjectModel(Like.name) private likeModel: Model<LikeDocument>,
+    @InjectModel(Blog.name) private blogModel: Model<BlogDocument>,
     public helpers: Helpers,
   ) {}
   async getPosts(
@@ -23,7 +25,7 @@ export class PostQueryRepository {
     sortDirection: 'asc' | 'desc' = 'desc',
     userId: string,
   ): Promise<PostViewModelWithQuery> {
-    const matchedPostsWithSkip = await this.postModel
+    let matchedPostsWithSkip = await this.postModel
       .find()
       .skip((pageNumber - 1) * pageSize)
       .limit(Number(pageSize))
@@ -32,13 +34,15 @@ export class PostQueryRepository {
 
     const matchedPosts = await this.postModel
       .find({})
-      .skip((pageNumber - 1) * pageSize)
-      .limit(Number(pageSize))
-      .sort([[sortBy, sortDirection]])
       .exec();
+
+    matchedPostsWithSkip = await Promise.all(matchedPostsWithSkip.filter(async post=>{
+      let blog = await this.blogModel.findOne({_id:post.blogId})
+      return !blog.isBanned;
+    }))
     const pagesCount = Math.ceil(matchedPosts.length / pageSize);
     const matchedPostsWithLikes = await Promise.all(
-      matchedPosts.map(async (post) => {
+      matchedPostsWithSkip.map(async (post) => {
         const mappedPost = await this.helpers.postMapperToView(post);
         let lastLikes = await this.likeModel
           .find({ entityId: post.id, status: LikeInfoViewModelValues.like })

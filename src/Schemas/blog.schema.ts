@@ -25,6 +25,13 @@ export class Blog {
 
   @Prop({ isRequired: true })
   userLogin: string;
+
+  @Prop({ isRequired: true })
+  isBanned: boolean;
+
+  @Prop({ isRequired: true })
+  banDate: string;
+
 }
 
 export const BlogSchema = SchemaFactory.createForClass(Blog);

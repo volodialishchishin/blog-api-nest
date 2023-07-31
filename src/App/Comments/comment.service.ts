@@ -2,17 +2,28 @@ import { Injectable } from '@nestjs/common';
 import { CommentRepository } from './comment.repository';
 import { Comment } from '../../Schemas/comment.schema';
 import { CommentViewModel } from '../../DTO/Comment/comment-view-model';
+import { LikeInfoViewModelValues } from '../../DTO/LikeInfo/like-info-view-model';
+import { PostsRepository } from '../Post/posts.repository';
+import { UserRepository } from '../Users/user.repository';
+import { BlogRepository } from "../Blog/blog.repository";
 
 @Injectable()
 export class CommentService {
-  constructor(private commentRep: CommentRepository) {}
+  constructor(
+    private commentRep: CommentRepository,
+    private postRep: PostsRepository,
+    private userRep: UserRepository,
+    private blogRep: BlogRepository
+  ) {}
 
   async createComment(
     postId: string,
     content: string,
     userId: string,
     userLogin: string,
-  ): Promise<CommentViewModel> {
+  ) {
+    let post = await this.postRep.getPostDocument(postId);
+    let userBanStatus = await this.userRep.isUserBanned(userId, post.blogId);
     const resolvedComment: Comment = {
       content,
       userId,
@@ -20,8 +31,19 @@ export class CommentService {
       createdAt: new Date().toISOString(),
       postId,
       isUserBanned: false,
+      blogId:post.blogId,
+      blogOwnerId:post.blogOwnerId
     };
-    return await this.commentRep.createComment(resolvedComment);
+
+    if (userBanStatus) return null;
+
+    let createdComment = await this.commentRep.createComment(resolvedComment);
+
+    createdComment!.likesInfo = {
+      myStatus: LikeInfoViewModelValues.none,
+      dislikesCount: 0,
+      likesCount: 0,
+    };
   }
 
   async getComment(id, userId: string) {
