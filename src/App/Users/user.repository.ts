@@ -103,39 +103,34 @@ export class UserRepository {
     return updateStatus.modifiedCount === 1;
   }
 
-  async banUserForBlog(
+  async updateBanStatus(
     userId: string,
     blogId: string,
     banReason: string,
     banDate: string,
+    status:boolean
   ) {
     let user = await this.getUserById(userId);
     if (!user) return null
     let userBanForBlog = await this.bannedUsersForModel.findOne({userId, blogId})
-    if (userBanForBlog) return null
+    if (userBanForBlog){
+      let updateResult = await this.bannedUsersForModel.updateOne({userId, blogId}, {$set:{banReason, banDate, isBanned:status}})
+    }
     const createdBan = new this.bannedUsersForModel({
       userId,
       userLogin: user?.accountData?.login,
       blogId,
       banReason,
       banDate,
+      isBanned: true
     });
     const ban = await createdBan.save();
-    console.log('Hello', ban, userId, blogId);
     return ban;
   }
 
-  async unbanUserForBlog(userId: string, blogId: string): Promise<boolean> {
-    let deleteResult = await this.bannedUsersForModel.deleteOne({
-      userId,
-      blogId,
-    });
-    console.log('Hello', deleteResult.deletedCount, userId, blogId);
-    return deleteResult.deletedCount === 1;
-  }
 
   async isUserBanned(userId: string, blogId: string) {
-    let userBan = await this.bannedUsersForModel.findOne({ userId, blogId });
+    let userBan = await this.bannedUsersForModel.findOne({ userId, blogId , isBanned:true});
     console.log(userBan);
     return userBan ? userBan : null;
   }

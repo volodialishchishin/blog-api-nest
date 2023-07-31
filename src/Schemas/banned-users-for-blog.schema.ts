@@ -20,6 +20,9 @@ export class BannedUsersForBlog {
 
   @Prop({ isRequired: true })
   banDate: string;
+
+  @Prop({ isRequired: true })
+  isBanned: boolean;
 }
 
 export const BannedUsersForBlogSchema =

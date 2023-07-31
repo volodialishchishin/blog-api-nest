@@ -111,7 +111,8 @@ export class UserQueryRepository {
         userLogin:searchLoginTerm
           ? { $regex: searchLoginTerm, $options: 'i' }
           : { $regex: '.' },
-        blogId:blogId
+        blogId:blogId,
+        isBanned:true
       })
       .exec();
     const bannedUserWithSkip = await this.bannedUsersForModel
@@ -119,7 +120,8 @@ export class UserQueryRepository {
         userLogin: searchLoginTerm
           ? { $regex: searchLoginTerm, $options: 'i' }
           : { $regex: '.' },
-        blogId:blogId
+        blogId:blogId,
+        isBanned:true
       })
       .skip((pageNumber - 1) * pageSize)
       .limit(Number(pageSize))

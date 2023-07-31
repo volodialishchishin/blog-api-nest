@@ -86,15 +86,16 @@ export class UserService {
   }
 
   async banUserForBlog(userId: string, blogId: string, banReason: string) {
-    return await this.userRep.banUserForBlog(
+    return await this.userRep.updateBanStatus(
       userId,
       blogId,
       banReason,
       new Date().toISOString(),
+      true
     );
   }
   async unbanUserForBlog(userId: string, blogId: string) {
-    return this.userRep.unbanUserForBlog(userId, blogId);
+    return this.userRep.updateBanStatus(userId, blogId, null, null, false);
   }
 
   async checkIfUserHasAccessToBan(userId:string, blogId:string){
