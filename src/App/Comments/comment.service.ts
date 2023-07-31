@@ -67,7 +67,9 @@ export class CommentService {
     );
   }
   async checkIfUserBanned(userId:string,postId:string){
-    let userBanStatus = await this.userRep.isUserBanned(userId, postId);
+    let post = await this.postRep.getPostDocument(postId);
+    let blog = await this.blogRep.getBlog(post.blogId)
+    let userBanStatus = await this.userRep.isUserBanned(userId, blog.id.toString());
     return userBanStatus
   }
 }

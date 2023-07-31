@@ -47,11 +47,6 @@ export class UserBloggerController {
     @Req() request: Request,
     @Res() response: Response,
   ) {
-    let userAccess = await this.blogService.checkIfBlogBelongsToUser(
-      params.blogId,
-      request.user.userInfo.userId,
-    );
-    if (!userAccess) response.sendStatus(403);
     const users = await this.userQueryRep.getBannedUsersForBlog(
       searchLoginTerm,
       pageNumber,
