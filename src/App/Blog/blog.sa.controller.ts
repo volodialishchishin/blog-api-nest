@@ -32,7 +32,7 @@ import { SkipThrottle } from '@nestjs/throttler';
 export class BlogSaController {
   constructor(
     private readonly blogQueryRep: BlogQueryRepository,
-    private readonly blogService: BlogsService
+    private readonly blogService: BlogsService,
   ) {}
   @Get()
   @UseGuards(BasicAuthGuard)
@@ -75,12 +75,10 @@ export class BlogSaController {
     @Param() params,
     @Res() response: Response,
     @Req() request: Request,
-    @Body() banInputModel: {isBanned:boolean},
+    @Body() banInputModel: { isBanned: boolean },
   ) {
     if (banInputModel.isBanned) {
-      let banUserStatus = await this.blogService.banBlog(
-        params.blogId
-      );
+      let banUserStatus = await this.blogService.banBlog(params.blogId);
       banUserStatus ? response.sendStatus(204) : response.sendStatus(404);
       return;
     } else {

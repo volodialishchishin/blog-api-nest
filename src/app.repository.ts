@@ -12,7 +12,10 @@ import {
   RecoveryPassword,
   recoveryPasswordDocument,
 } from './Schemas/recovery-password.schema';
-import { BannedUsersForBlog, BannedUsersForBlogDocument } from "./Schemas/banned-users-for-blog.schema";
+import {
+  BannedUsersForBlog,
+  BannedUsersForBlogDocument,
+} from './Schemas/banned-users-for-blog.schema';
 
 @Injectable()
 export class AppRepository {

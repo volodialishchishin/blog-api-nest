@@ -49,7 +49,7 @@ import {
   BannedUsersForBlog,
   BannedUsersForBlogSchema,
 } from './Schemas/banned-users-for-blog.schema';
-import { UserBloggerController } from "./App/Users/user.blogger.controller";
+import { UserBloggerController } from './App/Users/user.blogger.controller';
 
 @Module({
   imports: [
@@ -84,7 +84,7 @@ import { UserBloggerController } from "./App/Users/user.blogger.controller";
     BlogController,
     BlogBloggerController,
     BlogSaController,
-    UserBloggerController
+    UserBloggerController,
   ],
   providers: [
     AppService,

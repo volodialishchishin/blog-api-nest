@@ -22,8 +22,8 @@ import {
   BanInputModelDto,
   BanUserForBlogInputModelDto,
 } from '../../DTO/User/ban-input-model.dto';
-import { JwtAuthGuard } from "../Auth/Guards/jwt.auth.guard";
-import { BlogsService } from "../Blog/blogs.service";
+import { JwtAuthGuard } from '../Auth/Guards/jwt.auth.guard';
+import { BlogsService } from '../Blog/blogs.service';
 @SkipThrottle()
 @Controller('/blogger/users')
 export class UserBloggerController {
@@ -53,24 +53,24 @@ export class UserBloggerController {
       sortBy,
       pageSize,
       sortDirection,
-      params.blogId
+      params.blogId,
     );
 
-    if (users.items.length){
-      let accessToBan = await this.userService.checkIfUserHasAccessToBan(request.user.userInfo.userId, params.blogId)
+    if (users.items.length) {
+      let accessToBan = await this.userService.checkIfUserHasAccessToBan(
+        request.user.userInfo.userId,
+        params.blogId,
+      );
       if (!accessToBan) {
-        response.sendStatus(403)
-        return
+        response.sendStatus(403);
+        return;
+      } else {
+        response.status(200).json(users);
+        return;
       }
-      else{
-        response.status(200).json(users)
-        return
-      }
-
-    }
-    else{
-      response.sendStatus(404)
-      return
+    } else {
+      response.sendStatus(404);
+      return;
     }
   }
 
@@ -82,8 +82,11 @@ export class UserBloggerController {
     @Req() request: Request,
     @Body() banInputModel: BanUserForBlogInputModelDto,
   ) {
-    let accessToBan = await this.userService.checkIfUserHasAccessToBan(request.user.userInfo.userId, banInputModel.blogId)
-    if (!accessToBan) response.sendStatus(403)
+    let accessToBan = await this.userService.checkIfUserHasAccessToBan(
+      request.user.userInfo.userId,
+      banInputModel.blogId,
+    );
+    if (!accessToBan) response.sendStatus(403);
     if (banInputModel.isBanned) {
       let banUserStatus = await this.userService.banUserForBlog(
         params.id,
@@ -98,7 +101,7 @@ export class UserBloggerController {
         banInputModel.blogId,
       );
       banUserStatus ? response.sendStatus(204) : response.sendStatus(404);
-      return
+      return;
     }
   }
 }

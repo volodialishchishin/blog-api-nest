@@ -17,8 +17,8 @@ export class BlogsService {
       description: blog.description,
       userId: user.userId,
       userLogin: user.login,
-      isBanned:false,
-      banDate:null
+      isBanned: false,
+      banDate: null,
     };
     return this.blogRep.createBlog(newBlog);
   }
@@ -47,9 +47,13 @@ export class BlogsService {
     return this.blogRep.bindBlog(blogId, userId);
   }
   async banBlog(blogId: string): Promise<boolean> {
-    return this.blogRep.updateBanStatusOfBlog(blogId, new Date().toISOString(), true);
+    return this.blogRep.updateBanStatusOfBlog(
+      blogId,
+      new Date().toISOString(),
+      true,
+    );
   }
   async unbanBlog(blogId: string): Promise<boolean> {
-    return this.blogRep.updateBanStatusOfBlog(blogId, null, false)
+    return this.blogRep.updateBanStatusOfBlog(blogId, null, false);
   }
 }

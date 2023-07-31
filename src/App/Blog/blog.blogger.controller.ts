@@ -27,7 +27,7 @@ import { JwtAuthGuard } from '../Auth/Guards/jwt.auth.guard';
 import { BasicAuthGuard } from '../Auth/Guards/basic.auth.guard';
 import { AuthService } from '../Auth/auth.service';
 import { SkipThrottle } from '@nestjs/throttler';
-import { CommentQueryRepository } from "../Query/comment.query.repository";
+import { CommentQueryRepository } from '../Query/comment.query.repository';
 
 @SkipThrottle()
 @Controller('blogger/blogs')
@@ -73,7 +73,7 @@ export class BlogBloggerController {
       createPostDto.content,
       createPostDto.shortDescription,
       blog.name,
-      request.user.userInfo.userId
+      request.user.userInfo.userId,
     );
     response.json(post);
   }
@@ -256,12 +256,13 @@ export class BlogBloggerController {
     @Query('pageNumber') pageNumber,
     @Query('pageSize') pageSize,
   ) {
+    console.log('hello');
     const comments = await this.commentQueryRep.getAllCommentsForBlog(
       pageNumber,
       sortBy,
       pageSize,
       sortDirection,
-      request.user.userInfo.userId
+      request.user.userInfo.userId,
     );
     if (comments.items.length) {
       response.json(comments);

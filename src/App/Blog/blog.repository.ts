@@ -37,7 +37,9 @@ export class BlogRepository {
     return await this.blogModel.findOneAndRemove({ _id: id }).exec();
   }
   async getBlog(id: string): Promise<BlogViewModel> {
-    const blog = await this.blogModel.findOne({ _id: id, isBanned:false }).exec();
+    const blog = await this.blogModel
+      .findOne({ _id: id, isBanned: false })
+      .exec();
     return blog ? this.helpers.blogMapperToView(blog) : null;
   }
   async checkIfBlogBelongsToUser(id, userId: string) {
@@ -55,8 +57,15 @@ export class BlogRepository {
     return updateBlogStatus.modifiedCount === 1;
   }
 
-  async updateBanStatusOfBlog(blogId:string, banDate:string, status:boolean): Promise<boolean>{
-    let updateBanStatus =  await this.blogModel.updateOne({_id:blogId},{$set:{isBanned:status, banDate}})
-    return updateBanStatus.modifiedCount === 1
+  async updateBanStatusOfBlog(
+    blogId: string,
+    banDate: string,
+    status: boolean,
+  ): Promise<boolean> {
+    let updateBanStatus = await this.blogModel.updateOne(
+      { _id: blogId },
+      { $set: { isBanned: status, banDate } },
+    );
+    return updateBanStatus.modifiedCount === 1;
   }
 }

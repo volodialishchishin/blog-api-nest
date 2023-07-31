@@ -25,7 +25,7 @@ import { securityRepository } from './Security/security.repository';
 import { SecurityController } from './Security/security.controller';
 import { CommentSchema } from '../../Schemas/comment.schema';
 import { BannedUsersForBlogSchema } from '../../Schemas/banned-users-for-blog.schema';
-import { BlogSchema } from "../../Schemas/blog.schema";
+import { BlogSchema } from '../../Schemas/blog.schema';
 
 @Module({
   imports: [

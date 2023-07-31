@@ -10,7 +10,7 @@ import {
   BannedUsersForBlog,
   BannedUsersForBlogDocument,
 } from '../../Schemas/banned-users-for-blog.schema';
-import { Blog, BlogDocument } from "../../Schemas/blog.schema";
+import { Blog, BlogDocument } from '../../Schemas/blog.schema';
 
 @Injectable()
 export class UserRepository {
@@ -108,37 +108,48 @@ export class UserRepository {
     blogId: string,
     banReason: string,
     banDate: string,
-    status:boolean
+    status: boolean,
   ) {
     let user = await this.getUserById(userId);
-    if (!user) return null
-    let userBanForBlog = await this.bannedUsersForModel.findOne({userId, blogId})
-    if (userBanForBlog){
-      let updateResult = await this.bannedUsersForModel.updateOne({userId, blogId}, {$set:{banReason, banDate, isBanned:status}}).exec()
-
-      return updateResult.modifiedCount === 1
-    }
-    const createdBan = new this.bannedUsersForModel({
+    if (!user) return null;
+    let userBanForBlog = await this.bannedUsersForModel.findOne({
       userId,
-      userLogin: user?.accountData?.login,
       blogId,
-      banReason,
-      banDate,
-      isBanned: true
     });
-    const ban = await createdBan.save();
-    return ban;
+    if (userBanForBlog) {
+      let updateResult = await this.bannedUsersForModel
+        .updateOne(
+          { userId, blogId },
+          { $set: { banReason, banDate, isBanned: status } },
+        )
+        .exec();
+
+      return updateResult.modifiedCount === 1;
+    } else {
+      const createdBan = new this.bannedUsersForModel({
+        userId,
+        userLogin: user?.accountData?.login,
+        blogId,
+        banReason,
+        banDate,
+        isBanned: true,
+      });
+      return await createdBan.save();
+    }
   }
 
-
   async isUserBanned(userId: string, blogId: string) {
-    let userBan = await this.bannedUsersForModel.findOne({ userId, blogId , isBanned:true});
+    let userBan = await this.bannedUsersForModel.findOne({
+      userId,
+      blogId,
+      isBanned: true,
+    });
     console.log(userBan);
     return userBan ? userBan : null;
   }
 
   async checkIfUserHasAccessToBan(userId: string, blogId: string) {
-    let blog = await this.blogModel.findOne({ _id: blogId })
-    return blog.userId === userId
+    let blog = await this.blogModel.findOne({ _id: blogId });
+    return blog.userId === userId;
   }
 }

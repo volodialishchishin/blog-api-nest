@@ -31,7 +31,6 @@ export class Blog {
 
   @Prop({ isRequired: true })
   banDate: string;
-
 }
 
 export const BlogSchema = SchemaFactory.createForClass(Blog);

@@ -6,7 +6,7 @@ import { Helpers } from '../Helpers/helpers';
 import { Injectable } from '@nestjs/common';
 import { Like, LikeDocument } from '../../Schemas/like.schema';
 import { LikeInfoViewModelValues } from '../../DTO/LikeInfo/like-info-view-model';
-import { Blog, BlogDocument } from "../../Schemas/blog.schema";
+import { Blog, BlogDocument } from '../../Schemas/blog.schema';
 
 Injectable();
 export class PostsRepository {
@@ -51,15 +51,12 @@ export class PostsRepository {
     const result = await this.postModel.deleteOne({ _id: id });
     return result.deletedCount;
   }
-  async getPost(
-    id: string,
-    userId: string,
-  ): Promise<PostViewModel | null> {
+  async getPost(id: string, userId: string): Promise<PostViewModel | null> {
     console.log(id);
     const result = await this.postModel.findOne({ _id: id }).exec();
     console.log(result);
-    let blog = await this.blogModel.findOne({_id:result?.blogId})
-    if (blog.isBanned) return null
+    let blog = await this.blogModel.findOne({ _id: result?.blogId });
+    if (blog.isBanned) return null;
     if (result) {
       let postToView = await this.helpers.postMapperToView(result);
 
@@ -93,12 +90,10 @@ export class PostsRepository {
     }
   }
 
-  async getPostDocument(
-    id: string,
-  ): Promise<PostDocument> {
+  async getPostDocument(id: string): Promise<PostDocument> {
     console.log(id);
     const result = await this.postModel.findOne({ _id: id }).exec();
-    return result
+    return result;
   }
   async updateLikeStatus(
     likeStatus: LikeInfoViewModelValues,

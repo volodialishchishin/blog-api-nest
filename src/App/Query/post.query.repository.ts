@@ -8,7 +8,7 @@ import { Post, PostDocument } from '../../Schemas/post.schema';
 import { PostViewModelWithQuery } from '../../DTO/Post/post-view-model';
 import { Like, LikeDocument } from '../../Schemas/like.schema';
 import { LikeInfoViewModelValues } from '../../DTO/LikeInfo/like-info-view-model';
-import { Blog, BlogDocument } from "../../Schemas/blog.schema";
+import { Blog, BlogDocument } from '../../Schemas/blog.schema';
 
 @Injectable()
 export class PostQueryRepository {
@@ -32,14 +32,14 @@ export class PostQueryRepository {
       .sort([[sortBy, sortDirection]])
       .exec();
 
-    const matchedPosts = await this.postModel
-      .find({})
-      .exec();
+    const matchedPosts = await this.postModel.find({}).exec();
 
-    matchedPostsWithSkip = await Promise.all(matchedPostsWithSkip.filter(async post=>{
-      let blog = await this.blogModel.findOne({_id:post.blogId})
-      return !blog.isBanned;
-    }))
+    matchedPostsWithSkip = await Promise.all(
+      matchedPostsWithSkip.filter(async (post) => {
+        let blog = await this.blogModel.findOne({ _id: post.blogId });
+        return !blog.isBanned;
+      }),
+    );
     const pagesCount = Math.ceil(matchedPosts.length / pageSize);
     const matchedPostsWithLikes = await Promise.all(
       matchedPostsWithSkip.map(async (post) => {

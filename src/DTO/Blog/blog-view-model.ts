@@ -24,10 +24,10 @@ export type BlogViewModelSA = {
     userId: string;
     userLogin: string;
   };
-  banInfo:{
-    isBanned: boolean
-    banDate: string
-  }
+  banInfo: {
+    isBanned: boolean;
+    banDate: string;
+  };
 };
 export type BlogViewModelWithQuery = {
   pagesCount: number;

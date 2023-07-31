@@ -5,7 +5,7 @@ import { CommentViewModel } from '../../DTO/Comment/comment-view-model';
 import { LikeInfoViewModelValues } from '../../DTO/LikeInfo/like-info-view-model';
 import { PostsRepository } from '../Post/posts.repository';
 import { UserRepository } from '../Users/user.repository';
-import { BlogRepository } from "../Blog/blog.repository";
+import { BlogRepository } from '../Blog/blog.repository';
 
 @Injectable()
 export class CommentService {
@@ -13,7 +13,7 @@ export class CommentService {
     private commentRep: CommentRepository,
     private postRep: PostsRepository,
     private userRep: UserRepository,
-    private blogRep: BlogRepository
+    private blogRep: BlogRepository,
   ) {}
 
   async createComment(
@@ -30,8 +30,8 @@ export class CommentService {
       createdAt: new Date().toISOString(),
       postId,
       isUserBanned: false,
-      blogId:post.blogId,
-      blogOwnerId:post.blogOwnerId
+      blogId: post.blogId,
+      blogOwnerId: post.blogOwnerId,
     };
 
     let createdComment = await this.commentRep.createComment(resolvedComment);
@@ -41,7 +41,7 @@ export class CommentService {
       dislikesCount: 0,
       likesCount: 0,
     };
-    return createdComment
+    return createdComment;
   }
 
   async getComment(id, userId: string) {
@@ -67,12 +67,15 @@ export class CommentService {
       login,
     );
   }
-  async checkIfUserBanned(userId:string,postId:string){
+  async checkIfUserBanned(userId: string, postId: string) {
     let post = await this.postRep.getPostDocument(postId);
-    let blog = await this.blogRep.getBlog(post.blogId)
+    let blog = await this.blogRep.getBlog(post.blogId);
     console.log(blog);
-    let userBanStatus = await this.userRep.isUserBanned(userId, blog.id.toString());
+    let userBanStatus = await this.userRep.isUserBanned(
+      userId,
+      blog.id.toString(),
+    );
     console.log(userBanStatus);
-    return userBanStatus
+    return userBanStatus;
   }
 }

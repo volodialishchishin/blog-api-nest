@@ -31,19 +31,18 @@ export class BlogQueryRepository {
     console.log(userId);
     let findFilter = userId
       ? {
-        name: searchNameTerm
-          ? { $regex: searchNameTerm, $options: 'i' }
-          : { $regex: '.' },
-        userId: userId,
-        isBanned:false
-      }
+          name: searchNameTerm
+            ? { $regex: searchNameTerm, $options: 'i' }
+            : { $regex: '.' },
+          userId: userId,
+          isBanned: false,
+        }
       : {
           name: searchNameTerm
             ? { $regex: searchNameTerm, $options: 'i' }
             : { $regex: '.' },
-          isBanned:false
-
-      };
+          isBanned: false,
+        };
     const matchedBlogsWithSkip = await this.blogModel
       .find(findFilter)
       .skip((pageNumber - 1) * pageSize)
@@ -109,21 +108,21 @@ export class BlogQueryRepository {
     blogId: string,
     userId,
   ): Promise<PostViewModelWithQuery> {
-    let  matchedPostsWithSkip = await this.postModel
+    let matchedPostsWithSkip = await this.postModel
       .find({ blogId: blogId })
       .skip((pageNumber - 1) * pageSize)
       .limit(Number(pageSize))
       .sort([[sortBy, sortDirection]])
       .exec();
 
-    const matchedPosts = await this.postModel
-      .find({})
-      .exec();
+    const matchedPosts = await this.postModel.find({}).exec();
 
-    matchedPostsWithSkip = await Promise.all(matchedPostsWithSkip.filter(async post=>{
-      let blog = await this.blogModel.findOne({_id:post.blogId})
-      return !blog.isBanned;
-    }))
+    matchedPostsWithSkip = await Promise.all(
+      matchedPostsWithSkip.filter(async (post) => {
+        let blog = await this.blogModel.findOne({ _id: post.blogId });
+        return !blog.isBanned;
+      }),
+    );
 
     const pagesCount = Math.ceil(matchedPosts.length / pageSize);
     const matchedPostsWithLikes = await Promise.all(
@@ -166,6 +165,4 @@ export class BlogQueryRepository {
       items: matchedPostsWithLikes,
     };
   }
-
-
 }

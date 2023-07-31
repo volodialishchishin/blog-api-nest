@@ -92,9 +92,12 @@ export class PostController {
       response.sendStatus(404);
     } else {
       console.log('3123');
-      let userAccess = await this.commentService.checkIfUserBanned(userInfo.userId,params.id)
+      let userAccess = await this.commentService.checkIfUserBanned(
+        userInfo.userId,
+        params.id,
+      );
       console.log(userAccess);
-      if (userAccess)  response.sendStatus(403)
+      if (userAccess) response.sendStatus(403);
       let result = await this.commentService.createComment(
         params.id,
         content,
@@ -102,7 +105,7 @@ export class PostController {
         userInfo.login,
       );
 
-      response.status(201).json(result)
+      response.status(201).json(result);
     }
   }
 
