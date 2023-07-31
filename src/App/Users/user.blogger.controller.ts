@@ -23,12 +23,14 @@ import {
   BanUserForBlogInputModelDto,
 } from '../../DTO/User/ban-input-model.dto';
 import { JwtAuthGuard } from "../Auth/Guards/jwt.auth.guard";
+import { BlogsService } from "../Blog/blogs.service";
 @SkipThrottle()
 @Controller('/blogger/users')
 export class UserBloggerController {
   constructor(
     private readonly userService: UserService,
     private readonly userQueryRep: UserQueryRepository,
+    private readonly blogService: BlogsService,
   ) {}
 
   @Get('blog/:blogId')
@@ -45,7 +47,11 @@ export class UserBloggerController {
     @Req() request: Request,
     @Res() response: Response,
   ) {
-    console.log('12313');
+    let userAccess = await this.blogService.checkIfBlogBelongsToUser(
+      params.blogId,
+      request.user.userInfo.userId,
+    );
+    if (!userAccess) response.sendStatus(403);
     const users = await this.userQueryRep.getBannedUsersForBlog(
       searchLoginTerm,
       pageNumber,
@@ -54,7 +60,7 @@ export class UserBloggerController {
       sortDirection,
       params.blogId
     );
-    response.json(users)
+    users.items.length? response.json(users) : response.sendStatus(404)
   }
 
   @Put('/:id/ban')
