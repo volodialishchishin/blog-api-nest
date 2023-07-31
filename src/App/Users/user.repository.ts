@@ -123,7 +123,7 @@ export class UserRepository {
   }
 
   async unbanUserForBlog(userId: string, blogId: string): Promise<boolean> {
-    let deleteResult = await this.bannedUsersForModel.deleteOne({
+    let deleteResult = await this.bannedUsersForModel.deleteMany({
       userId,
       blogId,
     });
