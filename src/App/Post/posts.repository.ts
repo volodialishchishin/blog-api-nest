@@ -55,8 +55,10 @@ export class PostsRepository {
     id: string,
     userId: string,
   ): Promise<PostViewModel | null> {
+    console.log(id);
     const result = await this.postModel.findOne({ _id: id }).exec();
-    let blog = await this.blogModel.findOne({_id:result.blogId})
+    console.log(result);
+    let blog = await this.blogModel.findOne({_id:result?.blogId})
     if (blog.isBanned) return null
     if (result) {
       let postToView = await this.helpers.postMapperToView(result);

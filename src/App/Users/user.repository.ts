@@ -114,7 +114,9 @@ export class UserRepository {
     if (!user) return null
     let userBanForBlog = await this.bannedUsersForModel.findOne({userId, blogId})
     if (userBanForBlog){
-      let updateResult = await this.bannedUsersForModel.updateOne({userId, blogId}, {$set:{banReason, banDate, isBanned:status}})
+      let updateResult = await this.bannedUsersForModel.updateOne({userId, blogId}, {$set:{banReason, banDate, isBanned:status}}).exec()
+
+      return updateResult.modifiedCount === 1
     }
     const createdBan = new this.bannedUsersForModel({
       userId,
