@@ -108,7 +108,7 @@ export class UserRepository {
     blogId: string,
     banReason: string,
     banDate: string,
-  ): Promise<boolean> {
+  ) {
     let user = await this.getUserById(userId);
     if (!user) return null
     let userBanForBlog = await this.bannedUsersForModel.findOne({userId, blogId})
@@ -121,11 +121,12 @@ export class UserRepository {
       banDate,
     });
     const ban = await createdBan.save();
-    return !!ban;
+    console.log('Hello', ban, userId, blogId);
+    return ban;
   }
 
   async unbanUserForBlog(userId: string, blogId: string): Promise<boolean> {
-    let deleteResult = await this.bannedUsersForModel.deleteMany({
+    let deleteResult = await this.bannedUsersForModel.deleteOne({
       userId,
       blogId,
     });

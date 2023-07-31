@@ -86,12 +86,13 @@ export class PostController {
   ) {
     const { content } = createCommentDto;
     const { userInfo } = request.user;
-    let userAccess = this.commentService.checkIfUserBanned(userInfo.userId,params.id)
-    if (userAccess)  response.sendStatus(403)
+
     let foundPost = await this.postService.getPost(params.id, userInfo.userId);
     if (!foundPost) {
       response.sendStatus(404);
     } else {
+      let userAccess = this.commentService.checkIfUserBanned(userInfo.userId,params.id)
+      if (userAccess)  response.sendStatus(403)
       let result = await this.commentService.createComment(
         params.id,
         content,
