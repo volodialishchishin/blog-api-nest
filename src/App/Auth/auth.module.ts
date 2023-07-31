@@ -25,6 +25,7 @@ import { securityRepository } from './Security/security.repository';
 import { SecurityController } from './Security/security.controller';
 import { CommentSchema } from '../../Schemas/comment.schema';
 import { BannedUsersForBlogSchema } from '../../Schemas/banned-users-for-blog.schema';
+import { BlogSchema } from "../../Schemas/blog.schema";
 
 @Module({
   imports: [
@@ -52,6 +53,7 @@ import { BannedUsersForBlogSchema } from '../../Schemas/banned-users-for-blog.sc
       { name: 'BannedUsersForBlog', schema: BannedUsersForBlogSchema },
     ]),
     MongooseModule.forFeature([{ name: 'Comment', schema: CommentSchema }]),
+    MongooseModule.forFeature([{ name: 'Blog', schema: BlogSchema }]),
   ],
   controllers: [AuthController, SecurityController],
   providers: [
