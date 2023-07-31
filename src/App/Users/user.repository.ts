@@ -109,7 +109,8 @@ export class UserRepository {
   ): Promise<boolean> {
     let user = await this.getUserById(userId);
     if (!user) return null
-
+    let userBanForBlog = await this.bannedUsersForModel.findOne({userId, blogId})
+    if (userBanForBlog) return null
     const createdBan = new this.bannedUsersForModel({
       userId,
       userLogin: user?.accountData?.login,

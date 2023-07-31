@@ -105,9 +105,6 @@ export class UserQueryRepository {
     if (sortBy==='login'){
       sortBy = 'userLogin'
     }
-    let sortByField = sortBy
-      ? `accountData.${sortBy}`
-      : `accountData.createdAt`;
     const bannedUser = await this.bannedUsersForModel
       .find({
         userLogin:searchLoginTerm
@@ -125,7 +122,7 @@ export class UserQueryRepository {
       })
       .skip((pageNumber - 1) * pageSize)
       .limit(Number(pageSize))
-      .sort([[sortByField, sortDirection]])
+      .sort([[sortBy, sortDirection]])
       .exec();
     const pagesCount = Math.ceil(bannedUser.length / pageSize);
     return {

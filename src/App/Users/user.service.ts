@@ -1,13 +1,12 @@
-import { Injectable } from '@nestjs/common';
-import { UserRepository } from './user.repository';
-import { UserInputModel } from '../../DTO/User/user-input-model.dto';
-import { User, UserDocument } from '../../Schemas/user.schema';
-import { v4 } from 'uuid';
-import * as dateFns from 'date-fns';
-import * as bcrypt from 'bcrypt';
-import { MailService } from '../Auth/Mail/mail.service';
-import { AuthRepository } from '../Auth/auth.repository';
-import { CommentRepository } from '../Comments/comment.repository';
+import { Injectable } from "@nestjs/common";
+import { UserRepository } from "./user.repository";
+import { UserInputModel } from "../../DTO/User/user-input-model.dto";
+import { User, UserDocument } from "../../Schemas/user.schema";
+import { v4 } from "uuid";
+import * as dateFns from "date-fns";
+import * as bcrypt from "bcrypt";
+import { MailService } from "../Auth/Mail/mail.service";
+import { AuthRepository } from "../Auth/auth.repository";
 
 @Injectable()
 export class UserService {
@@ -87,13 +86,12 @@ export class UserService {
   }
 
   async banUserForBlog(userId: string, blogId: string, banReason: string) {
-    let banStatus = await this.userRep.banUserForBlog(
+    return await this.userRep.banUserForBlog(
       userId,
       blogId,
       banReason,
       new Date().toISOString(),
     );
-    return banStatus;
   }
   async unbanUserForBlog(userId: string, blogId: string) {
     return this.userRep.unbanUserForBlog(userId, blogId);
