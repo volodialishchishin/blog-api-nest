@@ -79,7 +79,7 @@ export class UserBloggerController {
         params.id,
         banInputModel.blogId,
       );
-      banUserStatus ? response.sendStatus(204) : response.sendStatus(404);
+      banUserStatus ? response.sendStatus(204) : response.sendStatus(405);
       return;
     }
   }
