@@ -12,6 +12,7 @@ import {
   RecoveryPassword,
   recoveryPasswordDocument,
 } from './Schemas/recovery-password.schema';
+import { BannedUsersForBlog, BannedUsersForBlogDocument } from "./Schemas/banned-users-for-blog.schema";
 
 @Injectable()
 export class AppRepository {
@@ -24,6 +25,8 @@ export class AppRepository {
     @InjectModel(Like.name) private likeModel: Model<LikeDocument>,
     @InjectModel(RecoveryPassword.name)
     private recoveryPasswords: Model<recoveryPasswordDocument>,
+    @InjectModel(BannedUsersForBlog.name)
+    private bannedUsersForModel: Model<BannedUsersForBlogDocument>,
     public helpers: Helpers,
   ) {}
 
