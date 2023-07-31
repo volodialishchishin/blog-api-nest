@@ -22,6 +22,7 @@ import {
   BanInputModelDto,
   BanUserForBlogInputModelDto,
 } from '../../DTO/User/ban-input-model.dto';
+import { JwtAuthGuard } from "../Auth/Guards/jwt.auth.guard";
 @SkipThrottle()
 @Controller('/blogger/users')
 export class UserBloggerController {
@@ -56,7 +57,7 @@ export class UserBloggerController {
   }
 
   @Put('/:id/ban')
-  @UseGuards(BasicAuthGuard)
+  @UseGuards(JwtAuthGuard)
   async banUser(
     @Param() params,
     @Res() response: Response,

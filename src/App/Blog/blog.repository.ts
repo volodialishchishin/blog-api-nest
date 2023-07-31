@@ -55,6 +55,7 @@ export class BlogRepository {
   }
 
   async updateBanStatusOfBlog(blogId:string, banDate:string, status:boolean): Promise<boolean>{
+    console.log(status);
     let updateBanStatus =  await this.blogModel.updateOne({_id:blogId},{$set:{isBanned:status, banDate}})
     return updateBanStatus.modifiedCount === 1
   }
