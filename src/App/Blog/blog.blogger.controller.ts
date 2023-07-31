@@ -245,7 +245,7 @@ export class BlogBloggerController {
     }
   }
 
-  @Get('blogs/comments')
+  @Get('/comments')
   @UseGuards(JwtAuthGuard)
   async getAllComments(
     @Param() params,
