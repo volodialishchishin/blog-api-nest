@@ -37,6 +37,7 @@ export class AppRepository {
     this.commentModel.deleteMany({}).exec();
     this.tokenModel.deleteMany({}).exec();
     this.likeModel.deleteMany({}).exec();
+    this.bannedUsersForModel.deleteMany({}).exec();
     return;
   }
 }
