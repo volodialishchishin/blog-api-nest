@@ -23,7 +23,6 @@ export class CommentService {
     userLogin: string,
   ) {
     let post = await this.postRep.getPostDocument(postId);
-    let userBanStatus = await this.userRep.isUserBanned(userId, post.blogId);
     const resolvedComment: Comment = {
       content,
       userId,
@@ -34,8 +33,6 @@ export class CommentService {
       blogId:post.blogId,
       blogOwnerId:post.blogOwnerId
     };
-
-    if (userBanStatus) return null;
 
     let createdComment = await this.commentRep.createComment(resolvedComment);
 
@@ -68,5 +65,9 @@ export class CommentService {
       commentId,
       login,
     );
+  }
+  async checkIfUserBanned(userId:string,postId:string){
+    let userBanStatus = await this.userRep.isUserBanned(userId, postId);
+    return userBanStatus
   }
 }

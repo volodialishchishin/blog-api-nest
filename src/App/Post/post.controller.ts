@@ -86,6 +86,8 @@ export class PostController {
   ) {
     const { content } = createCommentDto;
     const { userInfo } = request.user;
+    let userAccess = this.commentService.checkIfUserBanned(userInfo.userId,params.id)
+    if (userAccess)  response.sendStatus(403)
     let foundPost = await this.postService.getPost(params.id, userInfo.userId);
     if (!foundPost) {
       response.sendStatus(404);
@@ -97,7 +99,7 @@ export class PostController {
         userInfo.login,
       );
 
-      result ? response.status(201).json(result) : response.sendStatus(404);
+      response.status(201).json(result)
     }
   }
 

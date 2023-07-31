@@ -10,6 +10,7 @@ import {
   BannedUsersForBlog,
   BannedUsersForBlogDocument,
 } from '../../Schemas/banned-users-for-blog.schema';
+import { Blog, BlogDocument } from "../../Schemas/blog.schema";
 
 @Injectable()
 export class UserRepository {
@@ -17,6 +18,7 @@ export class UserRepository {
     @InjectModel(User.name) private userModel: Model<UserDocument>,
     @InjectModel(Like.name) private likeModel: Model<LikeDocument>,
     @InjectModel(Comment.name) private commentModel: Model<CommentDocument>,
+    @InjectModel(Blog.name) private blogModel: Model<BlogDocument>,
     @InjectModel(BannedUsersForBlog.name)
     private bannedUsersForModel: Model<BannedUsersForBlogDocument>,
     public helpers: Helpers,
@@ -134,5 +136,10 @@ export class UserRepository {
   async isUserBanned(userId: string, blogId: string) {
     let userBan = await this.bannedUsersForModel.findOne({ userId, blogId });
     return userBan ? userBan : null;
+  }
+
+  async checkIfUserHasAccessToBan(userId: string, blogId: string) {
+    let blog = await this.blogModel.findOne({ _id: blogId })
+    return blog.userId === userId
   }
 }

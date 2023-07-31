@@ -54,7 +54,7 @@ export class UserBloggerController {
       sortDirection,
       params.blogId
     );
-    users.items.length? response.json(users):response.sendStatus(404)
+    response.json(users)
   }
 
   @Put('/:id/ban')
@@ -62,9 +62,11 @@ export class UserBloggerController {
   async banUser(
     @Param() params,
     @Res() response: Response,
+    @Req() request: Request,
     @Body() banInputModel: BanUserForBlogInputModelDto,
   ) {
-    console.log(banInputModel.isBanned,banInputModel.blogId,params.id );
+    let accessToBan = await this.userService.checkIfUserHasAccessToBan(request.user.userInfo.userId, banInputModel.blogId)
+    if (accessToBan) response.sendStatus(403)
     if (banInputModel.isBanned) {
       console.log('3123');
       let banUserStatus = await this.userService.banUserForBlog(
@@ -75,12 +77,12 @@ export class UserBloggerController {
       banUserStatus ? response.sendStatus(204) : response.sendStatus(404);
       return;
     } else {
-      let banUserStatus = await this.userService.unbanUserForBlog(
+      await this.userService.unbanUserForBlog(
         params.id,
         banInputModel.blogId,
       );
-      banUserStatus ? response.sendStatus(204) : response.sendStatus(405);
-      return;
+      response.sendStatus(204)
+      return
     }
   }
 }

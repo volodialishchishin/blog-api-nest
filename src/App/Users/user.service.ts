@@ -96,4 +96,9 @@ export class UserService {
   async unbanUserForBlog(userId: string, blogId: string) {
     return this.userRep.unbanUserForBlog(userId, blogId);
   }
+
+  async checkIfUserHasAccessToBan(userId:string, blogId:string){
+    let access = this.userRep.checkIfUserHasAccessToBan(userId,blogId)
+    return access
+  }
 }

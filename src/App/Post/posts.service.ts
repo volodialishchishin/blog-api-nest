@@ -70,4 +70,6 @@ export class PostService {
   ) {
     return this.postRep.updateLikeStatus(likeStatus, userId, postId, login);
   }
+
+
 }
