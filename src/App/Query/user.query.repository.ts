@@ -105,6 +105,7 @@ export class UserQueryRepository {
     if (sortBy==='login'){
       sortBy = 'userLogin'
     }
+    console.log(blogId);
     const bannedUser = await this.bannedUsersForModel
       .find({
         userLogin:searchLoginTerm
