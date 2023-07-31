@@ -91,7 +91,9 @@ export class PostController {
     if (!foundPost) {
       response.sendStatus(404);
     } else {
-      let userAccess = this.commentService.checkIfUserBanned(userInfo.userId,params.id)
+      console.log('3123');
+      let userAccess = await this.commentService.checkIfUserBanned(userInfo.userId,params.id)
+      console.log(userAccess);
       if (userAccess)  response.sendStatus(403)
       let result = await this.commentService.createComment(
         params.id,

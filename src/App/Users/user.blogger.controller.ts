@@ -47,8 +47,6 @@ export class UserBloggerController {
     @Req() request: Request,
     @Res() response: Response,
   ) {
-
-
     const users = await this.userQueryRep.getBannedUsersForBlog(
       searchLoginTerm,
       pageNumber,
@@ -57,12 +55,22 @@ export class UserBloggerController {
       sortDirection,
       params.blogId
     );
+
     if (users.items.length){
       let accessToBan = await this.userService.checkIfUserHasAccessToBan(request.user.userInfo.userId, params.blogId)
-      if (!accessToBan) response.sendStatus(403)
-      response.json(users)
-    }else{
+      if (!accessToBan) {
+        response.sendStatus(403)
+        return
+      }
+      else{
+        response.status(200).json(users)
+        return
+      }
+
+    }
+    else{
       response.sendStatus(404)
+      return
     }
   }
 

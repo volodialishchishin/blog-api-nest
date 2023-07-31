@@ -16,6 +16,7 @@ export class BlogRepository {
   async createBlog(blog: Blog): Promise<BlogViewModel> {
     const createdBlog = new this.blogModel(blog);
     const newBlog = await createdBlog.save();
+    console.log(newBlog);
     return this.helpers.blogMapperToView(newBlog);
   }
   async updateBlog(

@@ -136,6 +136,7 @@ export class UserRepository {
 
   async isUserBanned(userId: string, blogId: string) {
     let userBan = await this.bannedUsersForModel.findOne({ userId, blogId });
+    console.log(userBan);
     return userBan ? userBan : null;
   }
 

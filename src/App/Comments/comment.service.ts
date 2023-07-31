@@ -41,6 +41,7 @@ export class CommentService {
       dislikesCount: 0,
       likesCount: 0,
     };
+    return createdComment
   }
 
   async getComment(id, userId: string) {
@@ -69,7 +70,9 @@ export class CommentService {
   async checkIfUserBanned(userId:string,postId:string){
     let post = await this.postRep.getPostDocument(postId);
     let blog = await this.blogRep.getBlog(post.blogId)
+    console.log(blog);
     let userBanStatus = await this.userRep.isUserBanned(userId, blog.id.toString());
+    console.log(userBanStatus);
     return userBanStatus
   }
 }

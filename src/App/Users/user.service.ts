@@ -86,7 +86,6 @@ export class UserService {
   }
 
   async banUserForBlog(userId: string, blogId: string, banReason: string) {
-    console.log();
     return await this.userRep.banUserForBlog(
       userId,
       blogId,
