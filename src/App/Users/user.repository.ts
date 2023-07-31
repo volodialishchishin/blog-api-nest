@@ -127,6 +127,7 @@ export class UserRepository {
       userId,
       blogId,
     });
+    console.log('Hello', deleteResult.deletedCount, userId, blogId);
     return deleteResult.deletedCount === 1;
   }
 
