@@ -70,14 +70,14 @@ export class UserBloggerController {
         banInputModel.blogId,
         banInputModel.banReason,
       );
-      banUserStatus ? response.sendStatus(204) : response.sendStatus(404);
+      response.sendStatus(204)
       return;
     } else {
       let banUserStatus = await this.userService.unbanUserForBlog(
         params.id,
         banInputModel.blogId,
       );
-      banUserStatus ? response.sendStatus(204) : response.sendStatus(404);
+      response.sendStatus(204)
       return;
     }
   }
