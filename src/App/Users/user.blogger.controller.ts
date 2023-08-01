@@ -47,7 +47,6 @@ export class UserBloggerController {
     @Req() request: Request,
     @Res() response: Response,
   ) {
-
     const blog = await this.blogService.getBlog(params.blogId);
 
     if (!blog) {
@@ -64,18 +63,17 @@ export class UserBloggerController {
       params.blogId,
     );
 
-
-      let accessToBan = await this.userService.checkIfUserHasAccessToBan(
-        request.user.userInfo.userId,
-        params.blogId,
-      );
-      if (!accessToBan) {
-        response.sendStatus(403);
-        return;
-      } else {
-        response.status(200).json(users);
-        return;
-      }
+    let accessToBan = await this.userService.checkIfUserHasAccessToBan(
+      request.user.userInfo.userId,
+      params.blogId,
+    );
+    if (!accessToBan) {
+      response.sendStatus(403);
+      return;
+    } else {
+      response.status(200).json(users);
+      return;
+    }
   }
 
   @Put('/:id/ban')

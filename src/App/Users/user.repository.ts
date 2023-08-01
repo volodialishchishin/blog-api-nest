@@ -117,7 +117,6 @@ export class UserRepository {
       blogId,
     });
     if (!userBanForBlog) {
-
       const createdBan = new this.bannedUsersForModel({
         userId,
         userLogin: user?.accountData?.login,
@@ -135,7 +134,6 @@ export class UserRepository {
         )
         .exec();
       return updateResult.modifiedCount === 1;
-
     }
   }
 
