@@ -68,9 +68,10 @@ export class UserBloggerController {
         response.status(200).json(users);
         return;
       }
-    } else {
-      response.sendStatus(404);
-      return;
+    }
+    else {
+      response.json(users)
+
     }
   }
 
