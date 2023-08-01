@@ -125,7 +125,7 @@ export class CommentQueryRepository {
           likesInfo: {
             likesCount: likesCount.length,
             dislikesCount: disLikesCount.length,
-            myStatus: myLikeForComment?.status || 'none',
+            myStatus: myLikeForComment?.status || 'None',
           },
           postInfo: {
             id: relatedPost._id.toString(),

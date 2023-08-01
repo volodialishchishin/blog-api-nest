@@ -116,16 +116,8 @@ export class UserRepository {
       userId,
       blogId,
     });
-    if (userBanForBlog) {
-      let updateResult = await this.bannedUsersForModel
-        .updateOne(
-          { userId, blogId },
-          { $set: { banReason, banDate, isBanned: status } },
-        )
-        .exec();
+    if (!userBanForBlog && status) {
 
-      return updateResult.modifiedCount === 1;
-    } else {
       const createdBan = new this.bannedUsersForModel({
         userId,
         userLogin: user?.accountData?.login,
@@ -135,6 +127,15 @@ export class UserRepository {
         isBanned: true,
       });
       return await createdBan.save();
+    } else {
+      let updateResult = await this.bannedUsersForModel
+        .updateOne(
+          { userId, blogId },
+          { $set: { banReason, banDate, isBanned: status } },
+        )
+        .exec();
+      return updateResult.modifiedCount === 1;
+
     }
   }
 
