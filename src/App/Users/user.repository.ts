@@ -116,7 +116,7 @@ export class UserRepository {
       userId,
       blogId,
     });
-    if (!userBanForBlog && status) {
+    if (!userBanForBlog) {
 
       const createdBan = new this.bannedUsersForModel({
         userId,
@@ -124,7 +124,7 @@ export class UserRepository {
         blogId,
         banReason,
         banDate,
-        isBanned: true,
+        isBanned: status,
       });
       return await createdBan.save();
     } else {
