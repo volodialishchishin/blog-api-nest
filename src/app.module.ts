@@ -50,6 +50,7 @@ import {
   BannedUsersForBlogSchema,
 } from './Schemas/banned-users-for-blog.schema';
 import { UserBloggerController } from './App/Users/user.blogger.controller';
+import { MailerModule } from "@nestjs-modules/mailer";
 
 @Module({
   imports: [
@@ -75,6 +76,15 @@ import { UserBloggerController } from './App/Users/user.blogger.controller';
     }),
     AuthModule,
     JwtModule,
+    MailerModule.forRoot({
+      transport:{
+        service: 'gmail',
+        auth:{
+          user: 'lishchishin.volodea@gmail.com',
+          pass: 'uykbtnrylavksddn',
+        }
+      }
+    }),
   ],
   controllers: [
     AppController,
