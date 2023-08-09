@@ -62,7 +62,7 @@ export class BlogBloggerController {
       response.sendStatus(404);
       return;
     }
-    let userAccess = await this.blogService.checkIfBlogBelongsToUser(
+    const userAccess = await this.blogService.checkIfBlogBelongsToUser(
       params.blogId,
       request.user.userInfo.userId,
     );
@@ -91,7 +91,7 @@ export class BlogBloggerController {
       response.sendStatus(404);
       return;
     }
-    let userAccess = await this.blogService.checkIfBlogBelongsToUser(
+    const userAccess = await this.blogService.checkIfBlogBelongsToUser(
       params.id,
       request.user.userInfo.userId,
     );
@@ -121,7 +121,7 @@ export class BlogBloggerController {
       response.sendStatus(404);
       return;
     }
-    let userAccess = await this.blogService.checkIfBlogBelongsToUser(
+    const userAccess = await this.blogService.checkIfBlogBelongsToUser(
       params.id,
       request.user.userInfo.userId,
     );
@@ -171,7 +171,7 @@ export class BlogBloggerController {
       return;
     }
 
-    let userAccess = await this.blogService.checkIfBlogBelongsToUser(
+    const userAccess = await this.blogService.checkIfBlogBelongsToUser(
       params.blogId,
       request.user.userInfo.userId,
     );
@@ -201,7 +201,7 @@ export class BlogBloggerController {
       response.sendStatus(404);
       return;
     }
-    let userAccess = await this.blogService.checkIfBlogBelongsToUser(
+    const userAccess = await this.blogService.checkIfBlogBelongsToUser(
       params.blogId,
       request.user.userInfo.userId,
     );
@@ -232,7 +232,7 @@ export class BlogBloggerController {
       response.sendStatus(404);
       return;
     }
-    let userAccess = await this.blogService.checkIfBlogBelongsToUser(
+    const userAccess = await this.blogService.checkIfBlogBelongsToUser(
       params.blogId,
       request.user.userInfo.userId,
     );

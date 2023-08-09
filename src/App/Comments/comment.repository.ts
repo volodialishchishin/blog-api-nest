@@ -19,7 +19,7 @@ export class CommentRepository {
     public helpers: Helpers,
   ) {}
   async updateComment(id: string, content: string): Promise<boolean> {
-    let result = await this.commentModel.updateOne(
+    const result = await this.commentModel.updateOne(
       { _id: id },
       {
         $set: {
@@ -30,7 +30,7 @@ export class CommentRepository {
     return result.matchedCount === 1;
   }
   async deleteComment(id: string): Promise<boolean> {
-    let result = await this.commentModel.deleteOne({ _id: id }).exec();
+    const result = await this.commentModel.deleteOne({ _id: id }).exec();
     return result.deletedCount === 1;
   }
   async createComment(comment: Comment): Promise<CommentViewModel> {
@@ -43,12 +43,12 @@ export class CommentRepository {
     const comment = await this.commentModel.findOne({ _id: id });
     if (comment) {
       if (comment.isUserBanned) return null;
-      let commentToView = await this.helpers.commentsMapperToView(comment);
+      const commentToView = await this.helpers.commentsMapperToView(comment);
 
       if (!userId) {
         return commentToView;
       }
-      let likeStatus = await this.likeModel.findOne({ userId, entityId: id });
+      const likeStatus = await this.likeModel.findOne({ userId, entityId: id });
       if (likeStatus) {
         commentToView.likesInfo.myStatus =
           likeStatus?.status || LikeInfoViewModelValues.none;
@@ -64,7 +64,7 @@ export class CommentRepository {
     commentId: string,
     login: string,
   ) {
-    let comment = await this.commentModel.findOne({ _id: commentId });
+    const comment = await this.commentModel.findOne({ _id: commentId });
     if (!comment) {
       return false;
     }
@@ -78,7 +78,7 @@ export class CommentRepository {
         userLogin: login,
         isUserBanned: false,
       };
-      let like = await this.likeModel.create(status);
+      const like = await this.likeModel.create(status);
       await like.save();
     } else {
       if (likeStatus === LikeInfoViewModelValues.none) {

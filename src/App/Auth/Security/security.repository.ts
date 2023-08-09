@@ -17,7 +17,7 @@ export class securityRepository {
     public helpers: Helpers,
   ) {}
   async getSessions(userId: string) {
-    let devices = await this.tokenModel.find({ userId }).exec();
+    const devices = await this.tokenModel.find({ userId }).exec();
     return devices.map(this.helpers.deviceMapperToView);
   }
   async deleteSessions(userId: string, deviceId: string) {
@@ -32,7 +32,7 @@ export class securityRepository {
     }
   }
   async getSession(userId: string, id: string): Promise<Token> {
-    let session = await this.tokenModel.findOne({ deviceId: id });
+    const session = await this.tokenModel.findOne({ deviceId: id });
     if (!session) {
       throw new Error('404');
     } else {

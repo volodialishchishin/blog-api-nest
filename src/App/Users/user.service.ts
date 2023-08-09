@@ -72,7 +72,7 @@ export class UserService {
   }
 
   async banUser(userId: string, banReason: string) {
-    let banStatus = await this.userRep.updateUserBanStatus(
+    const banStatus = await this.userRep.updateUserBanStatus(
       userId,
       banReason,
       new Date().toISOString(),
@@ -99,7 +99,7 @@ export class UserService {
   }
 
   async checkIfUserHasAccessToBan(userId: string, blogId: string) {
-    let access = this.userRep.checkIfUserHasAccessToBan(userId, blogId);
+    const access = this.userRep.checkIfUserHasAccessToBan(userId, blogId);
     return access;
   }
 }

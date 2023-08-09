@@ -29,7 +29,7 @@ export class BlogQueryRepository {
     role?: string,
   ): Promise<BlogViewModelWithQuery> {
     console.log(userId);
-    let findFilter = userId
+    const findFilter = userId
       ? {
           name: searchNameTerm
             ? { $regex: searchNameTerm, $options: 'i' }
@@ -119,7 +119,7 @@ export class BlogQueryRepository {
 
     matchedPostsWithSkip = await Promise.all(
       matchedPostsWithSkip.filter(async (post) => {
-        let blog = await this.blogModel.findOne({ _id: post.blogId });
+        const blog = await this.blogModel.findOne({ _id: post.blogId });
         return !blog.isBanned;
       }),
     );
@@ -128,7 +128,7 @@ export class BlogQueryRepository {
     const matchedPostsWithLikes = await Promise.all(
       matchedPostsWithSkip.map(async (post) => {
         const mappedPost = await this.helpers.postMapperToView(post);
-        let lastLikes = await this.likeModel
+        const lastLikes = await this.likeModel
           .find({ entityId: post.id, status: LikeInfoViewModelValues.like })
           .sort({ dateAdded: -1 })
           .limit(3)
@@ -144,7 +144,7 @@ export class BlogQueryRepository {
           return mappedPost;
         }
 
-        let myLikeForComment = await this.likeModel
+        const myLikeForComment = await this.likeModel
           .findOne({
             userId,
             entityId: post.id,

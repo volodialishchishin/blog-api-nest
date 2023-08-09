@@ -22,7 +22,7 @@ export class CommentService {
     userId: string,
     userLogin: string,
   ) {
-    let post = await this.postRep.getPostDocument(postId);
+    const post = await this.postRep.getPostDocument(postId);
     const resolvedComment: Comment = {
       content,
       userId,
@@ -34,7 +34,7 @@ export class CommentService {
       blogOwnerId: post.blogOwnerId,
     };
 
-    let createdComment = await this.commentRep.createComment(resolvedComment);
+    const createdComment = await this.commentRep.createComment(resolvedComment);
 
     createdComment!.likesInfo = {
       myStatus: LikeInfoViewModelValues.none,
@@ -68,10 +68,10 @@ export class CommentService {
     );
   }
   async checkIfUserBanned(userId: string, postId: string) {
-    let post = await this.postRep.getPostDocument(postId);
-    let blog = await this.blogRep.getBlog(post.blogId);
+    const post = await this.postRep.getPostDocument(postId);
+    const blog = await this.blogRep.getBlog(post.blogId);
     console.log(blog);
-    let userBanStatus = await this.userRep.isUserBanned(
+    const userBanStatus = await this.userRep.isUserBanned(
       userId,
       blog.id.toString(),
     );

@@ -50,7 +50,7 @@ export class BlogRepository {
   async bindBlog(id, userId: string): Promise<boolean> {
     const blog = await this.blogModel.findOne({ _id: id });
     if (!blog.userId) return false;
-    let updateBlogStatus = await this.blogModel.updateOne(
+    const updateBlogStatus = await this.blogModel.updateOne(
       { _id: id },
       { $set: { userId: userId } },
     );
@@ -62,7 +62,7 @@ export class BlogRepository {
     banDate: string,
     status: boolean,
   ): Promise<boolean> {
-    let updateBanStatus = await this.blogModel.updateOne(
+    const updateBanStatus = await this.blogModel.updateOne(
       { _id: blogId },
       { $set: { isBanned: status, banDate } },
     );

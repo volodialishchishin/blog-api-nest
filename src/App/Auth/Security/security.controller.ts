@@ -17,7 +17,7 @@ export class SecurityController {
   async getSessions(@Res() response: Response, @Req() request: Request) {
     try {
       const { refreshToken } = request.cookies;
-      let sessions = await this.securityService.getSessions(refreshToken);
+      const sessions = await this.securityService.getSessions(refreshToken);
       response.status(200).json(sessions);
     } catch (e) {
       response.sendStatus(401);
@@ -28,7 +28,7 @@ export class SecurityController {
   async deleteSessions(@Res() response: Response, @Req() request: Request) {
     const { refreshToken } = request.cookies;
     try {
-      let deleteResult = await this.securityService.deleteSessions(
+      const deleteResult = await this.securityService.deleteSessions(
         refreshToken,
       );
       if (deleteResult.deletedCount) {

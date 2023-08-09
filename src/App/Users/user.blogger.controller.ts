@@ -63,7 +63,7 @@ export class UserBloggerController {
       params.blogId,
     );
 
-    let accessToBan = await this.userService.checkIfUserHasAccessToBan(
+    const accessToBan = await this.userService.checkIfUserHasAccessToBan(
       request.user.userInfo.userId,
       params.blogId,
     );
@@ -84,13 +84,13 @@ export class UserBloggerController {
     @Req() request: Request,
     @Body() banInputModel: BanUserForBlogInputModelDto,
   ) {
-    let accessToBan = await this.userService.checkIfUserHasAccessToBan(
+    const accessToBan = await this.userService.checkIfUserHasAccessToBan(
       request.user.userInfo.userId,
       banInputModel.blogId,
     );
     if (!accessToBan) response.sendStatus(403);
     if (banInputModel.isBanned) {
-      let banUserStatus = await this.userService.banUserForBlog(
+      const banUserStatus = await this.userService.banUserForBlog(
         params.id,
         banInputModel.blogId,
         banInputModel.banReason,
@@ -98,7 +98,7 @@ export class UserBloggerController {
       banUserStatus ? response.sendStatus(204) : response.sendStatus(404);
       return;
     } else {
-      let banUserStatus = await this.userService.unbanUserForBlog(
+      const banUserStatus = await this.userService.unbanUserForBlog(
         params.id,
         banInputModel.blogId,
       );

@@ -61,7 +61,7 @@ export class BlogSaController {
     @Res() response: Response,
     @Req() request: Request,
   ) {
-    let blogBindUpdateStatus = this.blogService.bindBlog(
+    const blogBindUpdateStatus = this.blogService.bindBlog(
       params.blogId,
       params.userId,
     );
@@ -78,11 +78,11 @@ export class BlogSaController {
     @Body() banInputModel: { isBanned: boolean },
   ) {
     if (banInputModel.isBanned) {
-      let banUserStatus = await this.blogService.banBlog(params.blogId);
+      const banUserStatus = await this.blogService.banBlog(params.blogId);
       banUserStatus ? response.sendStatus(204) : response.sendStatus(404);
       return;
     } else {
-      let banUserStatus = await this.blogService.unbanBlog(params.blogId);
+      const banUserStatus = await this.blogService.unbanBlog(params.blogId);
       banUserStatus ? response.sendStatus(204) : response.sendStatus(404);
       return;
     }

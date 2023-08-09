@@ -87,18 +87,21 @@ export class PostController {
     const { content } = createCommentDto;
     const { userInfo } = request.user;
 
-    let foundPost = await this.postService.getPost(params.id, userInfo.userId);
+    const foundPost = await this.postService.getPost(
+      params.id,
+      userInfo.userId,
+    );
     if (!foundPost) {
       response.sendStatus(404);
     } else {
       console.log('3123');
-      let userAccess = await this.commentService.checkIfUserBanned(
+      const userAccess = await this.commentService.checkIfUserBanned(
         userInfo.userId,
         params.id,
       );
       console.log(userAccess);
       if (userAccess) response.sendStatus(403);
-      let result = await this.commentService.createComment(
+      const result = await this.commentService.createComment(
         params.id,
         content,
         userInfo.userId,
@@ -123,7 +126,7 @@ export class PostController {
     try {
       const authToken = request.headers.authorization?.split(' ')[1] || '';
       const user = await this.authService.getUserIdByToken(authToken);
-      let result = await this.commentsQueryRep.getComments(
+      const result = await this.commentsQueryRep.getComments(
         pageNumber,
         sortBy,
         pageSize,
@@ -145,7 +148,7 @@ export class PostController {
     @Res() response: Response,
     @Body() likeInputModel: LikeInputModel,
   ) {
-    let result = await this.postService.updateLikeStatus(
+    const result = await this.postService.updateLikeStatus(
       likeInputModel.likeStatus,
       request.user.userInfo.userId,
       params.postId,

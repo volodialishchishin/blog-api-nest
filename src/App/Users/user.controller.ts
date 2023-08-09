@@ -77,14 +77,14 @@ export class UserController {
     @Body() banInputModel: BanInputModelDto,
   ) {
     if (banInputModel.isBanned) {
-      let banUserStatus = await this.userService.banUser(
+      const banUserStatus = await this.userService.banUser(
         params.id,
         banInputModel.banReason,
       );
       banUserStatus ? response.sendStatus(204) : response.sendStatus(404);
       return;
     } else {
-      let banUserStatus = await this.userService.unbanUser(params.id);
+      const banUserStatus = await this.userService.unbanUser(params.id);
       banUserStatus ? response.sendStatus(204) : response.sendStatus(404);
       return;
     }

@@ -50,7 +50,11 @@ import {
   BannedUsersForBlogSchema,
 } from './Schemas/banned-users-for-blog.schema';
 import { UserBloggerController } from './App/Users/user.blogger.controller';
-import { MailerModule } from "@nestjs-modules/mailer";
+import { MailerModule } from '@nestjs-modules/mailer';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { UserEntity } from './DB/Entities/user.entity';
+import { SessionEntity } from './DB/Entities/session.entity';
+import { RecoveryPasswordsEntity } from './DB/Entities/recovery-passwords.entity';
 
 @Module({
   imports: [
@@ -77,13 +81,24 @@ import { MailerModule } from "@nestjs-modules/mailer";
     AuthModule,
     JwtModule,
     MailerModule.forRoot({
-      transport:{
+      transport: {
         service: 'gmail',
-        auth:{
+        auth: {
           user: 'lishchishin.volodea@gmail.com',
           pass: 'uykbtnrylavksddn',
-        }
-      }
+        },
+      },
+    }),
+    TypeOrmModule.forRoot({
+      type: 'postgres',
+      port: 5432,
+      host: 'ep-aged-hill-14839329.us-east-2.aws.neon.tech',
+      username: 'lishchishin.volodya',
+      password: 'PZ5hC2HSUonB',
+      database: 'neondb',
+      entities: [UserEntity, SessionEntity, RecoveryPasswordsEntity],
+      synchronize: true,
+      ssl: true,
     }),
   ],
   controllers: [

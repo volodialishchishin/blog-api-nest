@@ -18,7 +18,9 @@ export class PostsRepository {
   ) {}
   async getPosts(): Promise<PostViewModel[]> {
     const result = await this.postModel.find({}).exec();
-    let comments = await Promise.all(result.map(this.helpers.postMapperToView));
+    const comments = await Promise.all(
+      result.map(this.helpers.postMapperToView),
+    );
     return comments;
   }
 
@@ -55,12 +57,12 @@ export class PostsRepository {
     console.log(id);
     const result = await this.postModel.findOne({ _id: id }).exec();
     console.log(result);
-    let blog = await this.blogModel.findOne({ _id: result?.blogId });
+    const blog = await this.blogModel.findOne({ _id: result?.blogId });
     if (blog.isBanned) return null;
     if (result) {
-      let postToView = await this.helpers.postMapperToView(result);
+      const postToView = await this.helpers.postMapperToView(result);
 
-      let lastLikes = await this.likeModel
+      const lastLikes = await this.likeModel
         .find({
           entityId: id,
           status: LikeInfoViewModelValues.like,
@@ -79,7 +81,7 @@ export class PostsRepository {
       if (!userId) {
         return postToView;
       }
-      let likeStatus = await this.likeModel.findOne({ userId, entityId: id });
+      const likeStatus = await this.likeModel.findOne({ userId, entityId: id });
       if (likeStatus) {
         postToView.extendedLikesInfo.myStatus =
           likeStatus?.status || LikeInfoViewModelValues.none;
@@ -101,7 +103,7 @@ export class PostsRepository {
     postId: string,
     login: string,
   ) {
-    let post = await this.postModel.findOne({ _id: postId });
+    const post = await this.postModel.findOne({ _id: postId });
     if (!post) {
       return false;
     }
@@ -115,7 +117,7 @@ export class PostsRepository {
         userLogin: login,
         isUserBanned: false,
       };
-      let like = await this.likeModel.create(status);
+      const like = await this.likeModel.create(status);
       await like.save();
     } else {
       if (likeStatus === LikeInfoViewModelValues.none) {

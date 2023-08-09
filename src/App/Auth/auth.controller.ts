@@ -65,7 +65,7 @@ export class AuthController {
       userModel.loginOrEmail,
     );
     if (user && req.headers['user-agent']) {
-      let deviceId = v4();
+      const deviceId = v4();
       const token = this.authService.generateTokens(user, deviceId);
       await this.authService.saveToken(user.id, token.refreshToken, req.ip);
       response.cookie('refreshToken', token.refreshToken, {
@@ -142,7 +142,7 @@ export class AuthController {
     const { newPassword, recoveryCode } = req.body;
     const user = await this.authService.getUserByRecoveryCode(recoveryCode);
     if (user) {
-      let updateStatus = this.authService.processPasswordRecovery(
+      const updateStatus = this.authService.processPasswordRecovery(
         newPassword,
         user.id.toString(),
       );
@@ -170,7 +170,7 @@ export class AuthController {
     const { email } = req.body;
     try {
       const user = await this.userService.getUserByLoginOrEmail('', email);
-      let code = v4();
+      const code = v4();
       await this.mailService.sendRecoveryPasswordCode(user.result, false, code);
       await this.authService.savePasswordRecoveryCode(user.result.id, code);
       response.sendStatus(204);

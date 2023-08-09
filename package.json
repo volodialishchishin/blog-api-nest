@@ -31,6 +31,7 @@
     "@nestjs/platform-express": "^9.4.2",
     "@nestjs/swagger": "^6.3.0",
     "@nestjs/throttler": "^4.2.1",
+    "@nestjs/typeorm": "^10.0.0",
     "@types/bcrypt": "^5.0.0",
     "@types/cookie-parser": "^1.4.3",
     "@types/date-fns": "^2.6.0",
@@ -50,9 +51,11 @@
     "passport-http": "^0.3.0",
     "passport-jwt": "4.0.1",
     "passport-local": "1.0.0",
+    "pg": "^8.11.2",
     "reflect-metadata": "0.1.13",
     "rimraf": "4.4.1",
-    "rxjs": "7.5.5"
+    "rxjs": "7.5.5",
+    "typeorm": "^0.3.17"
   },
   "devDependencies": {
     "@nestjs/cli": "^9.5.0",

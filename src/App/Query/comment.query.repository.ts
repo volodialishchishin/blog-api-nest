@@ -32,7 +32,7 @@ export class CommentQueryRepository {
     postId: string,
     userId: string,
   ) {
-    let matchedComments = await this.commentModel
+    const matchedComments = await this.commentModel
       .find({ postId: postId })
       .skip((pageNumber - 1) * pageSize)
       .limit(Number(pageSize))
@@ -48,7 +48,7 @@ export class CommentQueryRepository {
           return mappedComment;
         }
 
-        let myLikeForComment = await this.likeModel.findOne({
+        const myLikeForComment = await this.likeModel.findOne({
           userId,
           entityId: comment.id,
         });
@@ -77,7 +77,7 @@ export class CommentQueryRepository {
     sortDirection: 'asc' | 'desc' = 'desc',
     userId: string,
   ): Promise<allCommentsForUserViewModelWithQuery> {
-    let comments = await this.commentModel
+    const comments = await this.commentModel
       .find({ blogOwnerId: userId })
       .skip((pageNumber - 1) * pageSize)
       .limit(Number(pageSize))
@@ -87,55 +87,56 @@ export class CommentQueryRepository {
       .find({ blogOwnerId: userId })
       .exec();
     const pagesCount = Math.ceil(allComments.length / pageSize);
-    let mappedComments: Array<allCommentsForUserViewModel> = await Promise.all(
-      comments.map(async (comment) => {
-        console.log(comment.postId);
-        let relatedPost = await this.postModel
-          .findOne({ _id: comment.postId })
-          .exec();
-        console.log(relatedPost);
-        let myLikeForComment = await this.likeModel
-          .findOne({
-            userId,
-            entityId: comment.id,
-          })
-          .exec();
-        let likesCount = await this.likeModel
-          .find({
-            entityId: comment.id,
-            status: LikeInfoViewModelValues.like,
-            isUserBanned: false,
-          })
-          .exec();
-        let disLikesCount = await this.likeModel
-          .find({
-            entityId: comment.id,
-            status: LikeInfoViewModelValues.dislike,
-            isUserBanned: false,
-          })
-          .exec();
-        return {
-          id: comment._id.toString(),
-          content: comment.content,
-          commentatorInfo: {
-            userId: comment.userId,
-            userLogin: comment.userLogin,
-          },
-          createdAt: comment.createdAt,
-          likesInfo: {
-            likesCount: likesCount.length,
-            dislikesCount: disLikesCount.length,
-            myStatus: myLikeForComment?.status || 'None',
-          },
-          postInfo: {
-            id: relatedPost._id.toString(),
-            title: relatedPost.title,
-            blogId: relatedPost.blogId,
-            blogName: relatedPost.blogName,
-          },
-        };
-      }),
-    );
+    const mappedComments: Array<allCommentsForUserViewModel> =
+      await Promise.all(
+        comments.map(async (comment) => {
+          console.log(comment.postId);
+          const relatedPost = await this.postModel
+            .findOne({ _id: comment.postId })
+            .exec();
+          console.log(relatedPost);
+          const myLikeForComment = await this.likeModel
+            .findOne({
+              userId,
+              entityId: comment.id,
+            })
+            .exec();
+          const likesCount = await this.likeModel
+            .find({
+              entityId: comment.id,
+              status: LikeInfoViewModelValues.like,
+              isUserBanned: false,
+            })
+            .exec();
+          const disLikesCount = await this.likeModel
+            .find({
+              entityId: comment.id,
+              status: LikeInfoViewModelValues.dislike,
+              isUserBanned: false,
+            })
+            .exec();
+          return {
+            id: comment._id.toString(),
+            content: comment.content,
+            commentatorInfo: {
+              userId: comment.userId,
+              userLogin: comment.userLogin,
+            },
+            createdAt: comment.createdAt,
+            likesInfo: {
+              likesCount: likesCount.length,
+              dislikesCount: disLikesCount.length,
+              myStatus: myLikeForComment?.status || 'None',
+            },
+            postInfo: {
+              id: relatedPost._id.toString(),
+              title: relatedPost.title,
+              blogId: relatedPost.blogId,
+              blogName: relatedPost.blogName,
+            },
+          };
+        }),
+      );
     return {
       pagesCount: Number(pagesCount),
       page: Number(pageNumber),

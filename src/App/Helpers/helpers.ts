@@ -12,13 +12,14 @@ import { Model } from 'mongoose';
 import { Like, LikeDocument } from '../../Schemas/like.schema';
 import { Injectable } from '@nestjs/common';
 import { Token, TokenDocument } from '../../Schemas/token.schema';
+import { UserEntity } from "../../DB/Entities/user.entity";
 
 Injectable();
 export class Helpers {
   constructor(@InjectModel(Like.name) private likeModel: Model<LikeDocument>) {}
   public userMapperToView(user: UserDocument): UserViewModel {
     return {
-      id: user._id,
+      id: user._id.toString(),
       email: user.accountData.email,
       createdAt: user.accountData.createdAt,
       login: user.accountData.login,
@@ -30,15 +31,29 @@ export class Helpers {
     };
   }
 
+  public userMapperToViewSql(user: UserEntity): UserViewModel {
+    return {
+      id: user.id.toString(),
+      email: user.email,
+      createdAt: user.createdAt,
+      login: user.login,
+      banInfo: {
+        isBanned: user.isBanned,
+        banReason: user.banReason,
+        banDate: user.banDate,
+      },
+    };
+  }
+
   public async postMapperToView(post: PostDocument): Promise<PostViewModel> {
-    let likesCount = await this.likeModel
+    const likesCount = await this.likeModel
       .find({
         entityId: post.id,
         status: LikeInfoViewModelValues.like,
         isUserBanned: false,
       })
       .exec();
-    let disLikesCount = await this.likeModel
+    const disLikesCount = await this.likeModel
       .find({
         entityId: post.id,
         status: LikeInfoViewModelValues.dislike,
@@ -65,14 +80,14 @@ export class Helpers {
   public async commentsMapperToView(
     comment: CommentDocument,
   ): Promise<CommentViewModel> {
-    let likesCount = await this.likeModel
+    const likesCount = await this.likeModel
       .find({
         entityId: comment.id,
         status: LikeInfoViewModelValues.like,
         isUserBanned: false,
       })
       .exec();
-    let disLikesCount = await this.likeModel
+    const disLikesCount = await this.likeModel
       .find({
         entityId: comment.id,
         status: LikeInfoViewModelValues.dislike,

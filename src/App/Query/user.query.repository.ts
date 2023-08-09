@@ -8,6 +8,8 @@ import {
   BannedUsersForBlog,
   BannedUsersForBlogDocument,
 } from '../../Schemas/banned-users-for-blog.schema';
+import { InjectDataSource } from "@nestjs/typeorm";
+import { DataSource } from "typeorm";
 
 @Injectable()
 export class UserQueryRepository {
@@ -15,6 +17,7 @@ export class UserQueryRepository {
     @InjectModel(User.name) private userModel: Model<UserDocument>,
     @InjectModel(BannedUsersForBlog.name)
     private bannedUsersForModel: Model<BannedUsersForBlogDocument>,
+    @InjectDataSource() protected dataSource: DataSource,
     public helpers: Helpers,
   ) {}
   async getUsers(
@@ -26,70 +29,53 @@ export class UserQueryRepository {
     sortDirection: 'asc' | 'desc' = 'desc',
     banStatus: string,
   ): Promise<UserViewModelWithQuery> {
-    let filterObject: any = {
-      $or: [
-        {
-          'accountData.login': searchLoginTerm
-            ? { $regex: searchLoginTerm, $options: 'i' }
-            : { $regex: '.' },
-        },
-        {
-          'accountData.email': searchEmailTerm
-            ? { $regex: searchEmailTerm, $options: 'i' }
-            : { $regex: '.' },
-        },
-      ],
-    };
-    if (banStatus === 'notBanned') {
-      filterObject = {
-        $or: [
-          {
-            'accountData.login': searchLoginTerm
-              ? { $regex: searchLoginTerm, $options: 'i' }
-              : { $regex: '.' },
-          },
-          {
-            'accountData.email': searchEmailTerm
-              ? { $regex: searchEmailTerm, $options: 'i' }
-              : { $regex: '.' },
-          },
-        ],
-        'banInfo.isBanned': false,
-      };
-    } else if (banStatus === 'banned') {
-      filterObject = {
-        $or: [
-          {
-            'accountData.login': searchLoginTerm
-              ? { $regex: searchLoginTerm, $options: 'i' }
-              : { $regex: '.' },
-          },
-          {
-            'accountData.email': searchEmailTerm
-              ? { $regex: searchEmailTerm, $options: 'i' }
-              : { $regex: '.' },
-          },
-        ],
-        'banInfo.isBanned': true,
-      };
-    }
-    let sortByField = sortBy
-      ? `accountData.${sortBy}`
-      : `accountData.createdAt`;
-    const matchedUsersWithSkip = await this.userModel
-      .find(filterObject)
-      .skip((pageNumber - 1) * pageSize)
-      .limit(Number(pageSize))
-      .sort([[sortByField, sortDirection]])
-      .exec();
-    const matchedUsers = await this.userModel.find(filterObject).exec();
-    const pagesCount = Math.ceil(matchedUsers.length / pageSize);
+
+    const offset = (pageNumber - 1) * pageSize;
+
+    const query = `
+    SELECT
+      *
+    FROM
+      user_entity u
+    WHERE
+      u.login ILIKE $1
+      AND u.email ILIKE $2
+      ${banStatus === 'notBanned' ? 'AND NOT u.is_banned' : ''}
+      ${banStatus === 'banned' ? 'AND u.is_banned' : ''}
+    ORDER BY
+      "${sortBy}" ${sortDirection}
+    LIMIT
+      $3
+    OFFSET
+      $4
+  `;
+
+    const queryWithOutSkip = `
+    SELECT
+      *
+    FROM
+      user_entity u
+    WHERE
+      u.login ILIKE $1
+      AND u.email ILIKE $2
+      ${banStatus === 'notBanned' ? 'AND NOT u.is_banned' : ''}
+      ${banStatus === 'banned' ? 'AND u.is_banned' : ''}
+  `;
+
+    const parameters = [ `%${searchLoginTerm}%`, `%${searchEmailTerm}%`, pageSize, offset ];
+    const parametersWithOutSkip = [ `%${searchLoginTerm}%`, `%${searchEmailTerm}%` ];
+
+    const items = await this.dataSource.query(query, parameters);
+    const itemsWithOutSkip = await this.dataSource.query(queryWithOutSkip, parametersWithOutSkip).catch;
+
+    const pagesCount = Math.ceil(itemsWithOutSkip.length / pageSize);
+
     return {
-      pagesCount: Number(pagesCount),
-      page: Number(pageNumber),
+      pagesCount,
+      page: pageNumber,
       pageSize: Number(pageSize),
-      totalCount: matchedUsers.length,
-      items: matchedUsersWithSkip.map(this.helpers.userMapperToView),
+      totalCount:itemsWithOutSkip.length,
+      items: items.map(this.helpers.userMapperToViewSql),
     };
   }
 
@@ -104,45 +90,41 @@ export class UserQueryRepository {
     if (sortBy === 'login') {
       sortBy = 'userLogin';
     }
-    console.log(blogId);
-    const bannedUser = await this.bannedUsersForModel
-      .find({
-        userLogin: searchLoginTerm
-          ? { $regex: searchLoginTerm, $options: 'i' }
-          : { $regex: '.' },
-        blogId: blogId,
-        isBanned: true,
-      })
-      .exec();
+
+    const filterObject = {
+      userLogin: { $regex: searchLoginTerm, $options: 'i' },
+      blogId: blogId,
+      isBanned: true,
+    };
+
     const bannedUserWithSkip = await this.bannedUsersForModel
-      .find({
-        userLogin: searchLoginTerm
-          ? { $regex: searchLoginTerm, $options: 'i' }
-          : { $regex: '.' },
-        blogId: blogId,
-        isBanned: true,
-      })
+      .find(filterObject)
       .skip((pageNumber - 1) * pageSize)
-      .limit(Number(pageSize))
-      .sort([[sortBy, sortDirection]])
+      .limit(pageSize)
+      .sort({ [sortBy]: sortDirection })
       .exec();
-    const pagesCount = Math.ceil(bannedUser.length / pageSize);
+
+    const totalCount = await this.bannedUsersForModel
+      .countDocuments(filterObject)
+      .exec();
+    const pagesCount = Math.ceil(totalCount / pageSize);
+
+    const items = bannedUserWithSkip.map((user) => ({
+      id: user.userId,
+      login: user.userLogin,
+      banInfo: {
+        isBanned: true,
+        banDate: user.banDate,
+        banReason: user.banReason,
+      },
+    }));
+
     return {
-      pagesCount: Number(pagesCount),
-      page: Number(pageNumber),
-      pageSize: Number(pageSize),
-      totalCount: bannedUser.length,
-      items: bannedUserWithSkip.map((user) => {
-        return {
-          id: user.userId,
-          login: user.userLogin,
-          banInfo: {
-            isBanned: true,
-            banDate: user.banDate,
-            banReason: user.banReason,
-          },
-        };
-      }),
+      pagesCount,
+      page: pageNumber,
+      pageSize,
+      totalCount,
+      items,
     };
   }
 }

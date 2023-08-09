@@ -11,70 +11,127 @@ import {
   BannedUsersForBlogDocument,
 } from '../../Schemas/banned-users-for-blog.schema';
 import { Blog, BlogDocument } from '../../Schemas/blog.schema';
+import { InjectDataSource } from "@nestjs/typeorm";
+import { DataSource } from "typeorm";
+import { UserEntity } from "../../DB/Entities/user.entity";
 
 @Injectable()
 export class UserRepository {
   constructor(
-    @InjectModel(User.name) private userModel: Model<UserDocument>,
-    @InjectModel(Like.name) private likeModel: Model<LikeDocument>,
+    @InjectDataSource() protected dataSource: DataSource,
+    public helpers: Helpers,
     @InjectModel(Comment.name) private commentModel: Model<CommentDocument>,
     @InjectModel(Blog.name) private blogModel: Model<BlogDocument>,
-    @InjectModel(BannedUsersForBlog.name)
-    private bannedUsersForModel: Model<BannedUsersForBlogDocument>,
-    public helpers: Helpers,
+    @InjectModel(BannedUsersForBlog.name) private bannedUsersForModel : Model<BannedUsersForBlogDocument>
   ) {}
   async createUser(user: User): Promise<UserViewModel> {
-    const createdUser = new this.userModel(user);
-    const newUser = await createdUser.save();
-    return this.helpers.userMapperToView(newUser);
+    const query =
+      'insert into user_entity(password, "passwordSalt", email, login, "createdAt", "emailConfirmationCode", "emailConfirmationDate", "isEmailConfirmed", "isBanned", "banDate", "banReason") values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11) RETURNING *';
+    const resolvedUser:Array<UserEntity> = await this.dataSource.query(query, [
+      user.accountData.password,
+      user.accountData.passwordSalt,
+      user.accountData.email,
+      user.accountData.login,
+      user.accountData.createdAt,
+      user.emailConfirmation.confirmationCode,
+      user.emailConfirmation.confirmationDate,
+      user.emailConfirmation.isConfirmed,
+      user.banInfo.isBanned,
+      user.banInfo.banDate,
+      user.banInfo.banReason
+    ]);
+    return this.helpers.userMapperToViewSql(resolvedUser[0]);
+
   }
 
   async deleteUser(userId: string): Promise<number> {
-    const result = await this.userModel.deleteOne({ _id: userId }).exec();
-    return result.deletedCount;
+    const query =
+      'DELETE FROM user_entity WHERE id = $1';
+    const deleteResult = await this.dataSource.query(query, [userId]);
+    return deleteResult.length;
   }
 
   async updateUser(userId: string, field: string, value) {
-    const result = await this.userModel.updateOne(
-      { _id: userId },
-      { $set: { 'emailConfirmation.confirmationCode': value } },
-    );
-    return result.modifiedCount;
+
+    const query = 'UPDATE user_entity SET "confirmationCode" = $1 WHERE "userId" = $2 RETURNING *';
+    const updateResult = await this.dataSource.query(query, [
+      value,
+      userId,
+    ]);
+    return updateResult.length;
   }
 
   async getUserByLoginOrEmail(
     login: string,
     email: string,
   ): Promise<{ result: UserDocument; field: 'login' | 'email' }> {
-    const resultByLogin = await this.userModel.findOne({
-      'accountData.login': login,
-    });
-    const resultByEmail = resultByLogin
-      ? null
-      : await this.userModel.findOne({ 'accountData.email': email });
-    return (
-      {
-        result: resultByLogin || resultByEmail,
-        field: resultByLogin ? 'login' : 'email',
-      } || null
-    );
+    const query = `
+    SELECT
+      *
+    FROM
+      user_entity u
+    WHERE
+      u.login = $1
+      OR u.email = $2
+    LIMIT
+      1
+  `;
+
+    const parameters = [login, email];
+
+    const result = await this.dataSource.query(query, parameters);
+
+    if (result.length > 0) {
+      const user = result[0];
+      const field = user.login === login ? 'login' : 'email';
+      return { result: user, field };
+    } else {
+      return null;
+    }
   }
   async getUserByCode(value: string): Promise<UserDocument> {
-    const result = await this.userModel.findOne({
-      'emailConfirmation.confirmationCode': value,
-    });
-    return result || null;
+    const query =
+      'select * from user_entity where "confirmationCode" = $1';
+    const user = await this.dataSource.query(query, [value]);
+    return user[0];
   }
   async getUserById(id: string): Promise<UserDocument> {
-    const result = await this.userModel.findOne({ _id: id });
-    return result || null;
+    const query = `
+    SELECT
+      *
+    FROM
+      user_entity u
+    WHERE
+      u.id = $1
+    LIMIT
+      1
+  `;
+
+    const parameters = [id];
+
+    const result = await this.dataSource.query(query, parameters);
+
+    if (result.length > 0) {
+      return result[0];
+    } else {
+      return null;
+    }
   }
   async confirmCode(userId: string) {
-    const result = await this.userModel.updateOne(
-      { _id: userId },
-      { $set: { 'emailConfirmation.isConfirmed': true } },
-    );
-    return result.modifiedCount === 1;
+    const query = `
+    UPDATE
+      user_entity
+    SET
+      email_confirmation_is_confirmed = true
+    WHERE
+      id = $1
+  `;
+
+    const parameters = [userId];
+
+    const updateResult = await this.dataSource.query(query, parameters);
+
+    return updateResult.affected > 0;
   }
   async updateUserBanStatus(
     userId: string,
@@ -82,25 +139,22 @@ export class UserRepository {
     banDate: string,
     banStatus: boolean,
   ) {
-    let updateStatus = await this.userModel.updateOne(
-      { _id: userId },
-      {
-        $set: {
-          'banInfo.isBanned': banStatus,
-          'banInfo.banReason': banReason,
-          'banInfo.banDate': banDate,
-        },
-      },
-    );
-    await this.commentModel.updateMany(
-      { userId },
-      { $set: { isUserBanned: banStatus } },
-    );
-    await this.likeModel.updateMany(
-      { userId },
-      { $set: { isUserBanned: banStatus } },
-    );
-    return updateStatus.modifiedCount === 1;
+    const query = `
+    UPDATE
+      user_entity
+    SET
+      is_banned = $1,
+      ban_reason = $2,
+      ban_date = $3
+    WHERE
+      id = $4
+  `;
+
+    const parameters = [banStatus, banReason, banDate, userId];
+
+    const updateResult = await this.dataSource.query(query, parameters);
+
+    return updateResult.affected > 0;
   }
 
   async updateBanStatus(
@@ -110,9 +164,9 @@ export class UserRepository {
     banDate: string,
     status: boolean,
   ) {
-    let user = await this.getUserById(userId);
+    const user = await this.getUserById(userId);
     if (!user) return null;
-    let userBanForBlog = await this.bannedUsersForModel.findOne({
+    const userBanForBlog = await this.bannedUsersForModel.findOne({
       userId,
       blogId,
     });
@@ -127,7 +181,7 @@ export class UserRepository {
       });
       return await createdBan.save();
     } else {
-      let updateResult = await this.bannedUsersForModel
+      const updateResult = await this.bannedUsersForModel
         .updateOne(
           { userId, blogId },
           { $set: { banReason, banDate, isBanned: status } },
@@ -138,7 +192,7 @@ export class UserRepository {
   }
 
   async isUserBanned(userId: string, blogId: string) {
-    let userBan = await this.bannedUsersForModel.findOne({
+    const userBan = await this.bannedUsersForModel.findOne({
       userId,
       blogId,
       isBanned: true,
@@ -148,7 +202,7 @@ export class UserRepository {
   }
 
   async checkIfUserHasAccessToBan(userId: string, blogId: string) {
-    let blog = await this.blogModel.findOne({ _id: blogId });
+    const blog = await this.blogModel.findOne({ _id: blogId });
     return blog.userId === userId;
   }
 }

@@ -34,7 +34,7 @@ export class CommentController {
   ) {
     const authToken = request.headers.authorization?.split(' ')[1] || '';
     const user = await this.authService.getUserIdByToken(authToken);
-    let result = await this.commentService.getComment(params.id, user?.user);
+    const result = await this.commentService.getComment(params.id, user?.user);
     result ? response.status(200).json(result) : response.sendStatus(404);
   }
 
@@ -45,7 +45,7 @@ export class CommentController {
     @Res() response: Response,
     @Req() request: Request,
   ) {
-    let comment = await this.commentService.getComment(
+    const comment = await this.commentService.getComment(
       params.id,
       request.user.userInfo.userId,
     );
@@ -58,7 +58,7 @@ export class CommentController {
       return;
     }
 
-    let deleteStatus = await this.commentService.deleteComment(
+    const deleteStatus = await this.commentService.deleteComment(
       request.params.id,
     );
     if (deleteStatus) {
@@ -75,7 +75,7 @@ export class CommentController {
     @Req() request: Request,
     @Body() commentUpdateDto: CommentInputModel,
   ) {
-    let comment = await this.commentService.getComment(
+    const comment = await this.commentService.getComment(
       params.id,
       request.user.userInfo.userId,
     );
@@ -87,7 +87,7 @@ export class CommentController {
       response.sendStatus(403);
       return;
     }
-    let updateStatus = await this.commentService.updateComment(
+    const updateStatus = await this.commentService.updateComment(
       params.id,
       commentUpdateDto.content,
     );
@@ -105,7 +105,7 @@ export class CommentController {
     @Req() request: Request,
     @Body() likeUpdateDto: LikeInputModel,
   ) {
-    let result = await this.commentService.updateLikeStatus(
+    const result = await this.commentService.updateLikeStatus(
       likeUpdateDto.likeStatus,
       request.user.userInfo.userId,
       params.id,

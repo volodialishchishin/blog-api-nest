@@ -88,7 +88,7 @@ export class AuthService {
   async processPasswordRecovery(newPassword: string, userId: string) {
     const passwordSalt = await bcrypt.genSalt(10);
     const passwordHash = await bcrypt.hash(newPassword, passwordSalt);
-    let updateStatus = await this.authRepository.updateUserPassword(
+    const updateStatus = await this.authRepository.updateUserPassword(
       userId,
       passwordHash,
       passwordSalt,
