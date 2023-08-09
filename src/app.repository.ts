@@ -29,7 +29,7 @@ export class AppRepository {
     @InjectModel(Token.name) private tokenModel: Model<TokenDocument>,
     @InjectModel(Like.name) private likeModel: Model<LikeDocument>,
     @InjectDataSource() protected dataSource: DataSource,
-    private recoveryPasswords: Model<recoveryPasswordDocument>,
+    @InjectModel(RecoveryPassword.name)  private recoveryPasswords: Model<recoveryPasswordDocument>,
     @InjectModel(BannedUsersForBlog.name)
     private bannedUsersForModel: Model<BannedUsersForBlogDocument>,
     public helpers: Helpers,
