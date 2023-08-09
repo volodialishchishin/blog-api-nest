@@ -5,7 +5,7 @@ import { AppRepository } from './app.repository';
 export class AppService {
   constructor(private appRep: AppRepository) {}
 
-  deleteAll() {
-    return this.appRep.deleteAll();
+  async deleteAll() {
+    return await this.appRep.deleteAll();
   }
 }

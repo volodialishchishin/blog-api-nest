@@ -16,6 +16,8 @@ import {
   BannedUsersForBlog,
   BannedUsersForBlogDocument,
 } from './Schemas/banned-users-for-blog.schema';
+import { InjectDataSource } from "@nestjs/typeorm";
+import { DataSource } from "typeorm";
 
 @Injectable()
 export class AppRepository {
@@ -26,21 +28,24 @@ export class AppRepository {
     @InjectModel(Comment.name) private commentModel: Model<CommentDocument>,
     @InjectModel(Token.name) private tokenModel: Model<TokenDocument>,
     @InjectModel(Like.name) private likeModel: Model<LikeDocument>,
-    @InjectModel(RecoveryPassword.name)
+    @InjectDataSource() protected dataSource: DataSource,
     private recoveryPasswords: Model<recoveryPasswordDocument>,
     @InjectModel(BannedUsersForBlog.name)
     private bannedUsersForModel: Model<BannedUsersForBlogDocument>,
     public helpers: Helpers,
   ) {}
 
-  deleteAll() {
-    this.userModel.deleteMany({}).exec();
-    this.postModel.deleteMany({}).exec();
-    this.blogModel.deleteMany({}).exec();
-    this.commentModel.deleteMany({}).exec();
-    this.tokenModel.deleteMany({}).exec();
-    this.likeModel.deleteMany({}).exec();
-    this.bannedUsersForModel.deleteMany({}).exec();
+  async deleteAll() {
+    await this.userModel.deleteMany({}).exec();
+    await this.postModel.deleteMany({}).exec();
+    await this.blogModel.deleteMany({}).exec();
+    await this.commentModel.deleteMany({}).exec();
+    await this.tokenModel.deleteMany({}).exec();
+    await this.likeModel.deleteMany({}).exec();
+    await this.bannedUsersForModel.deleteMany({}).exec();
+    await this.dataSource.query('DELETE FROM user_entity')
+    await this.dataSource.query('DELETE FROM session_entity')
+    await this.dataSource.query('DELETE FROM recovery_passwords_entity')
     return;
   }
 }

@@ -7,8 +7,8 @@ export class AppController {
   constructor(private readonly appService: AppService) {}
 
   @Delete()
-  deleteAll(@Res() res: Response) {
-    this.appService.deleteAll();
+  async deleteAll(@Res() res: Response) {
+    await this.appService.deleteAll();
     res.sendStatus(204);
   }
 }
