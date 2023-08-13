@@ -184,7 +184,7 @@ export class AuthController {
   @Post('refresh-token')
   async refreshToken(@Req() req, @Res() response: Response) {
     try {
-      const { refreshToken } = req.cookies;
+      const { refresh:refreshToken } = req.cookies;
       let tokens;
       if (req.headers['user-agent']) {
         tokens = await this.authService.refresh(

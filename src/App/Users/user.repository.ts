@@ -96,7 +96,7 @@ export class UserRepository {
     const user = await this.dataSource.query(query, [value]);
     return user[0] ? this.helpers.userMapperToDocument(user[0]) : null
   }
-  async getUserById(id: string): Promise<UserDocument> {
+  async getUserById(id: string): Promise<User & {id:string}> {
     const query = `
     SELECT
       *
@@ -112,11 +112,7 @@ export class UserRepository {
 
     const result = await this.dataSource.query(query, parameters);
 
-    if (result.length > 0) {
-      return result[0];
-    } else {
-      return null;
-    }
+    return result[0] ? this.helpers.userMapperToDocument(result[0]) : null
   }
   async confirmCode(userId: string) {
     const query = `

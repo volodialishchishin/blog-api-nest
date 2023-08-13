@@ -27,7 +27,9 @@ export class AuthRepository {
   async findTokenByUserId(userId: string, deviceId: string) {
     const query =
       'select * from session_entity where "userId" = $1 and "deviceId" = $2';
+    console.log(userId, deviceId);
     const token = await this.dataSource.query(query, [userId, deviceId]);
+    console.log(token);
     return token[0];
   }
 

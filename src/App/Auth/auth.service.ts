@@ -62,7 +62,7 @@ export class AuthService {
     );
     const refreshToken = this.jwtService.sign(
       { user: user.id, deviceId: deviceId },
-      { secret: this.configService.get('SECRET'), expiresIn: '20s' },
+      { secret: this.configService.get('SECRET'), expiresIn: '30m' },
     );
     return {
       accessToken,
@@ -133,7 +133,9 @@ export class AuthService {
       throw new Error();
     }
     const user = await this.userRep.getUserById(userData.user);
+    console.log(user);
     const tokens = this.generateTokens(user, userData.deviceId);
+    console.log(tokens);
     await this.saveToken(user.id, tokens.refreshToken, ip);
     return { ...tokens };
   }
