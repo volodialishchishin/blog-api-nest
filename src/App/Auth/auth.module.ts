@@ -39,7 +39,7 @@ import { BlogSchema } from '../../Schemas/blog.schema';
       inject: [ConfigService],
       useFactory: async (configService: ConfigService) => ({
         secret: configService.get('SECRET'),
-        signOptions: { expiresIn: '10m' },
+        signOptions: { expiresIn: '10s' },
       }),
     }),
     ConfigModule,

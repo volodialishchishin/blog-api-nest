@@ -62,7 +62,7 @@ export class AuthService {
     );
     const refreshToken = this.jwtService.sign(
       { user: user.id, deviceId: deviceId },
-      { secret: this.configService.get('SECRET'), expiresIn: '30m' },
+      { secret: this.configService.get('SECRET'), expiresIn: '20s' },
     );
     return {
       accessToken,
