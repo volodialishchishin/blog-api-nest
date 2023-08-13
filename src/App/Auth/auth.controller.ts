@@ -88,7 +88,7 @@ export class AuthController {
       '',
       userModel.email,
     );
-    if (user?.result?.emailConfirmation?.isConfirmed || !user.result) {
+    if (user?.result?.emailConfirmation?.isConfirmed || !user?.result) {
       throw new BadRequestException([
         {
           message: 'User is already confirmed',
@@ -114,9 +114,11 @@ export class AuthController {
     @Res() response: Response,
   ) {
     const user = await this.userService.getUserByField(userModel.code);
+    console.log(!user, user.emailConfirmation.isConfirmed, user.emailConfirmation.confirmationCode);
+
     if (
       !user ||
-      user.emailConfirmation.isConfirmed ||
+      user.emailConfirmation?.isConfirmed ||
       !user.emailConfirmation?.confirmationCode
     ) {
       throw new BadRequestException([

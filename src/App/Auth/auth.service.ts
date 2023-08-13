@@ -40,7 +40,7 @@ export class AuthService {
 
   async checkCredentials(login: string, password: string, email: string) {
     const matchedUser = await this.userRep.getUserByLoginOrEmail(login, email);
-    if (!matchedUser.result) return null;
+    if (!matchedUser?.result) return null;
     if (matchedUser.result.banInfo.isBanned) return null;
     const passwordHash = await bcrypt.hash(
       password,

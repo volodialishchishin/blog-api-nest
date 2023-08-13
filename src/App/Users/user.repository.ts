@@ -48,12 +48,12 @@ export class UserRepository {
     const query =
       'DELETE FROM user_entity WHERE id = $1 ';
     const [,deleteResult] = await this.dataSource.query(query, [userId]);
-    return deleteResult.length;
+    return deleteResult;
   }
 
   async updateUser(userId: string, field: string, value) {
 
-    const query = 'UPDATE user_entity SET "confirmationCode" = $1 WHERE "userId" = $2 RETURNING *';
+    const query = 'UPDATE user_entity SET "emailConfirmationCode" = $1 WHERE "id" = $2 RETURNING *';
     const [,updateResult] = await this.dataSource.query(query, [
       value,
       userId,
@@ -89,11 +89,12 @@ export class UserRepository {
       return null;
     }
   }
-  async getUserByCode(value: string): Promise<UserDocument> {
+  async getUserByCode(value: string): Promise<User & {id:string}> {
     const query =
-      'select * from user_entity where "confirmationCode" = $1';
+      'select * from user_entity where "emailConfirmationCode" = $1';
+    console.log(value);
     const user = await this.dataSource.query(query, [value]);
-    return user[0];
+    return this.helpers.userMapperToDocument(user[0]);
   }
   async getUserById(id: string): Promise<UserDocument> {
     const query = `
@@ -122,17 +123,17 @@ export class UserRepository {
     UPDATE
       user_entity
     SET
-      email_confirmation_is_confirmed = true
+      "isEmailConfirmed" = true
     WHERE
       id = $1
   `;
 
     const parameters = [userId];
 
-    const updateResult = await this.dataSource.query(query, parameters);
+    const [,updateResult] = await this.dataSource.query(query, parameters);
     console.log(updateResult);
 
-    return updateResult.affected > 0;
+    return updateResult > 0;
   }
   async updateUserBanStatus(
     userId: string,
