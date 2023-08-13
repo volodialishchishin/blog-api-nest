@@ -40,8 +40,8 @@ export class UserQueryRepository {
     WHERE
       u.login ILIKE $1
       AND u.email ILIKE $2
-      ${banStatus === 'notBanned' ? 'AND NOT u.is_banned' : ''}
-      ${banStatus === 'banned' ? 'AND u.is_banned' : ''}
+      ${banStatus === 'notBanned' ? 'AND NOT u.isBanned' : ''}
+      ${banStatus === 'banned' ? 'AND u.isBanned' : ''}
     ORDER BY
       "${sortBy}" ${sortDirection}
     LIMIT
@@ -58,8 +58,8 @@ export class UserQueryRepository {
     WHERE
       u.login ILIKE $1
       OR u.email ILIKE $2
-      ${banStatus === 'notBanned' ? 'AND NOT u.is_banned' : ''}
-      ${banStatus === 'banned' ? 'AND u.is_banned' : ''}
+      ${banStatus === 'notBanned' ? 'AND NOT u.isBanned' : ''}
+      ${banStatus === 'banned' ? 'AND u.isBanned' : ''}
   `;
 
     const parameters = [ `%${searchLoginTerm}%`, `%${searchEmailTerm}%`, pageSize, offset ];
