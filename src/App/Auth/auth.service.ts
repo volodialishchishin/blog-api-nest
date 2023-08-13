@@ -114,7 +114,7 @@ export class AuthService {
         refreshToken,
         deviceId,
       );
-      return status.modifiedCount;
+      return status;
     }
     return await this.authRepository.createToken({
       deviceId,

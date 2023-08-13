@@ -31,7 +31,7 @@ export class SecurityController {
       const deleteResult = await this.securityService.deleteSessions(
         refreshToken,
       );
-      if (deleteResult.deletedCount) {
+      if (deleteResult) {
         response.sendStatus(204);
       } else {
         response.sendStatus(401);

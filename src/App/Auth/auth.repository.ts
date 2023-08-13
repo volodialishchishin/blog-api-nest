@@ -39,24 +39,25 @@ export class AuthRepository {
   async getUserByRecoveryCode(recoveryCode: string): Promise<UserViewModel> {
     const query = 'SELECT * FROM user_entity WHERE code = $1';
     const user = await this.dataSource.query(query, [recoveryCode]);
-    return this.helpers.userMapperToView(user[0]);
+    return query? this.helpers.userMapperToView(user[0]) : null;
   }
 
   async updateToken(userId: string, refreshToken: string, deviceId: string) {
     const query =
       'UPDATE session_entity SET "refreshToken" = $1, "lastActiveDate" = $2 WHERE "userId" = $3 AND "deviceId" = $4';
-    return await this.dataSource.query(query, [
+    let [,updateResult] =  await this.dataSource.query(query, [
       refreshToken,
       new Date().toISOString(),
       userId,
       deviceId,
     ]);
+    return updateResult>0
   }
   async deleteToken(token: string) {
     const query =
       'DELETE FROM session_entity WHERE "refreshToken" = $1 RETURNING *';
-    const deleteResult = await this.dataSource.query(query, [token]);
-    return !!deleteResult.length;
+    const [,deleteResult] = await this.dataSource.query(query, [token]);
+    return deleteResult>0
   }
   async updateUserPassword(
     userId: string,
@@ -65,12 +66,12 @@ export class AuthRepository {
   ) {
     const query =
       'UPDATE user_entity SET "passwordSalt" = $1, password = $2 WHERE "userId" = $3 RETURNING *';
-    const updateResult = await this.dataSource.query(query, [
+    const [,updateResult] = await this.dataSource.query(query, [
       passwordSalt,
       newPassword,
       userId,
     ]);
-    return !!updateResult.length;
+    return  updateResult>0
   }
   async createToken(token: Token) {
     const query =
@@ -94,7 +95,7 @@ export class AuthRepository {
 
   async deleteAllTokens(userId: string) {
     const query = 'DELETE FROM session_entity WHERE "userId" = $1';
-    const deleteResult = await this.dataSource.query(query, [userId]);
-    return !!deleteResult.length;
+    const [,deleteResult] = await this.dataSource.query(query, [userId]);
+    return deleteResult>0;
   }
 }

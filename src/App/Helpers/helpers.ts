@@ -13,6 +13,7 @@ import { Like, LikeDocument } from '../../Schemas/like.schema';
 import { Injectable } from '@nestjs/common';
 import { Token, TokenDocument } from '../../Schemas/token.schema';
 import { UserEntity } from "../../DB/Entities/user.entity";
+import { SessionEntity } from "../../DB/Entities/session.entity";
 
 Injectable();
 export class Helpers {
@@ -163,6 +164,15 @@ export class Helpers {
   }
 
   deviceMapperToView(token: Token) {
+    return {
+      deviceId: token.deviceId,
+      lastActiveDate: token.lastActiveDate,
+      ip: token.ip,
+      title: token.title,
+    };
+  }
+
+  deviceMapperToViewSql(token: SessionEntity) {
     return {
       deviceId: token.deviceId,
       lastActiveDate: token.lastActiveDate,
