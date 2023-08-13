@@ -94,7 +94,7 @@ export class UserRepository {
       'select * from user_entity where "emailConfirmationCode" = $1';
     console.log(value);
     const user = await this.dataSource.query(query, [value]);
-    return this.helpers.userMapperToDocument(user[0]);
+    return user[0] ? this.helpers.userMapperToDocument(user[0]) : null
   }
   async getUserById(id: string): Promise<UserDocument> {
     const query = `

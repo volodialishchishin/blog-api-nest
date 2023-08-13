@@ -114,7 +114,6 @@ export class AuthController {
     @Res() response: Response,
   ) {
     const user = await this.userService.getUserByField(userModel.code);
-    console.log(!user, user.emailConfirmation.isConfirmed, user.emailConfirmation.confirmationCode);
 
     if (
       !user ||
