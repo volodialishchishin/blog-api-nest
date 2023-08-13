@@ -55,10 +55,10 @@ export class UserQueryRepository {
     FROM
       user_entity u
     WHERE
-      u.login ILIKE $1
-      OR u.email ILIKE $2
-      ${banStatus === 'notBanned' ? 'AND NOT u."isBanned"' : ''}
-      ${banStatus === 'banned' ? 'AND u."isBanned"' : ''}
+      (u.login ILIKE $1
+      OR u.email ILIKE $2)
+      ${banStatus === 'notBanned' ? 'AND u."isBanned"= false' : ''}
+      ${banStatus === 'banned' ? 'AND u."isBanned" = true' : ''}
   `;
 
     console.log();
@@ -75,7 +75,7 @@ export class UserQueryRepository {
       pagesCount,
       page: Number(pageNumber),
       pageSize: Number(pageSize),
-      totalCount:items.length,
+      totalCount:itemsWithOutSkip.length,
       items: items.map(this.helpers.userMapperToViewSql),
     };
   }
