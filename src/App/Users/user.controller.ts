@@ -62,6 +62,7 @@ export class UserController {
   @UseGuards(BasicAuthGuard)
   async deleteUser(@Param() params, @Res() response: Response) {
     const result = await this.userService.deleteUser(params.id);
+    console.log(result);
     if (result) {
       response.sendStatus(204);
     } else {

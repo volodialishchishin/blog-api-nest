@@ -1,4 +1,4 @@
-import { UserDocument } from '../../Schemas/user.schema';
+import { User, UserDocument } from "../../Schemas/user.schema";
 import { UserViewModel } from '../../DTO/User/user-view-model.dto';
 import { PostDocument } from '../../Schemas/post.schema';
 import { PostViewModel } from '../../DTO/Post/post-view-model';
@@ -37,6 +37,29 @@ export class Helpers {
       email: user.email,
       createdAt: user.createdAt,
       login: user.login,
+      banInfo: {
+        isBanned: user.isBanned,
+        banReason: user.banReason,
+        banDate: user.banDate,
+      },
+    };
+  }
+
+  public userMapperToDocument(user: UserEntity){
+    return {
+      id: user.id,
+      accountData:{
+        login: user.login,
+        email:user.email,
+        password:user.password,
+        passwordSalt:user.passwordSalt,
+        createdAt:user.createdAt
+      },
+      emailConfirmation:{
+        isConfirmed:user.isEmailConfirmed,
+        confirmationCode: user.emailConfirmationCode,
+        confirmationDate: new Date(user.emailConfirmationDate)
+      },
       banInfo: {
         isBanned: user.isBanned,
         banReason: user.banReason,

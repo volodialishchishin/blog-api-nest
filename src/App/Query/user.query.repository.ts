@@ -66,7 +66,7 @@ export class UserQueryRepository {
     const parametersWithOutSkip = [ `%${searchLoginTerm}%`, `%${searchEmailTerm}%` ];
 
     const items = await this.dataSource.query(query, parameters);
-    const itemsWithOutSkip = await this.dataSource.query(queryWithOutSkip, parametersWithOutSkip).catch;
+    const itemsWithOutSkip = await this.dataSource.query(queryWithOutSkip, parametersWithOutSkip);
 
     const pagesCount = Math.ceil(itemsWithOutSkip.length / pageSize);
 

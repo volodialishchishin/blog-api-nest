@@ -51,7 +51,7 @@ export class AuthService {
     }
   }
 
-  generateTokens(user: UserDocument, deviceId?: string) {
+  generateTokens(user, deviceId?: string) {
     const accessToken = this.jwtService.sign(
       {
         user: user.id,

@@ -40,7 +40,7 @@ export class AuthController {
       userModel?.login,
       userModel?.email,
     );
-    if (isUserExists.result) {
+    if (isUserExists?.result) {
       throw new BadRequestException([
         {
           message: 'User Exists',

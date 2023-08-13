@@ -46,25 +46,25 @@ export class UserRepository {
 
   async deleteUser(userId: string): Promise<number> {
     const query =
-      'DELETE FROM user_entity WHERE id = $1';
-    const deleteResult = await this.dataSource.query(query, [userId]);
+      'DELETE FROM user_entity WHERE id = $1 ';
+    const [,deleteResult] = await this.dataSource.query(query, [userId]);
     return deleteResult.length;
   }
 
   async updateUser(userId: string, field: string, value) {
 
     const query = 'UPDATE user_entity SET "confirmationCode" = $1 WHERE "userId" = $2 RETURNING *';
-    const updateResult = await this.dataSource.query(query, [
+    const [,updateResult] = await this.dataSource.query(query, [
       value,
       userId,
     ]);
-    return updateResult.length;
+    return updateResult;
   }
 
   async getUserByLoginOrEmail(
     login: string,
     email: string,
-  ): Promise<{ result: UserDocument; field: 'login' | 'email' }> {
+  ): Promise<{ result: User & {id:string} ; field: 'login' | 'email' }> {
     const query = `
     SELECT
       *
@@ -84,7 +84,7 @@ export class UserRepository {
     if (result.length > 0) {
       const user = result[0];
       const field = user.login === login ? 'login' : 'email';
-      return { result: user, field };
+      return { result: this.helpers.userMapperToDocument(user) || null, field };
     } else {
       return null;
     }
@@ -130,6 +130,7 @@ export class UserRepository {
     const parameters = [userId];
 
     const updateResult = await this.dataSource.query(query, parameters);
+    console.log(updateResult);
 
     return updateResult.affected > 0;
   }
@@ -143,18 +144,19 @@ export class UserRepository {
     UPDATE
       user_entity
     SET
-      is_banned = $1,
-      ban_reason = $2,
-      ban_date = $3
+      "isBanned" = $1,
+      "banReason" = $2,
+      "banDate" = $3
     WHERE
       id = $4
+    RETURNING *
   `;
 
     const parameters = [banStatus, banReason, banDate, userId];
 
-    const updateResult = await this.dataSource.query(query, parameters);
+    const [,updateResult] = await this.dataSource.query(query, parameters);
 
-    return updateResult.affected > 0;
+    return updateResult > 0;
   }
 
   async updateBanStatus(
