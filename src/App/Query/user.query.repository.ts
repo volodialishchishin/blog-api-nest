@@ -75,7 +75,7 @@ export class UserQueryRepository {
       pagesCount,
       page: Number(pageNumber),
       pageSize: Number(pageSize),
-      totalCount:itemsWithOutSkip.length,
+      totalCount:items.length,
       items: items.map(this.helpers.userMapperToViewSql),
     };
   }
