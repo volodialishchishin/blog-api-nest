@@ -29,7 +29,6 @@ export class UserQueryRepository {
     sortDirection: 'asc' | 'desc' = 'desc',
     banStatus: string,
   ): Promise<UserViewModelWithQuery> {
-
     const offset = (pageNumber - 1) * pageSize;
 
     const query = `
@@ -38,10 +37,10 @@ export class UserQueryRepository {
     FROM
       user_entity u
     WHERE
-      u.login ILIKE $1
-      OR u.email ILIKE $2
-      ${banStatus === 'notBanned' ? 'AND NOT u."isBanned"' : ''}
-      ${banStatus === 'banned' ? 'AND u."isBanned"' : ''}
+      (u.login ILIKE $1
+      OR u.email ILIKE $2)
+      ${banStatus === 'notBanned' ? 'AND u."isBanned"= false' : ''}
+      ${banStatus === 'banned' ? 'AND u."isBanned" = true' : ''}
     ORDER BY
       "${sortBy}" ${sortDirection}
     LIMIT

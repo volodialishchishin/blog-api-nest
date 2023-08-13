@@ -40,6 +40,7 @@ export class UserController {
     @Req() request: Request,
     @Res() response: Response,
   ) {
+    console.log(banStatus);
     const users = await this.userQueryRep.getUsers(
       searchLoginTerm,
       searchEmailTerm,
