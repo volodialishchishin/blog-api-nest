@@ -8,50 +8,38 @@ import {
 import { User } from '../../../Schemas/user.schema';
 import { Injectable } from '@nestjs/common';
 import { Helpers } from '../../Helpers/helpers';
-import { InjectDataSource } from "@nestjs/typeorm";
-import { DataSource } from "typeorm";
 
 Injectable();
 export class securityRepository {
   constructor(
     @InjectModel(Token.name) private tokenModel: Model<TokenDocument>,
     @InjectModel(User.name) private userModel: Model<User>,
-    @InjectDataSource() protected dataSource: DataSource,
     public helpers: Helpers,
   ) {}
   async getSessions(userId: string) {
-    const query = 'select * from session_entity where "userId" = $1';
-    const sessions = await this.dataSource.query(query, [userId]);
-    return sessions.map(this.helpers.deviceMapperToViewSql);
+    const devices = await this.tokenModel.find({ userId }).exec();
+    return devices.map(this.helpers.deviceMapperToView);
   }
   async deleteSessions(userId: string, deviceId: string) {
-    const query =
-      'DELETE FROM session_entity WHERE "userId" = $1 and not "deviceId" = $2';
-    const [,deleteResult] = await this.dataSource.query(query, [userId, deviceId]);
-    return deleteResult>0
+    return this.tokenModel.deleteMany({ userId, deviceId: { $ne: deviceId } });
   }
   async deleteSession(userId: string, id: string) {
     try {
-      const query =
-        'DELETE FROM session_entity WHERE "userId" = $1 and "deviceId" = $2 RETURNING *';
       await this.getSession(userId, id);
-      const [,deleteResult] = await this.dataSource.query(query, [userId, id]);
-      return deleteResult>0
+      return await this.tokenModel.deleteOne({ userId: userId, deviceId: id });
     } catch (e: any) {
       throw new Error(e.message);
     }
   }
   async getSession(userId: string, id: string): Promise<Token> {
-    const query =
-      'select * from session_entity where "deviceId" = $1';
-    const session = await this.dataSource.query(query, [id]);
-    if (!session[0]) {
+    const session = await this.tokenModel.findOne({ deviceId: id });
+    if (!session) {
       throw new Error('404');
     } else {
-      if (session[0]?.userId !== userId) {
+      if (session?.userId !== userId) {
         throw new Error('403');
       } else {
-        return session[0];
+        return session;
       }
     }
   }
