@@ -137,7 +137,9 @@ export class PostController {
       result.items.length
         ? response.status(200).json(result)
         : response.sendStatus(404);
-    } catch (e) {}
+    } catch (e) {
+      console.log(e);
+    }
   }
 
   @Put('/:postId/like-status')

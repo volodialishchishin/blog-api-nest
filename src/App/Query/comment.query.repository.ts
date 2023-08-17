@@ -56,13 +56,12 @@ export class CommentQueryRepository {
 
     const queryWithOutSkip = `
     SELECT
-      c.*
+      c.*, u.login
     FROM
       comment_entity c
     inner join 
+    user_entity u on u.id = c."userId"
     where c."postId" = $1
-    ORDER BY
-      "${sortBy}" ${sortDirection}
   `;
     const itemsWithOutSkip = await this.dataSource.query(queryWithOutSkip, [postId]);
     const pagesCount = Math.ceil(items.length / pageSize);
