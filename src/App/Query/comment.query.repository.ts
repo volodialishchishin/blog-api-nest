@@ -64,22 +64,22 @@ export class CommentQueryRepository {
     where c."postId" = $1
   `;
     const itemsWithOutSkip = await this.dataSource.query(queryWithOutSkip, [postId]);
-    const pagesCount = Math.ceil(items.length / pageSize);
+    const pagesCount = Math.ceil(itemsWithOutSkip.length / pageSize);
     const itemsWithLikes = await Promise.all(
       items.map(async (comment) => {
         let likesCount = await this.dataSource.query(
-          'select * from like_entity where "entityId" = $1 and status = $2',
+          'select * from like_entity inner join user_entity u on u.id = like_entity."userId" where "entityId" = $1 and status = $2 and u."isBanned" = false',
           [comment.id, LikeInfoViewModelValues.like],
         );
         let dislikeCount = await this.dataSource.query(
-          'select * from like_entity where "entityId" = $1 and status = $2',
+          'select * from like_entity  inner join user_entity u on u.id = like_entity."userId" where "entityId" = $1 and status = $2   and u."isBanned" = false',
           [comment.id, LikeInfoViewModelValues.dislike],
         );
 
         const mappedComment = await this.helpers.commentsMapperToViewSql({
           ...comment,
           likesCount: likesCount.length,
-          dislikeCount: dislikeCount.length,
+          disLikesCount: dislikeCount.length,
           login: comment.login
         });
 

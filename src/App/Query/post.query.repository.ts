@@ -57,11 +57,11 @@ export class PostQueryRepository {
     const itemsWithLikes = await Promise.all(
       items.map(async (post) => {
         let likesCount = await this.dataSource.query(
-          'select * from like_entity where "entityId" = $1 and status = $2',
+          'select * from like_entity inner join user_entity u on u.id = like_entity."userId" where "entityId" = $1 and status = $2 and u."isBanned" = false',
           [post.id, LikeInfoViewModelValues.like],
         );
         let dislikeCount = await this.dataSource.query(
-          'select * from like_entity where "entityId" = $1 and status = $2',
+          'select * from like_entity  inner join user_entity u on u.id = like_entity."userId" where "entityId" = $1 and status = $2   and u."isBanned" = false',
           [post.id, LikeInfoViewModelValues.dislike],
         );
 
@@ -69,7 +69,7 @@ export class PostQueryRepository {
         SELECT l."createdAt", l."userId", u.login AS "userLogin"
         FROM like_entity l
         LEFT JOIN user_entity u ON l."userId" = u.id
-        WHERE l."entityId" = $1 AND l.status = 'Like' 
+        WHERE l."entityId" = $1 AND l.status = 'Like' and u."isBanned" = false 
         ORDER BY l."createdAt" DESC
         LIMIT 3`;
         const lastLikes = await this.dataSource.query(lastLikesQuery, [

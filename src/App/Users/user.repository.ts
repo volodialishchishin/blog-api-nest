@@ -165,6 +165,7 @@ export class UserRepository {
   }
 
   async banUserForBlog(userId:string, blogId:string, banReason:string, banDate:string){
+    console.log(userId);
     const user = await this.getUserById(userId);
     if (!user) return null;
     const insertUserBanQuery = `
@@ -177,10 +178,11 @@ export class UserRepository {
   }
 
   async isUserBanned(userId: string, postId: string) {
-    const userBan = this.dataSource.query(
+    const userBan = await this.dataSource.query(
       'select * from user_blogs_ban_entity where (select p."blogId"  from post_entity p  where p.id = $1 ) = user_blogs_ban_entity."blogId" and user_blogs_ban_entity."userId" = $2',
       [postId,userId ],
     );
+    console.log(userId, postId);
     return userBan[0] ? userBan[0] : null;
   }
 

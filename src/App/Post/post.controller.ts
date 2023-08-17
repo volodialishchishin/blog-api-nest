@@ -100,7 +100,10 @@ export class PostController {
         params.id,
       );
       console.log(userAccess);
-      if (userAccess) response.sendStatus(403);
+      if (userAccess) {
+        response.sendStatus(403)
+        return
+      };
       const result = await this.commentService.createComment(
         params.id,
         content,
@@ -109,6 +112,7 @@ export class PostController {
       );
 
       response.status(201).json(result);
+      return
     }
   }
 
