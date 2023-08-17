@@ -55,8 +55,9 @@ export class CommentRepository {
 
   async getComment(id: string, userId: string) {
     const comment= await this.dataSource.query('select comment_entity.* , u.login from comment_entity inner join user_entity u on comment_entity."userId" = u.id where comment_entity.id = $1 and u."isBanned" = false', [id])
+    console.log(comment);
     if (comment[0]) {
-      const commentToView = await this.helpers.commentsMapperToViewSql({ ...comment[0], disLikesCount:0, login: comment.login, likesCount:0 });
+      const commentToView = await this.helpers.commentsMapperToViewSql({ ...comment[0], disLikesCount:0, login: comment[0].login, likesCount:0 });
 
       if (!userId) {
         return commentToView;

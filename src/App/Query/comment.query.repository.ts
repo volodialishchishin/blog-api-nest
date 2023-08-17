@@ -116,7 +116,7 @@ export class CommentQueryRepository {
   ): Promise<allCommentsForUserViewModelWithQuery> {
     const offset = (pageNumber - 1) * pageSize;
     const comments = await this.dataSource.query(`select c.*, u.login, p.title, p."blogId", b.name from comment_entity c inner join user_entity u on c."userId" = u.id inner join post_entity p on c."postId" = p.id inner join blog_entity b on p."blogId" = b.id ORDER BY "${sortBy}" ${sortDirection} Limit $1 offset $2`, [pageSize,offset])
-    const allComments =await this.dataSource.query(`select c.*, u.login, p.title, p."blogId", b.name from comment_entity c inner join user_entity u on c."userId" = u.id inner join post_entity p on c."postId" = p.id inner join blog_entity b on p."blogId" = b.id`, [pageSize,offset])
+    const allComments =await this.dataSource.query(`select c.*, u.login, p.title, p."blogId", b.name from comment_entity c inner join user_entity u on c."userId" = u.id inner join post_entity p on c."postId" = p.id inner join blog_entity b on p."blogId" = b.id`)
 
     const pagesCount = Math.ceil(allComments.length / pageSize);
     const mappedComments: Array<allCommentsForUserViewModel> =

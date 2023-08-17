@@ -74,7 +74,16 @@ export class PostsRepository {
       return null;
     }
 
-    const postToView = await this.helpers.postMapperToViewSql(result);
+    let likesCount = await this.dataSource.query(
+      'select * from like_entity where "entityId" = $1 and status = $2',
+      [id, LikeInfoViewModelValues.like],
+    );
+    let dislikeCount = await this.dataSource.query(
+      'select * from like_entity where "entityId" = $1 and status = $2',
+      [id, LikeInfoViewModelValues.dislike],
+    );
+
+    const postToView = await this.helpers.postMapperToViewSql({ ...result, dislikesCount:dislikeCount.length, likesCount:likesCount.length });
 
     const likeQuery = `
     SELECT l."createdAt", l."userId", u.login AS "userLogin"

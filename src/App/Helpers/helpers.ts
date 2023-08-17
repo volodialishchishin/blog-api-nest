@@ -168,7 +168,7 @@ export class Helpers {
   public async commentsMapperToViewSql(
     comment: CommentEntity & {login:string, likesCount:number, disLikesCount:number},
   ): Promise<CommentViewModel> {
-    console.log(comment);
+    console.log('mapper',comment);
     return {
       content: comment.content,
       commentatorInfo: {
