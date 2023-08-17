@@ -82,6 +82,7 @@ export class BlogRepository {
     banDate: string,
     status: boolean,
   ): Promise<boolean> {
+    console.log(status);
     const updateQuery =
       'UPDATE blog_entity SET "isBanned" = $1, "banDate" = $2 WHERE "id" = $3';
     const [, updateResult] = await this.dataSource.query(updateQuery, [

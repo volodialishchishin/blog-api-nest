@@ -77,7 +77,9 @@ export class BlogSaController {
     @Req() request: Request,
     @Body() banInputModel: { isBanned: boolean },
   ) {
+    console.log(banInputModel.isBanned);
     if (banInputModel.isBanned) {
+      console.log(banInputModel);
       const banUserStatus = await this.blogService.banBlog(params.blogId);
       banUserStatus ? response.sendStatus(204) : response.sendStatus(404);
       return;

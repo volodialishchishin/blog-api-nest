@@ -40,7 +40,7 @@ export class BlogQueryRepository {
     FROM
       blog_entity b
     WHERE
-      (b.name ILIKE $1)  ${userId ? `AND b."userId" = ${userId}"` : ''}
+      (b.name ILIKE $1)  ${userId ? `AND b."userId" = ${userId}"` : ''} and b."isBanned" = false
 
     ORDER BY
       "${sortBy}" ${sortDirection}
@@ -54,9 +54,9 @@ export class BlogQueryRepository {
     SELECT
       *
     FROM
-      blog_entity b
+      blog_entity b 
     WHERE
-      (b.name ILIKE $1)  ${userId ? `AND b."userId" = ${userId}"` : ''}
+      (b.name ILIKE $1)  ${userId ? `AND b."userId" = ${userId}"` : ''} and b."isBanned" = false
 
     ORDER BY
       "${sortBy}" ${sortDirection}

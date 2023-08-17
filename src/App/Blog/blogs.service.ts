@@ -47,6 +47,7 @@ export class BlogsService {
     return this.blogRep.bindBlog(blogId, userId);
   }
   async banBlog(blogId: string): Promise<boolean> {
+    console.log(blogId);
     return this.blogRep.updateBanStatusOfBlog(
       blogId,
       new Date().toISOString(),
