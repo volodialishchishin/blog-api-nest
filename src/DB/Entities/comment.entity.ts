@@ -10,8 +10,8 @@ export class CommentEntity {
   content: string;
   @Column({ type: 'varchar' })
   createdAt: string;
-  @Column({ type: 'varchar' })
+  @Column({ type: 'uuid' })
   postId: string;
-  @Column({ type: 'varchar' })
+  @Column({ type: 'uuid' })
   userId: string;
 }

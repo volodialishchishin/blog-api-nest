@@ -75,12 +75,12 @@ export class PostsRepository {
       return null;
     }
 
-    const postToView = await this.helpers.postMapperToView(result);
+    const postToView = await this.helpers.postMapperToViewSql(result);
 
     const likeQuery = `
     SELECT l."createdAt", l."userId", u.login AS "userLogin"
     FROM like_entity AS l
-    LEFT JOIN users AS u ON l."userId" = u.id
+    LEFT JOIN user_entity AS u ON l."userId" = u.id
     WHERE l."entityId" = $1 AND l.status = $2 AND u."isBanned" = $3
     ORDER BY l."createdAt" DESC
     LIMIT 3`;

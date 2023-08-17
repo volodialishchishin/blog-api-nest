@@ -50,7 +50,7 @@ export class CommentRepository {
       comment.createdAt,
       comment.userId
     ]);
-    return this.helpers.commentsMapperToViewSql({...resolvedComment[0], login:user.login, likesCount:0, disLikesCount:0});
+    return this.helpers.commentsMapperToViewSql({...resolvedComment[0], login:user[0].login, likesCount:0, disLikesCount:0});
   }
 
   async getComment(id: string, userId: string) {
