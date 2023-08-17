@@ -112,7 +112,7 @@ export class UserQueryRepository {
     select b.*, u.login  from user_blogs_ban_entity b
     left join user_entity u on b."userId" =  u.id
     WHERE
-      u.login ILIKE $1 and b."blogId" = $4
+      u.login ILIKE $1 and b."blogId" = $2
   `;
 
     const bannedUserWithSkip = await this.dataSource.query(query, [
@@ -124,6 +124,7 @@ export class UserQueryRepository {
 
     const totalCount = await this.dataSource.query(queryWithOutSkip, [
       `%${searchLoginTerm}%`,
+      blogId
     ]);
     const pagesCount = Math.ceil(totalCount.length / pageSize);
 
