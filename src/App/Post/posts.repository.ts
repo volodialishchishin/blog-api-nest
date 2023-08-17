@@ -38,13 +38,12 @@ export class PostsRepository {
     id: string,
   ): Promise<boolean> {
     const query =
-      'UPDATE post_entity SET "title" = $1, "shortDescription" = $2, content = $3, "blogId" = $4 AND "id" = $5';
+      'UPDATE post_entity SET "title" = $1, "shortDescription" = $2, content = $3 where  id = $4';
     const [, updateResult] = await this.dataSource.query(query, [
       title,
       shortDescription,
       content,
-      blogId,
-      id,
+      id
     ]);
     return updateResult > 0;
   }
