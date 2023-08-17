@@ -153,34 +153,6 @@ export class UserRepository {
     return updateResult > 0;
   }
 
-  async updateBanStatus(
-    userId: string,
-    blogId: string,
-    banReason: string,
-    banDate: string,
-  ) {
-    const user = await this.getUserById(userId);
-    if (!user) return null;
-
-    if (!userBan) {
-      const insertUserBanQuery = `
-      INSERT INTO user_blogs_ban_entity ("userId", "blogId", "banReason", "banDate")
-      VALUES ($1,$2,$3,$4)`;
-
-      const insertUserBanValues = [userId, blogId, banReason, banDate];
-      await this.dataSource.query(insertUserBanQuery, insertUserBanValues);
-      return true;
-    }
-    else {
-      const updateUserBanQuery = `
-      delete from user_blogs_ban_entity where id= $1 and "blogId" = $2`;
-
-      const updateUserBanValues = [userBan.userId, userBan.blogId];
-      await this.dataSource.query(updateUserBanQuery, updateUserBanValues);
-
-      return true;
-    }
-  }
   async unbanUserForBlog(userId:string, blogId:string){
     const user = await this.getUserById(userId);
     if (!user) return null;

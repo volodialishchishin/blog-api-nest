@@ -47,14 +47,14 @@ export class CommentRepository {
     const resolvedComment: Array<CommentEntity> = await this.dataSource.query(query, [
       comment.content,
       comment.createdAt,
-      comment.createdAt,
+      comment.postId,
       comment.userId
     ]);
     return this.helpers.commentsMapperToViewSql({...resolvedComment[0], login:user[0].login, likesCount:0, disLikesCount:0});
   }
 
   async getComment(id: string, userId: string) {
-    const comment= await this.dataSource.query('select comment_entity.* , u.login from comment_entity inner join user_entity u on comment_entity."userId" = u.id where id = $1 and u."isBanned" = false', [id])
+    const comment= await this.dataSource.query('select comment_entity.* , u.login from comment_entity inner join user_entity u on comment_entity."userId" = u.id where comment_entity.id = $1 and u."isBanned" = false', [id])
     if (comment[0]) {
       const commentToView = await this.helpers.commentsMapperToViewSql({ ...comment, disLikesCount:0, login: comment.login, likesCount:0 });
 
