@@ -38,7 +38,7 @@ export class PostsRepository {
     id: string,
   ): Promise<boolean> {
     const query =
-      'UPDATE post_entity SET "title" = $1, "shortDescription" = $2, content = $3, blogId = $4 AND "id" = $5';
+      'UPDATE post_entity SET "title" = $1, "shortDescription" = $2, content = $3, "blogId" = $4 AND "id" = $5';
     const [, updateResult] = await this.dataSource.query(query, [
       title,
       shortDescription,
@@ -56,7 +56,7 @@ export class PostsRepository {
   async getPost(id: string, userId: string): Promise<PostViewModel | null> {
     const queryResult = await this.dataSource.query(
       `
-    SELECT p.*, b."isBanned" AS "blogIsBanned"
+    SELECT p.*, b."isBanned" AS "blogIsBanned",b.name as "blogName"
     FROM post_entity AS p
     LEFT JOIN blog_entity AS b ON p."blogId" = b.id
     WHERE p.id = $1`,

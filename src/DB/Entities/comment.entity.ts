@@ -12,6 +12,6 @@ export class CommentEntity {
   createdAt: string;
   @Column({ type: 'uuid' })
   postId: string;
-  @Column({ type: 'uuid' })
+  @Column({ type: 'uuid'  })
   userId: string;
 }

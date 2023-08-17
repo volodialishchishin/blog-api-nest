@@ -143,7 +143,7 @@ export class UserQueryRepository {
 
     return {
       pagesCount,
-      page: pageNumber,
+      page: Number(pageNumber),
       pageSize:Number(pageSize),
       totalCount:totalCount.length,
       items,
