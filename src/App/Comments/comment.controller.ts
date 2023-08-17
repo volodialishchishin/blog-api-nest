@@ -111,6 +111,7 @@ export class CommentController {
       params.id,
       request.user.userInfo.login,
     );
+    console.log('result',result);
     if (result) {
       response.sendStatus(204);
     } else {

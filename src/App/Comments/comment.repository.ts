@@ -82,6 +82,7 @@ export class CommentRepository {
       'select *  from comment_entity where id = $1',
       [commentId],
     );
+    console.log('comment', !comment[0]);
     if (!comment[0]) {
       return false;
     }
@@ -96,14 +97,17 @@ export class CommentRepository {
 
       const insertLikeValues = [commentId, userId, likeStatus, new Date()];
       await this.dataSource.query(insertLikeQuery, insertLikeValues);
-    } else {
+      return true
+    }
+    else {
       if (likeStatus === LikeInfoViewModelValues.none) {
         const deleteLikeQuery = `
         DELETE FROM like_entity
         WHERE "entityId" = $1 AND "userId" = $2`;
 
         await this.dataSource.query(deleteLikeQuery, [commentId, userId]);
-      } else {
+      }
+      else {
         const updateLikeQuery = `
         UPDATE like_entity
         SET status = $1
