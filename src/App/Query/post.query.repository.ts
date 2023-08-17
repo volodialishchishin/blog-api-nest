@@ -78,12 +78,12 @@ export class PostQueryRepository {
         const mappedPost = await this.helpers.postMapperToViewSql({
           ...post,
           likesCount: likesCount.length,
-          dislikeCount: dislikeCount.length,
+          dislikesCount: dislikeCount.length,
           blogName: post.blogName,
         });
         mappedPost.extendedLikesInfo.newestLikes = lastLikes.map((e) => {
           return {
-            addedAt: e.createdAt,
+            addedAt: e.createdAt.toString(),
             userId: e.userId,
             login: e.userLogin,
           };
