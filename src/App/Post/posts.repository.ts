@@ -75,15 +75,15 @@ export class PostsRepository {
     }
 
     let likesCount = await this.dataSource.query(
-      'select * from like_entity where "entityId" = $1 and status = $2',
+      'select * from like_entity inner join user_entity u on u.id = like_entity."userId" where "entityId" = $1 and status = $2 and u."isBanned" = false',
       [id, LikeInfoViewModelValues.like],
     );
-    let dislikesCount = await this.dataSource.query(
-      'select * from like_entity where "entityId" = $1 and status = $2',
+    let dislikeCount = await this.dataSource.query(
+      'select * from like_entity  inner join user_entity u on u.id = like_entity."userId" where "entityId" = $1 and status = $2   and u."isBanned" = false',
       [id, LikeInfoViewModelValues.dislike],
     );
 
-    const postToView = await this.helpers.postMapperToViewSql({ ...result, dislikesCount:dislikesCount.length, likesCount:likesCount.length });
+    const postToView = await this.helpers.postMapperToViewSql({ ...result, dislikesCount:dislikeCount.length, likesCount:likesCount.length });
 
     const likeQuery = `
     SELECT l."createdAt", l."userId", u.login AS "userLogin"
