@@ -126,8 +126,6 @@ export class UserQueryRepository {
     const totalCount = await this.dataSource.query(queryWithOutSkip, [
       `%${searchLoginTerm}%`,
     ]);
-    console.log(bannedUserWithSkip);
-    console.log(totalCount);
     const pagesCount = Math.ceil(totalCount.length / pageSize);
 
     const items = bannedUserWithSkip.map((user) => ({

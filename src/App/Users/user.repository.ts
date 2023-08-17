@@ -184,9 +184,9 @@ export class UserRepository {
     }
     else {
       const updateUserBanQuery = `
-      delete from user_blogs_ban_entity where id= $1`;
+      delete from user_blogs_ban_entity where id= $1 and "blogId" = $2`;
 
-      const updateUserBanValues = [userBan.userId];
+      const updateUserBanValues = [userBan.userId, userBan.blogId];
       await this.dataSource.query(updateUserBanQuery, updateUserBanValues);
 
       return true;
