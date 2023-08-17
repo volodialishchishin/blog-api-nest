@@ -181,7 +181,8 @@ export class UserRepository {
       const insertUserBanValues = [userId, blogId, banReason, banDate];
       await this.dataSource.query(insertUserBanQuery, insertUserBanValues);
       return true;
-    } else {
+    }
+    else {
       const updateUserBanQuery = `
       delete from user_blogs_ban_entity where id= $1`;
 

@@ -5,9 +5,9 @@ export class UserBlogsBanEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ type: 'varchar' })
+  @Column({ type: 'varchar', nullable:true })
   banDate: string;
-  @Column({ type: 'varchar' })
+  @Column({ type: 'varchar', nullable:true })
   banReason: string;
   @Column({ type: 'uuid' })
   blogId: string;

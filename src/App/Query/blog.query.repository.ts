@@ -40,8 +40,7 @@ export class BlogQueryRepository {
     FROM
       blog_entity b
     WHERE
-      (b.name ILIKE $1)  ${userId ? `AND b."userId" = ${userId}"` : ''} and b."isBanned" = false
-
+      (b.name ILIKE $1)  ${userId ? `AND b."userId" = $4` : ''} and b."isBanned" = false
     ORDER BY
       "${sortBy}" ${sortDirection}
     LIMIT
@@ -56,14 +55,13 @@ export class BlogQueryRepository {
     FROM
       blog_entity b 
     WHERE
-      (b.name ILIKE $1)  ${userId ? `AND b."userId" = ${userId}"` : ''} and b."isBanned" = false
-
+      (b.name ILIKE $1)  ${userId ? `AND b."userId" = $2` : ''} and b."isBanned" = false
     ORDER BY
       "${sortBy}" ${sortDirection}
   `;
 
-    const parameters = [`%${searchNameTerm}%`, pageSize, offset];
-    const parametersWithOutSkip = [`%${searchNameTerm}%`];
+    const parameters = [`%${searchNameTerm}%`, pageSize, offset, userId];
+    const parametersWithOutSkip = [`%${searchNameTerm}%`, userId];
 
     const items = await this.dataSource.query(query, parameters);
     const itemsWithOutSkip = await this.dataSource.query(
