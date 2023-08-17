@@ -1,7 +1,7 @@
 import { Types } from 'mongoose';
 
 export type BlogViewModel = {
-  id: Types.ObjectId;
+  id: string;
   name: string;
   websiteUrl: string;
   createdAt: string;
@@ -14,7 +14,7 @@ export type BlogViewModel = {
 };
 
 export type BlogViewModelSA = {
-  id: Types.ObjectId;
+  id: string;
   name: string;
   websiteUrl: string;
   createdAt: string;

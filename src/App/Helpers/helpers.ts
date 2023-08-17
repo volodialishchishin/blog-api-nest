@@ -1,19 +1,22 @@
-import { User, UserDocument } from "../../Schemas/user.schema";
+import { User, UserDocument } from '../../DB/Schemas/user.schema';
 import { UserViewModel } from '../../DTO/User/user-view-model.dto';
-import { PostDocument } from '../../Schemas/post.schema';
+import { PostDocument } from '../../DB/Schemas/post.schema';
 import { PostViewModel } from '../../DTO/Post/post-view-model';
 import { LikeInfoViewModelValues } from '../../DTO/LikeInfo/like-info-view-model';
-import { CommentDocument } from '../../Schemas/comment.schema';
+import { CommentDocument } from '../../DB/Schemas/comment.schema';
 import { CommentViewModel } from '../../DTO/Comment/comment-view-model';
-import { BlogDocument } from '../../Schemas/blog.schema';
+import { BlogDocument } from '../../DB/Schemas/blog.schema';
 import { BlogViewModel, BlogViewModelSA } from '../../DTO/Blog/blog-view-model';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { Like, LikeDocument } from '../../Schemas/like.schema';
+import { Like, LikeDocument } from '../../DB/Schemas/like.schema';
 import { Injectable } from '@nestjs/common';
-import { Token, TokenDocument } from '../../Schemas/token.schema';
-import { UserEntity } from "../../DB/Entities/user.entity";
-import { SessionEntity } from "../../DB/Entities/session.entity";
+import { Token, TokenDocument } from '../../DB/Schemas/token.schema';
+import { UserEntity } from '../../DB/Entities/user.entity';
+import { SessionEntity } from '../../DB/Entities/session.entity';
+import { BlogEntity } from '../../DB/Entities/blog.entity';
+import { PostEntity } from '../../DB/Entities/post.entity';
+import { CommentEntity } from "../../DB/Entities/comment.entity";
 
 Injectable();
 export class Helpers {
@@ -46,20 +49,20 @@ export class Helpers {
     };
   }
 
-  public userMapperToDocument(user: UserEntity){
+  public userMapperToDocument(user: UserEntity) {
     return {
       id: user.id,
-      accountData:{
+      accountData: {
         login: user.login,
-        email:user.email,
-        password:user.password,
-        passwordSalt:user.passwordSalt,
-        createdAt:user.createdAt
+        email: user.email,
+        password: user.password,
+        passwordSalt: user.passwordSalt,
+        createdAt: user.createdAt,
       },
-      emailConfirmation:{
-        isConfirmed:user.isEmailConfirmed,
+      emailConfirmation: {
+        isConfirmed: user.isEmailConfirmed,
         confirmationCode: user.emailConfirmationCode,
-        confirmationDate: new Date(user.emailConfirmationDate)
+        confirmationDate: new Date(user.emailConfirmationDate),
       },
       banInfo: {
         isBanned: user.isBanned,
@@ -85,7 +88,7 @@ export class Helpers {
       })
       .exec();
     return {
-      id: post._id,
+      id: post._id.toString(),
       title: post.title,
       shortDescription: post.shortDescription,
       content: post.content,
@@ -95,6 +98,34 @@ export class Helpers {
       extendedLikesInfo: {
         likesCount: likesCount.length,
         dislikesCount: disLikesCount.length,
+        myStatus: LikeInfoViewModelValues.none,
+        newestLikes: [],
+      },
+    };
+  }
+
+  public postMapperToViewSql(
+    post: PostEntity & {
+      blogName: string;
+      dateAdded: string;
+      userLogin: string;
+      userId: string;
+      likesCount: number;
+      dislikesCount: number;
+    },
+  ): PostViewModel {
+    console.log(post.blogName, post);
+    return {
+      id: post.id.toString(),
+      title: post.title,
+      shortDescription: post.shortDescription,
+      content: post.content,
+      blogId: post.blogId,
+      blogName: post.blogName,
+      createdAt: post.createdAt,
+      extendedLikesInfo: {
+        likesCount: post.likesCount||0,
+        dislikesCount: post.dislikesCount || 0,
         myStatus: LikeInfoViewModelValues.none,
         newestLikes: [],
       },
@@ -124,7 +155,7 @@ export class Helpers {
         userId: comment.userId,
         userLogin: comment.userLogin,
       },
-      id: comment._id,
+      id: comment._id.toString(),
       createdAt: comment.createdAt,
       likesInfo: {
         likesCount: likesCount.length,
@@ -134,9 +165,39 @@ export class Helpers {
     };
   }
 
+  public async commentsMapperToViewSql(
+    comment: CommentEntity & {login:string, likesCount:number, disLikesCount:number},
+  ): Promise<CommentViewModel> {
+    return {
+      content: comment.content,
+      commentatorInfo: {
+        userId: comment.userId,
+        userLogin: comment.login,
+      },
+      id: comment.id.toString(),
+      createdAt: comment.createdAt,
+      likesInfo: {
+        likesCount: comment.likesCount || 0,
+        dislikesCount: comment.disLikesCount || 0,
+        myStatus: LikeInfoViewModelValues.none,
+      },
+    };
+  }
+
   public blogMapperToView(blog: BlogDocument): BlogViewModel {
     return {
-      id: blog._id,
+      id: blog._id.toString(),
+      name: blog.name,
+      createdAt: blog.createdAt,
+      websiteUrl: blog.websiteUrl,
+      description: blog.description,
+      isMembership: blog.isMembership,
+    };
+  }
+
+  public blogMapperToViewSql(blog: BlogEntity): BlogViewModel {
+    return {
+      id: blog.id,
       name: blog.name,
       createdAt: blog.createdAt,
       websiteUrl: blog.websiteUrl,
@@ -146,7 +207,7 @@ export class Helpers {
   }
   public blogMapperToViewSa(blog: BlogDocument): BlogViewModelSA {
     return {
-      id: blog._id,
+      id: blog._id.toString(),
       name: blog.name,
       createdAt: blog.createdAt,
       websiteUrl: blog.websiteUrl,
@@ -155,6 +216,27 @@ export class Helpers {
       blogOwnerInfo: {
         userId: blog.userId,
         userLogin: blog.userLogin,
+      },
+      banInfo: {
+        isBanned: blog.isBanned,
+        banDate: blog.banDate,
+      },
+    };
+  }
+
+  public blogMapperToViewSaSql(
+    blog: BlogEntity & { login: string },
+  ): BlogViewModelSA {
+    return {
+      id: blog.id.toString(),
+      name: blog.name,
+      createdAt: blog.createdAt,
+      websiteUrl: blog.websiteUrl,
+      description: blog.description,
+      isMembership: blog.isMembership,
+      blogOwnerInfo: {
+        userId: blog.userId,
+        userLogin: blog.login,
       },
       banInfo: {
         isBanned: blog.isBanned,

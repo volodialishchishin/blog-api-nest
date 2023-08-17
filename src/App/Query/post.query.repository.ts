@@ -1,21 +1,21 @@
 import { Injectable } from '@nestjs/common';
-import { User, UserDocument } from '../../Schemas/user.schema';
+import { User, UserDocument } from '../../DB/Schemas/user.schema';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { UserViewModelWithQuery } from '../../DTO/User/user-view-model.dto';
 import { Helpers } from '../Helpers/helpers';
-import { Post, PostDocument } from '../../Schemas/post.schema';
+import { Post, PostDocument } from '../../DB/Schemas/post.schema';
 import { PostViewModelWithQuery } from '../../DTO/Post/post-view-model';
-import { Like, LikeDocument } from '../../Schemas/like.schema';
+import { Like, LikeDocument } from '../../DB/Schemas/like.schema';
 import { LikeInfoViewModelValues } from '../../DTO/LikeInfo/like-info-view-model';
-import { Blog, BlogDocument } from '../../Schemas/blog.schema';
+import { Blog, BlogDocument } from '../../DB/Schemas/blog.schema';
+import { InjectDataSource } from '@nestjs/typeorm';
+import { DataSource } from 'typeorm';
 
 @Injectable()
 export class PostQueryRepository {
   constructor(
-    @InjectModel(Post.name) private postModel: Model<PostDocument>,
-    @InjectModel(Like.name) private likeModel: Model<LikeDocument>,
-    @InjectModel(Blog.name) private blogModel: Model<BlogDocument>,
+    @InjectDataSource() protected dataSource: DataSource,
     public helpers: Helpers,
   ) {}
   async getPosts(
@@ -25,49 +25,80 @@ export class PostQueryRepository {
     sortDirection: 'asc' | 'desc' = 'desc',
     userId: string,
   ): Promise<PostViewModelWithQuery> {
-    let matchedPostsWithSkip = await this.postModel
-      .find()
-      .skip((pageNumber - 1) * pageSize)
-      .limit(Number(pageSize))
-      .sort([[sortBy, sortDirection]])
-      .exec();
+    const offset = (pageNumber - 1) * pageSize;
+    const query = `
+    SELECT
+      p.*, b.name as "blogName"
+    FROM
+      post_entity p
+    inner join 
+    blog_entity b on b.id = p."blogId"
+    where b."isBanned" = false
+    ORDER BY
+      "${sortBy}" ${sortDirection}
+    LIMIT
+      $1
+    OFFSET
+      $2
+  `;
+    const items = await this.dataSource.query(query, [pageSize, offset]);
 
-    const matchedPosts = await this.postModel.find({}).exec();
+    const queryWithOutSkip = `
+    SELECT
+      p.*
+    FROM
+      post_entity p
+    inner join 
+    blog_entity b on b.id = p."blogId"
+    where b."isBanned" = false
+  `;
+    const itemsWithOutSkip = await this.dataSource.query(queryWithOutSkip, []);
+    const pagesCount = Math.ceil(items.length / pageSize);
+    const itemsWithLikes = await Promise.all(
+      items.map(async (post) => {
+        let likesCount = await this.dataSource.query(
+          'select * from like_entity where "entityId" = $1 and status = $2',
+          [post.id, LikeInfoViewModelValues.like],
+        );
+        let dislikeCount = await this.dataSource.query(
+          'select * from like_entity where "entityId" = $1 and status = $2',
+          [post.id, LikeInfoViewModelValues.dislike],
+        );
 
-    matchedPostsWithSkip = await Promise.all(
-      matchedPostsWithSkip.filter(async (post) => {
-        const blog = await this.blogModel.findOne({ _id: post.blogId });
-        return !blog.isBanned;
-      }),
-    );
-    const pagesCount = Math.ceil(matchedPosts.length / pageSize);
-    const matchedPostsWithLikes = await Promise.all(
-      matchedPostsWithSkip.map(async (post) => {
-        const mappedPost = await this.helpers.postMapperToView(post);
-        const lastLikes = await this.likeModel
-          .find({ entityId: post.id, status: LikeInfoViewModelValues.like })
-          .sort({ dateAdded: -1 })
-          .limit(3)
-          .exec();
+        const lastLikesQuery = `
+        SELECT l."createdAt", l."userId", u.login AS "userLogin"
+        FROM like_entity l
+        LEFT JOIN user_entity u ON l."userId" = u.id
+        WHERE l."entityId" = $1 AND l.status = 'Like' 
+        ORDER BY l."createdAt" DESC
+        LIMIT 3`;
+        const lastLikes = await this.dataSource.query(lastLikesQuery, [
+          post.id,
+        ]);
+        const mappedPost = await this.helpers.postMapperToViewSql({
+          ...post,
+          likesCount: likesCount.length,
+          dislikeCount: dislikeCount.length,
+          blogName: post.blogName,
+        });
         mappedPost.extendedLikesInfo.newestLikes = lastLikes.map((e) => {
           return {
-            addedAt: e.dateAdded,
+            addedAt: e.createdAt,
             userId: e.userId,
             login: e.userLogin,
           };
         });
+
         if (!userId) {
           return mappedPost;
         }
 
-        const myLikeForComment = await this.likeModel
-          .findOne({
-            userId,
-            entityId: post.id,
-          })
-          .exec();
-        if (myLikeForComment) {
-          mappedPost.extendedLikesInfo.myStatus = myLikeForComment.status;
+        const myLikeForComment = await this.dataSource.query(
+          'select * from like_entity where "userId" = $1 and "entityId" = $2',
+          [userId, mappedPost.id],
+        );
+        if (myLikeForComment[0]) {
+          mappedPost.extendedLikesInfo.myStatus = myLikeForComment[0].status;
           return mappedPost;
         }
         return mappedPost;
@@ -77,8 +108,8 @@ export class PostQueryRepository {
       pagesCount: Number(pagesCount),
       page: Number(pageNumber),
       pageSize: Number(pageSize),
-      totalCount: matchedPosts.length,
-      items: matchedPostsWithLikes,
+      totalCount: itemsWithOutSkip.length,
+      items: itemsWithLikes,
     };
   }
 }

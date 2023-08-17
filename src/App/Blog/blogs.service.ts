@@ -1,6 +1,6 @@
 import { BlogViewModel } from '../../DTO/Blog/blog-view-model';
 import { BlogRepository } from './blog.repository';
-import { Blog } from '../../Schemas/blog.schema';
+import { Blog } from '../../DB/Schemas/blog.schema';
 import { BlogInputModel } from '../../DTO/Blog/blog-input-model';
 import { Injectable } from '@nestjs/common';
 

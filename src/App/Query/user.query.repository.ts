@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { User, UserDocument } from '../../Schemas/user.schema';
+import { User, UserDocument } from '../../DB/Schemas/user.schema';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { UserViewModelWithQuery } from '../../DTO/User/user-view-model.dto';
@@ -7,16 +7,13 @@ import { Helpers } from '../Helpers/helpers';
 import {
   BannedUsersForBlog,
   BannedUsersForBlogDocument,
-} from '../../Schemas/banned-users-for-blog.schema';
-import { InjectDataSource } from "@nestjs/typeorm";
-import { DataSource } from "typeorm";
+} from '../../DB/Schemas/banned-users-for-blog.schema';
+import { InjectDataSource } from '@nestjs/typeorm';
+import { DataSource } from 'typeorm';
 
 @Injectable()
 export class UserQueryRepository {
   constructor(
-    @InjectModel(User.name) private userModel: Model<UserDocument>,
-    @InjectModel(BannedUsersForBlog.name)
-    private bannedUsersForModel: Model<BannedUsersForBlogDocument>,
     @InjectDataSource() protected dataSource: DataSource,
     public helpers: Helpers,
   ) {}
@@ -61,13 +58,22 @@ export class UserQueryRepository {
       ${banStatus === 'banned' ? 'AND u."isBanned" = true' : ''}
   `;
 
-    console.log();
-
-    const parameters = [ `%${searchLoginTerm}%`, `%${searchEmailTerm}%`, pageSize, offset ];
-    const parametersWithOutSkip = [ `%${searchLoginTerm}%`, `%${searchEmailTerm}%` ];
+    const parameters = [
+      `%${searchLoginTerm}%`,
+      `%${searchEmailTerm}%`,
+      pageSize,
+      offset,
+    ];
+    const parametersWithOutSkip = [
+      `%${searchLoginTerm}%`,
+      `%${searchEmailTerm}%`,
+    ];
 
     const items = await this.dataSource.query(query, parameters);
-    const itemsWithOutSkip = await this.dataSource.query(queryWithOutSkip, parametersWithOutSkip);
+    const itemsWithOutSkip = await this.dataSource.query(
+      queryWithOutSkip,
+      parametersWithOutSkip,
+    );
 
     const pagesCount = Math.ceil(itemsWithOutSkip.length / pageSize);
 
@@ -75,7 +81,7 @@ export class UserQueryRepository {
       pagesCount,
       page: Number(pageNumber),
       pageSize: Number(pageSize),
-      totalCount:itemsWithOutSkip.length,
+      totalCount: itemsWithOutSkip.length,
       items: items.map(this.helpers.userMapperToViewSql),
     };
   }
@@ -88,31 +94,45 @@ export class UserQueryRepository {
     sortDirection: 'asc' | 'desc' = 'desc',
     blogId: string,
   ) {
-    if (sortBy === 'login') {
-      sortBy = 'userLogin';
-    }
+    const offset = (pageNumber - 1) * pageSize;
+    const query = `
+    select b.*, u.login  from user_blogs_ban_entity b
+    left join user_entity u on b."userId" =  u.id
+    WHERE
+      u.login ILIKE $1
+    ORDER BY
+      "${sortBy}" ${sortDirection}
+    LIMIT
+      $2
+    OFFSET
+      $3
+  `;
 
-    const filterObject = {
-      userLogin: { $regex: searchLoginTerm, $options: 'i' },
-      blogId: blogId,
-      isBanned: true,
-    };
+    const queryWithOutSkip = `
+    select * from user_blogs_ban_entity b
+    left join user_entity u on b."userId" =  u.id
+    WHERE
+      u.login ILIKE $1
+    ORDER BY
+      "${sortBy}" ${sortDirection}
+  `;
 
-    const bannedUserWithSkip = await this.bannedUsersForModel
-      .find(filterObject)
-      .skip((pageNumber - 1) * pageSize)
-      .limit(pageSize)
-      .sort({ [sortBy]: sortDirection })
-      .exec();
+    const bannedUserWithSkip = await this.dataSource.query(query, [
+      `%${searchLoginTerm}%`,
+      pageSize,
+      offset,
+    ]);
 
-    const totalCount = await this.bannedUsersForModel
-      .countDocuments(filterObject)
-      .exec();
-    const pagesCount = Math.ceil(totalCount / pageSize);
+    const totalCount = await this.dataSource.query(queryWithOutSkip, [
+      `%${searchLoginTerm}%`,
+    ]);
+    console.log(bannedUserWithSkip);
+    console.log(totalCount);
+    const pagesCount = Math.ceil(totalCount.length / pageSize);
 
     const items = bannedUserWithSkip.map((user) => ({
       id: user.userId,
-      login: user.userLogin,
+      login: user.login,
       banInfo: {
         isBanned: true,
         banDate: user.banDate,
@@ -120,11 +140,12 @@ export class UserQueryRepository {
       },
     }));
 
+
     return {
       pagesCount,
       page: pageNumber,
-      pageSize,
-      totalCount,
+      pageSize:Number(pageSize),
+      totalCount:totalCount.length,
       items,
     };
   }

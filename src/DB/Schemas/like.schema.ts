@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
-import { LikeInfoViewModelValues } from '../DTO/LikeInfo/like-info-view-model';
+import { LikeInfoViewModelValues } from '../../DTO/LikeInfo/like-info-view-model';
 
 export type LikeDocument = HydratedDocument<Like>;
 

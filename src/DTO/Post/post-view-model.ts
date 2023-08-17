@@ -12,7 +12,7 @@ export type ExtendedLikesInfoViewModel = {
   }>;
 };
 export type PostViewModel = {
-  id: Types.ObjectId;
+  id: string;
   title: string;
   shortDescription: string;
   content: string;

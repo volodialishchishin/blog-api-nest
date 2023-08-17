@@ -1,11 +1,11 @@
 import { InjectModel } from '@nestjs/mongoose';
-import { Token, TokenDocument } from '../../../Schemas/token.schema';
+import { Token, TokenDocument } from '../../../DB/Schemas/token.schema';
 import { Model } from 'mongoose';
 import {
   RecoveryPassword,
   recoveryPasswordDocument,
-} from '../../../Schemas/recovery-password.schema';
-import { User } from '../../../Schemas/user.schema';
+} from '../../../DB/Schemas/recovery-password.schema';
+import { User } from '../../../DB/Schemas/user.schema';
 import { Injectable } from '@nestjs/common';
 import { Helpers } from '../../Helpers/helpers';
 

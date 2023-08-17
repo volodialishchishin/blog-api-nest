@@ -2,12 +2,12 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model, ObjectId, Types } from 'mongoose';
 import { Helpers } from '../Helpers/helpers';
 import { Injectable } from '@nestjs/common';
-import { Token, TokenDocument } from '../../Schemas/token.schema';
+import { Token, TokenDocument } from '../../DB/Schemas/token.schema';
 import {
   RecoveryPassword,
   recoveryPasswordDocument,
-} from '../../Schemas/recovery-password.schema';
-import { User } from '../../Schemas/user.schema';
+} from '../../DB/Schemas/recovery-password.schema';
+import { User } from '../../DB/Schemas/user.schema';
 import { UserViewModel } from '../../DTO/User/user-view-model.dto';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
@@ -27,9 +27,7 @@ export class AuthRepository {
   async findTokenByUserId(userId: string, deviceId: string) {
     const query =
       'select * from session_entity where "userId" = $1 and "deviceId" = $2';
-    console.log(userId, deviceId);
     const token = await this.dataSource.query(query, [userId, deviceId]);
-    console.log(token);
     return token[0];
   }
 
@@ -41,25 +39,25 @@ export class AuthRepository {
   async getUserByRecoveryCode(recoveryCode: string): Promise<UserViewModel> {
     const query = 'SELECT * FROM user_entity WHERE code = $1';
     const user = await this.dataSource.query(query, [recoveryCode]);
-    return query? this.helpers.userMapperToView(user[0]) : null;
+    return query ? this.helpers.userMapperToView(user[0]) : null;
   }
 
   async updateToken(userId: string, refreshToken: string, deviceId: string) {
     const query =
       'UPDATE session_entity SET "refreshToken" = $1, "lastActiveDate" = $2 WHERE "userId" = $3 AND "deviceId" = $4';
-    let [,updateResult] =  await this.dataSource.query(query, [
+    const [, updateResult] = await this.dataSource.query(query, [
       refreshToken,
       new Date().toISOString(),
       userId,
       deviceId,
     ]);
-    return updateResult>0
+    return updateResult > 0;
   }
   async deleteToken(token: string) {
     const query =
       'DELETE FROM session_entity WHERE "refreshToken" = $1 RETURNING *';
-    const [,deleteResult] = await this.dataSource.query(query, [token]);
-    return deleteResult>0
+    const [, deleteResult] = await this.dataSource.query(query, [token]);
+    return deleteResult > 0;
   }
   async updateUserPassword(
     userId: string,
@@ -68,12 +66,12 @@ export class AuthRepository {
   ) {
     const query =
       'UPDATE user_entity SET "passwordSalt" = $1, password = $2 WHERE "userId" = $3 RETURNING *';
-    const [,updateResult] = await this.dataSource.query(query, [
+    const [, updateResult] = await this.dataSource.query(query, [
       passwordSalt,
       newPassword,
       userId,
     ]);
-    return  updateResult>0
+    return updateResult > 0;
   }
   async createToken(token: Token) {
     const query =
@@ -97,7 +95,7 @@ export class AuthRepository {
 
   async deleteAllTokens(userId: string) {
     const query = 'DELETE FROM session_entity WHERE "userId" = $1';
-    const [,deleteResult] = await this.dataSource.query(query, [userId]);
-    return deleteResult>0;
+    const [, deleteResult] = await this.dataSource.query(query, [userId]);
+    return deleteResult > 0;
   }
 }

@@ -12,11 +12,11 @@ import { UserService } from './App/Users/user.service';
 import { UserRepository } from './App/Users/user.repository';
 import { Helpers } from './App/Helpers/helpers';
 import { UserQueryRepository } from './App/Query/user.query.repository';
-import { UserSchema } from './Schemas/user.schema';
+import { UserSchema } from './DB/Schemas/user.schema';
 import { AppRepository } from './app.repository';
-import { CommentSchema } from './Schemas/comment.schema';
-import { BlogSchema } from './Schemas/blog.schema';
-import { PostSchema } from './Schemas/post.schema';
+import { CommentSchema } from './DB/Schemas/comment.schema';
+import { BlogSchema } from './DB/Schemas/blog.schema';
+import { PostSchema } from './DB/Schemas/post.schema';
 import { CommentController } from './App/Comments/comment.controller';
 import { PostController } from './App/Post/post.controller';
 import { BlogController } from './App/Blog/blog.controller';
@@ -32,15 +32,15 @@ import { BlogRepository } from './App/Blog/blog.repository';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthModule } from './App/Auth/auth.module';
 import { MailService } from './App/Auth/Mail/mail.service';
-import { TokenSchema } from './Schemas/token.schema';
-import { LikeSchema } from './Schemas/like.schema';
+import { TokenSchema } from './DB/Schemas/token.schema';
+import { LikeSchema } from './DB/Schemas/like.schema';
 import { blogExisting } from './Middewares/blog-existing.middleware';
 import { isBlogExists } from './DTO/Post/post-input-model';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { securityService } from './App/Auth/Security/security.service';
 import { securityRepository } from './App/Auth/Security/security.repository';
 import { SecurityController } from './App/Auth/Security/security.controller';
-import { RecoveryPasswordSchema } from './Schemas/recovery-password.schema';
+import { RecoveryPasswordSchema } from './DB/Schemas/recovery-password.schema';
 import { JwtModule, JwtService } from '@nestjs/jwt';
 import { BlogBloggerController } from './App/Blog/blog.blogger.controller';
 import { AuthRepository } from './App/Auth/auth.repository';
@@ -48,13 +48,18 @@ import { BlogSaController } from './App/Blog/blog.sa.controller';
 import {
   BannedUsersForBlog,
   BannedUsersForBlogSchema,
-} from './Schemas/banned-users-for-blog.schema';
+} from './DB/Schemas/banned-users-for-blog.schema';
 import { UserBloggerController } from './App/Users/user.blogger.controller';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserEntity } from './DB/Entities/user.entity';
 import { SessionEntity } from './DB/Entities/session.entity';
 import { RecoveryPasswordsEntity } from './DB/Entities/recovery-passwords.entity';
+import { PostEntity } from './DB/Entities/post.entity';
+import { BlogEntity } from './DB/Entities/blog.entity';
+import { LikeEntity } from './DB/Entities/like.entity';
+import { UserBlogsBanEntity } from './DB/Entities/user-blogs-ban.entity';
+import { CommentEntity } from './DB/Entities/comment.entity';
 
 @Module({
   imports: [
@@ -96,7 +101,16 @@ import { RecoveryPasswordsEntity } from './DB/Entities/recovery-passwords.entity
       username: 'lishchishin.volodya',
       password: 'PZ5hC2HSUonB',
       database: 'neondb',
-      entities: [UserEntity, SessionEntity, RecoveryPasswordsEntity],
+      entities: [
+        UserEntity,
+        SessionEntity,
+        RecoveryPasswordsEntity,
+        PostEntity,
+        BlogEntity,
+        LikeEntity,
+        UserBlogsBanEntity,
+        CommentEntity,
+      ],
       synchronize: true,
       ssl: true,
     }),

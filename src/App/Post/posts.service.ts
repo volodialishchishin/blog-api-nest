@@ -1,5 +1,5 @@
 import { PostViewModel } from '../../DTO/Post/post-view-model';
-import { Post } from '../../Schemas/post.schema';
+import { Post } from '../../DB/Schemas/post.schema';
 import { LikeType } from '../../@types/Like/like.type';
 import { PostsRepository } from './posts.repository';
 import { BlogsService } from '../Blog/blogs.service';
@@ -9,10 +9,6 @@ import { LikeInfoViewModelValues } from '../../DTO/LikeInfo/like-info-view-model
 @Injectable()
 export class PostService {
   constructor(private blog: BlogsService, private postRep: PostsRepository) {}
-
-  async getPosts(): Promise<PostViewModel[]> {
-    return this.postRep.getPosts();
-  }
 
   async createPost(
     blogId: string,
@@ -55,7 +51,7 @@ export class PostService {
       id,
     );
   }
-  async deletePost(id: string): Promise<number> {
+  async deletePost(id: string): Promise<boolean> {
     return this.postRep.deletePost(id);
   }
   async getPost(id: string, userId: string): Promise<PostViewModel> {

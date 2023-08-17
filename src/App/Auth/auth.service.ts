@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UserRepository } from '../Users/user.repository';
 import * as bcrypt from 'bcrypt';
-import { User, UserDocument } from '../../Schemas/user.schema';
+import { User, UserDocument } from '../../DB/Schemas/user.schema';
 import jwt from 'jsonwebtoken';
 import { ConfigService } from '@nestjs/config';
 import { config } from 'rxjs';

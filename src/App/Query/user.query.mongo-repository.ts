@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { User, UserDocument } from '../../Schemas/user.schema';
+import { User, UserDocument } from '../../DB/Schemas/user.schema';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { UserViewModelWithQuery } from '../../DTO/User/user-view-model.dto';
@@ -7,7 +7,7 @@ import { Helpers } from '../Helpers/helpers';
 import {
   BannedUsersForBlog,
   BannedUsersForBlogDocument,
-} from '../../Schemas/banned-users-for-blog.schema';
+} from '../../DB/Schemas/banned-users-for-blog.schema';
 
 @Injectable()
 export class UserQueryRepository {
@@ -73,7 +73,7 @@ export class UserQueryRepository {
         'banInfo.isBanned': true,
       };
     }
-    let sortByField = sortBy
+    const sortByField = sortBy
       ? `accountData.${sortBy}`
       : `accountData.createdAt`;
     const matchedUsersWithSkip = await this.userModel

@@ -1,4 +1,4 @@
-import { User } from '../../../Schemas/user.schema';
+import { User } from '../../../DB/Schemas/user.schema';
 import { Injectable } from '@nestjs/common';
 import { MailerService } from '@nestjs-modules/mailer';
 

@@ -9,23 +9,23 @@ import { AuthController } from './auth.controller';
 import { UserService } from '../Users/user.service';
 import { UserRepository } from '../Users/user.repository';
 import { MongooseModule } from '@nestjs/mongoose';
-import { UserSchema } from '../../Schemas/user.schema';
+import { UserSchema } from '../../DB/Schemas/user.schema';
 import { Helpers } from '../Helpers/helpers';
 import { MailService } from './Mail/mail.service';
 import { AuthRepository } from './auth.repository';
-import { TokenSchema } from '../../Schemas/token.schema';
-import { LikeSchema } from '../../Schemas/like.schema';
+import { TokenSchema } from '../../DB/Schemas/token.schema';
+import { LikeSchema } from '../../DB/Schemas/like.schema';
 import { ThrottlerModule } from '@nestjs/throttler';
 import {
   RecoveryPassword,
   RecoveryPasswordSchema,
-} from '../../Schemas/recovery-password.schema';
+} from '../../DB/Schemas/recovery-password.schema';
 import { securityService } from './Security/security.service';
 import { securityRepository } from './Security/security.repository';
 import { SecurityController } from './Security/security.controller';
-import { CommentSchema } from '../../Schemas/comment.schema';
-import { BannedUsersForBlogSchema } from '../../Schemas/banned-users-for-blog.schema';
-import { BlogSchema } from '../../Schemas/blog.schema';
+import { CommentSchema } from '../../DB/Schemas/comment.schema';
+import { BannedUsersForBlogSchema } from '../../DB/Schemas/banned-users-for-blog.schema';
+import { BlogSchema } from '../../DB/Schemas/blog.schema';
 
 @Module({
   imports: [
@@ -39,7 +39,7 @@ import { BlogSchema } from '../../Schemas/blog.schema';
       inject: [ConfigService],
       useFactory: async (configService: ConfigService) => ({
         secret: configService.get('SECRET'),
-        signOptions: { expiresIn: '10s' },
+        signOptions: { expiresIn: '100m' },
       }),
     }),
     ConfigModule,

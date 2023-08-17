@@ -1,16 +1,16 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { User, UserDocument } from '../../Schemas/user.schema';
+import { User, UserDocument } from '../../DB/Schemas/user.schema';
 import { Model } from 'mongoose';
 import { Helpers } from '../Helpers/helpers';
 import { UserViewModel } from '../../DTO/User/user-view-model.dto';
-import { Like, LikeDocument } from '../../Schemas/like.schema';
-import { Comment, CommentDocument } from '../../Schemas/comment.schema';
+import { Like, LikeDocument } from '../../DB/Schemas/like.schema';
+import { Comment, CommentDocument } from '../../DB/Schemas/comment.schema';
 import {
   BannedUsersForBlog,
   BannedUsersForBlogDocument,
-} from '../../Schemas/banned-users-for-blog.schema';
-import { Blog, BlogDocument } from '../../Schemas/blog.schema';
+} from '../../DB/Schemas/banned-users-for-blog.schema';
+import { Blog, BlogDocument } from '../../DB/Schemas/blog.schema';
 
 @Injectable()
 export class UserRepository {
@@ -82,7 +82,7 @@ export class UserRepository {
     banDate: string,
     banStatus: boolean,
   ) {
-    let updateStatus = await this.userModel.updateOne(
+    const updateStatus = await this.userModel.updateOne(
       { _id: userId },
       {
         $set: {
@@ -110,9 +110,9 @@ export class UserRepository {
     banDate: string,
     status: boolean,
   ) {
-    let user = await this.getUserById(userId);
+    const user = await this.getUserById(userId);
     if (!user) return null;
-    let userBanForBlog = await this.bannedUsersForModel.findOne({
+    const userBanForBlog = await this.bannedUsersForModel.findOne({
       userId,
       blogId,
     });
@@ -127,7 +127,7 @@ export class UserRepository {
       });
       return await createdBan.save();
     } else {
-      let updateResult = await this.bannedUsersForModel
+      const updateResult = await this.bannedUsersForModel
         .updateOne(
           { userId, blogId },
           { $set: { banReason, banDate, isBanned: status } },
@@ -138,7 +138,7 @@ export class UserRepository {
   }
 
   async isUserBanned(userId: string, blogId: string) {
-    let userBan = await this.bannedUsersForModel.findOne({
+    const userBan = await this.bannedUsersForModel.findOne({
       userId,
       blogId,
       isBanned: true,
@@ -148,7 +148,7 @@ export class UserRepository {
   }
 
   async checkIfUserHasAccessToBan(userId: string, blogId: string) {
-    let blog = await this.blogModel.findOne({ _id: blogId });
+    const blog = await this.blogModel.findOne({ _id: blogId });
     return blog.userId === userId;
   }
 }

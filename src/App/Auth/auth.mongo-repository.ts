@@ -2,12 +2,12 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model, ObjectId, Types } from 'mongoose';
 import { Helpers } from '../Helpers/helpers';
 import { Injectable } from '@nestjs/common';
-import { Token, TokenDocument } from '../../Schemas/token.schema';
+import { Token, TokenDocument } from '../../DB/Schemas/token.schema';
 import {
   RecoveryPassword,
   recoveryPasswordDocument,
-} from '../../Schemas/recovery-password.schema';
-import { User } from '../../Schemas/user.schema';
+} from '../../DB/Schemas/recovery-password.schema';
+import { User } from '../../DB/Schemas/user.schema';
 import { UserViewModel } from '../../DTO/User/user-view-model.dto';
 
 Injectable();

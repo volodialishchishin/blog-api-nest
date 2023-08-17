@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { CommentRepository } from './comment.repository';
-import { Comment } from '../../Schemas/comment.schema';
+import { Comment } from '../../DB/Schemas/comment.schema';
 import { CommentViewModel } from '../../DTO/Comment/comment-view-model';
 import { LikeInfoViewModelValues } from '../../DTO/LikeInfo/like-info-view-model';
 import { PostsRepository } from '../Post/posts.repository';
@@ -22,16 +22,13 @@ export class CommentService {
     userId: string,
     userLogin: string,
   ) {
-    const post = await this.postRep.getPostDocument(postId);
-    const resolvedComment: Comment = {
+    const resolvedComment = {
       content,
       userId,
       userLogin,
       createdAt: new Date().toISOString(),
       postId,
       isUserBanned: false,
-      blogId: post.blogId,
-      blogOwnerId: post.blogOwnerId,
     };
 
     const createdComment = await this.commentRep.createComment(resolvedComment);
@@ -68,13 +65,7 @@ export class CommentService {
     );
   }
   async checkIfUserBanned(userId: string, postId: string) {
-    const post = await this.postRep.getPostDocument(postId);
-    const blog = await this.blogRep.getBlog(post.blogId);
-    console.log(blog);
-    const userBanStatus = await this.userRep.isUserBanned(
-      userId,
-      blog.id.toString(),
-    );
+    const userBanStatus = await this.userRep.isUserBanned(userId, postId);
     console.log(userBanStatus);
     return userBanStatus;
   }

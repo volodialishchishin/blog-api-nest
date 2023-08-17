@@ -1,15 +1,15 @@
 import { InjectModel } from '@nestjs/mongoose';
-import { Token, TokenDocument } from '../../../Schemas/token.schema';
+import { Token, TokenDocument } from '../../../DB/Schemas/token.schema';
 import { Model } from 'mongoose';
 import {
   RecoveryPassword,
   recoveryPasswordDocument,
-} from '../../../Schemas/recovery-password.schema';
-import { User } from '../../../Schemas/user.schema';
+} from '../../../DB/Schemas/recovery-password.schema';
+import { User } from '../../../DB/Schemas/user.schema';
 import { Injectable } from '@nestjs/common';
 import { Helpers } from '../../Helpers/helpers';
-import { InjectDataSource } from "@nestjs/typeorm";
-import { DataSource } from "typeorm";
+import { InjectDataSource } from '@nestjs/typeorm';
+import { DataSource } from 'typeorm';
 
 Injectable();
 export class securityRepository {
@@ -27,23 +27,25 @@ export class securityRepository {
   async deleteSessions(userId: string, deviceId: string) {
     const query =
       'DELETE FROM session_entity WHERE "userId" = $1 and not "deviceId" = $2';
-    const [,deleteResult] = await this.dataSource.query(query, [userId, deviceId]);
-    return deleteResult>0
+    const [, deleteResult] = await this.dataSource.query(query, [
+      userId,
+      deviceId,
+    ]);
+    return deleteResult > 0;
   }
   async deleteSession(userId: string, id: string) {
     try {
       const query =
         'DELETE FROM session_entity WHERE "userId" = $1 and "deviceId" = $2 RETURNING *';
       await this.getSession(userId, id);
-      const [,deleteResult] = await this.dataSource.query(query, [userId, id]);
-      return deleteResult>0
+      const [, deleteResult] = await this.dataSource.query(query, [userId, id]);
+      return deleteResult > 0;
     } catch (e: any) {
       throw new Error(e.message);
     }
   }
   async getSession(userId: string, id: string): Promise<Token> {
-    const query =
-      'select * from session_entity where "deviceId" = $1';
+    const query = 'select * from session_entity where "deviceId" = $1';
     const session = await this.dataSource.query(query, [id]);
     if (!session[0]) {
       throw new Error('404');

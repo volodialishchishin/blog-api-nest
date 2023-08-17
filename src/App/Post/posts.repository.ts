@@ -1,33 +1,34 @@
 import { PostViewModel } from '../../DTO/Post/post-view-model';
 import { InjectModel } from '@nestjs/mongoose';
-import { Post, PostDocument } from '../../Schemas/post.schema';
+import { Post, PostDocument } from '../../DB/Schemas/post.schema';
 import { Model } from 'mongoose';
 import { Helpers } from '../Helpers/helpers';
 import { Injectable } from '@nestjs/common';
-import { Like, LikeDocument } from '../../Schemas/like.schema';
+import { Like, LikeDocument } from '../../DB/Schemas/like.schema';
 import { LikeInfoViewModelValues } from '../../DTO/LikeInfo/like-info-view-model';
-import { Blog, BlogDocument } from '../../Schemas/blog.schema';
+import { Blog, BlogDocument } from '../../DB/Schemas/blog.schema';
+import { InjectDataSource } from '@nestjs/typeorm';
+import { DataSource } from 'typeorm';
+import { PostEntity } from '../../DB/Entities/post.entity';
 
 Injectable();
 export class PostsRepository {
   constructor(
-    @InjectModel(Post.name) private postModel: Model<PostDocument>,
-    @InjectModel(Like.name) private likeModel: Model<LikeDocument>,
-    @InjectModel(Blog.name) private blogModel: Model<BlogDocument>,
     public helpers: Helpers,
+    @InjectDataSource() protected dataSource: DataSource,
   ) {}
-  async getPosts(): Promise<PostViewModel[]> {
-    const result = await this.postModel.find({}).exec();
-    const comments = await Promise.all(
-      result.map(this.helpers.postMapperToView),
-    );
-    return comments;
-  }
-
   async createPost(post: Post) {
-    const createdPost = new this.postModel(post);
-    const newPost = await createdPost.save();
-    return this.helpers.postMapperToView(newPost);
+    const query =
+      'insert into post_entity (title, "shortDescription", content, "createdAt", "blogId")  values ($1,$2,$3,$4,$5) returning *,(select name from blog_entity where id = $5) as "blogName"';
+    const resolvedPost = await this.dataSource.query(query, [
+      post.title,
+      post.shortDescription,
+      post.content,
+      post.createdAt,
+      post.blogId,
+    ]);
+    console.log(resolvedPost);
+    return this.helpers.postMapperToViewSql(resolvedPost[0]);
   }
   async updatePost(
     blogId: string,
@@ -36,66 +37,84 @@ export class PostsRepository {
     shortDescription: string,
     id: string,
   ): Promise<boolean> {
-    const result = await this.postModel.updateOne(
-      { _id: id },
-      {
-        $set: {
-          title: title,
-          shortDescription: shortDescription,
-          content: content,
-          blogId: blogId,
-        },
-      },
-    );
-    return result.matchedCount === 1;
+    const query =
+      'UPDATE post_entity SET "title" = $1, "shortDescription" = $2, content = $3, blogId = $4 AND "id" = $5';
+    const [, updateResult] = await this.dataSource.query(query, [
+      title,
+      shortDescription,
+      content,
+      blogId,
+      id,
+    ]);
+    return updateResult > 0;
   }
-  async deletePost(id: string): Promise<number> {
-    const result = await this.postModel.deleteOne({ _id: id });
-    return result.deletedCount;
+  async deletePost(id: string): Promise<boolean> {
+    const query = 'DELETE FROM post_entity WHERE "id" = $1 RETURNING *';
+    const [, deleteResult] = await this.dataSource.query(query, [id]);
+    return deleteResult > 0;
   }
   async getPost(id: string, userId: string): Promise<PostViewModel | null> {
-    console.log(id);
-    const result = await this.postModel.findOne({ _id: id }).exec();
-    console.log(result);
-    const blog = await this.blogModel.findOne({ _id: result?.blogId });
-    if (blog.isBanned) return null;
-    if (result) {
-      const postToView = await this.helpers.postMapperToView(result);
+    const queryResult = await this.dataSource.query(
+      `
+    SELECT p.*, b."isBanned" AS "blogIsBanned"
+    FROM post_entity AS p
+    LEFT JOIN blog_entity AS b ON p."blogId" = b.id
+    WHERE p.id = $1`,
+      [id],
+    );
 
-      const lastLikes = await this.likeModel
-        .find({
-          entityId: id,
-          status: LikeInfoViewModelValues.like,
-          isUserBanned: false,
-        })
-        .sort({ dateAdded: -1 })
-        .limit(3)
-        .exec();
-      postToView.extendedLikesInfo.newestLikes = lastLikes.map((e) => {
-        return {
-          addedAt: e.dateAdded,
-          userId: e.userId,
-          login: e.userLogin,
-        };
-      });
-      if (!userId) {
-        return postToView;
-      }
-      const likeStatus = await this.likeModel.findOne({ userId, entityId: id });
-      if (likeStatus) {
-        postToView.extendedLikesInfo.myStatus =
-          likeStatus?.status || LikeInfoViewModelValues.none;
-      }
-      return postToView;
-    } else {
-      return undefined;
+    const result = queryResult[0];
+
+    if (!result) {
+      return null;
     }
-  }
 
-  async getPostDocument(id: string): Promise<PostDocument> {
-    console.log(id);
-    const result = await this.postModel.findOne({ _id: id }).exec();
-    return result;
+    const blogIsBanned = result.blogIsBanned;
+
+    if (blogIsBanned) {
+      return null;
+    }
+
+    const postToView = await this.helpers.postMapperToView(result);
+
+    const likeQuery = `
+    SELECT l."createdAt", l."userId", u.login AS "userLogin"
+    FROM like_entity AS l
+    LEFT JOIN users AS u ON l."userId" = u.id
+    WHERE l."entityId" = $1 AND l.status = $2 AND u."isBanned" = $3
+    ORDER BY l."createdAt" DESC
+    LIMIT 3`;
+
+    const lastLikes = await this.dataSource.query(likeQuery, [
+      id,
+      LikeInfoViewModelValues.like,
+      false,
+    ]);
+    postToView.extendedLikesInfo.newestLikes = lastLikes.map((e) => ({
+      addedAt: e.createdAt,
+      userId: e.userId,
+      login: e.userLogin,
+    }));
+
+    if (!userId) {
+      return postToView;
+    }
+
+    const likeStatusQuery = `
+    SELECT status
+    FROM like_entity
+    WHERE "userId" = $1 AND "entityId" = $2`;
+
+    const likeStatusResult = await this.dataSource.query(likeStatusQuery, [
+      userId,
+      id,
+    ]);
+    const likeStatus = likeStatusResult[0];
+
+    postToView.extendedLikesInfo.myStatus =
+      likeStatus?.status || LikeInfoViewModelValues.none;
+
+    return postToView;
   }
   async updateLikeStatus(
     likeStatus: LikeInfoViewModelValues,
@@ -103,35 +122,45 @@ export class PostsRepository {
     postId: string,
     login: string,
   ) {
-    const post = await this.postModel.findOne({ _id: postId });
-    if (!post) {
+    const post = await this.dataSource.query(
+      'select *  from post_entity where id = $1',
+      [postId],
+    );
+    if (!post[0]) {
       return false;
     }
-    const like = await this.likeModel.findOne({ entityId: postId, userId });
-    if (!like) {
-      const status: Like = {
-        entityId: postId,
-        userId,
-        status: likeStatus,
-        dateAdded: new Date(),
-        userLogin: login,
-        isUserBanned: false,
-      };
-      const like = await this.likeModel.create(status);
-      await like.save();
+    const like = await this.dataSource.query(
+      'select *  from like_entity where "entityId" = $1 and "userId" = $2',
+      [postId, userId],
+    );
+    if (!like[0]) {
+      const insertLikeQuery = `
+      INSERT INTO like_entity ("entityId", "userId", "status", "createdAt")
+      VALUES ($1, $2, $3, $4)`;
+
+      const insertLikeValues = [postId, userId, likeStatus, new Date()];
+      await this.dataSource.query(insertLikeQuery, insertLikeValues);
     } else {
       if (likeStatus === LikeInfoViewModelValues.none) {
-        await this.likeModel.deleteOne({
-          userId: like.userId,
-          entityId: like.entityId,
-        });
+        const deleteLikeQuery = `
+        DELETE FROM like_entity
+        WHERE "entityId" = $1 AND "userId" = $2`;
+
+        await this.dataSource.query(deleteLikeQuery, [postId, userId]);
       } else {
-        await this.likeModel.updateOne(
-          { entityId: postId, userId },
-          { $set: { status: likeStatus } },
-        );
+        const updateLikeQuery = `
+        UPDATE like_entity
+        SET status = $1
+        WHERE "entityId" = $2 AND "userId" = $3`;
+
+        await this.dataSource.query(updateLikeQuery, [
+          likeStatus,
+          postId,
+          userId,
+        ]);
       }
     }
+
     return true;
   }
 }

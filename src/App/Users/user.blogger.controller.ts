@@ -88,7 +88,7 @@ export class UserBloggerController {
       request.user.userInfo.userId,
       banInputModel.blogId,
     );
-    if (!accessToBan) response.sendStatus(403);
+    if (!accessToBan) return response.sendStatus(403)
     if (banInputModel.isBanned) {
       const banUserStatus = await this.userService.banUserForBlog(
         params.id,
@@ -102,8 +102,13 @@ export class UserBloggerController {
         params.id,
         banInputModel.blogId,
       );
-      banUserStatus ? response.sendStatus(204) : response.sendStatus(404);
-      return;
+      if (banUserStatus) {
+        response.sendStatus(204);
+        return;
+      } else {
+        response.sendStatus(404);
+        return;
+      }
     }
   }
 }

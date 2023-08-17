@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { Request, Response, NextFunction } from 'express';
 import { InjectModel } from '@nestjs/mongoose';
-import { Blog, BlogDocument } from '../Schemas/blog.schema';
+import { Blog, BlogDocument } from '../DB/Schemas/blog.schema';
 import { Model } from 'mongoose';
 import { BlogsService } from '../App/Blog/blogs.service';
 

@@ -2,7 +2,7 @@ import { LikeInfoViewModel } from '../LikeInfo/like-info-view-model';
 import { Types } from 'mongoose';
 
 export type CommentViewModel = {
-  id: Types.ObjectId;
+  id: string;
   commentatorInfo: {
     userId: string;
     userLogin: string;
