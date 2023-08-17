@@ -87,7 +87,7 @@ export class UserService {
   }
 
   async banUserForBlog(userId: string, blogId: string, banReason: string) {
-    return await this.userRep.updateBanStatus(
+    return await this.userRep.banUserForBlog(
       userId,
       blogId,
       banReason,
@@ -95,7 +95,7 @@ export class UserService {
     );
   }
   async unbanUserForBlog(userId: string, blogId: string) {
-    return this.userRep.updateBanStatus(userId, blogId, null, null);
+    return this.userRep.unbanUserForBlog(userId, blogId);
   }
 
   async checkIfUserHasAccessToBan(userId: string, blogId: string) {

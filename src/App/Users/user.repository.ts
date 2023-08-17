@@ -162,17 +162,6 @@ export class UserRepository {
     const user = await this.getUserById(userId);
     if (!user) return null;
 
-    const userBanQuery = `
-    SELECT *
-    FROM user_blogs_ban_entity
-    WHERE "userId" = $1 AND "blogId" = $2`;
-
-    const userBanResult = await this.dataSource.query(userBanQuery, [
-      userId,
-      blogId,
-    ]);
-    const userBan: UserBlogsBanEntity = userBanResult[0];
-
     if (!userBan) {
       const insertUserBanQuery = `
       INSERT INTO user_blogs_ban_entity ("userId", "blogId", "banReason", "banDate")
@@ -191,6 +180,28 @@ export class UserRepository {
 
       return true;
     }
+  }
+  async unbanUserForBlog(userId:string, blogId:string){
+    const user = await this.getUserById(userId);
+    if (!user) return null;
+    const updateUserBanQuery = `
+      delete from user_blogs_ban_entity where id= $1 and "blogId" = $2`;
+
+    const updateUserBanValues = [userId, blogId];
+    await this.dataSource.query(updateUserBanQuery, updateUserBanValues);
+    return  true
+  }
+
+  async banUserForBlog(userId:string, blogId:string, banReason:string, banDate:string){
+    const user = await this.getUserById(userId);
+    if (!user) return null;
+    const insertUserBanQuery = `
+      INSERT INTO user_blogs_ban_entity ("userId", "blogId", "banReason", "banDate")
+      VALUES ($1,$2,$3,$4)`;
+
+    const insertUserBanValues = [userId, blogId, banReason, banDate];
+    await this.dataSource.query(insertUserBanQuery, insertUserBanValues);
+    return true;
   }
 
   async isUserBanned(userId: string, postId: string) {
