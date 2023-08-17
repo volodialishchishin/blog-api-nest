@@ -229,7 +229,7 @@ export class BlogQueryRepository {
     const itemsWithOutSkip = await this.dataSource.query(queryWithOutSkip, [
       blogId,
     ]);
-    const pagesCount = Math.ceil(items.length / pageSize);
+    const pagesCount = Math.ceil(itemsWithOutSkip.length / pageSize);
     const itemsWithLikes = await Promise.all(
       items.map(async (post) => {
         let likesCount = await this.dataSource.query(
