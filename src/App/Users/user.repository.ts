@@ -195,7 +195,7 @@ export class UserRepository {
 
   async isUserBanned(userId: string, postId: string) {
     const userBan = this.dataSource.query(
-      'select * from user_blogs_ban_entity where (select p."blogId"  from post_entity p  where p.id = $1 ) = user_blogs_ban_entity."blogId" and user_blogs_ban_entity."banDate" = $2',
+      'select * from user_blogs_ban_entity where (select p."blogId"  from post_entity p  where p.id = $1 ) = user_blogs_ban_entity."blogId" and user_blogs_ban_entity."userId" = $2',
       [postId,userId ],
     );
     return userBan[0] ? userBan[0] : null;

@@ -99,7 +99,7 @@ export class UserQueryRepository {
     select b.*, u.login  from user_blogs_ban_entity b
     left join user_entity u on b."userId" =  u.id
     WHERE
-      u.login ILIKE $1
+      u.login ILIKE $1 and b."blogId" = $4
     ORDER BY
       "${sortBy}" ${sortDirection}
     LIMIT
@@ -109,18 +109,17 @@ export class UserQueryRepository {
   `;
 
     const queryWithOutSkip = `
-    select * from user_blogs_ban_entity b
+    select b.*, u.login  from user_blogs_ban_entity b
     left join user_entity u on b."userId" =  u.id
     WHERE
-      u.login ILIKE $1
-    ORDER BY
-      "${sortBy}" ${sortDirection}
+      u.login ILIKE $1 and b."blogId" = $4
   `;
 
     const bannedUserWithSkip = await this.dataSource.query(query, [
       `%${searchLoginTerm}%`,
       pageSize,
       offset,
+      blogId
     ]);
 
     const totalCount = await this.dataSource.query(queryWithOutSkip, [

@@ -28,7 +28,6 @@ export class BlogQueryRepository {
     sortBy = 'createdAt',
     pageSize = 10,
     sortDirection: 'asc' | 'desc' = 'desc',
-    userId?: string,
   ): Promise<BlogViewModelWithQuery> {
     const offset = (pageNumber - 1) * pageSize;
 
@@ -40,7 +39,7 @@ export class BlogQueryRepository {
     FROM
       blog_entity b
     WHERE
-      (b.name ILIKE $1)  ${userId ? `AND b."userId" = $4` : ''} and b."isBanned" = false
+      (b.name ILIKE $1)   and b."isBanned" = false
     ORDER BY
       "${sortBy}" ${sortDirection}
     LIMIT
@@ -55,7 +54,64 @@ export class BlogQueryRepository {
     FROM
       blog_entity b 
     WHERE
-      (b.name ILIKE $1)  ${userId ? `AND b."userId" = $2` : ''} and b."isBanned" = false
+      (b.name ILIKE $1)   and b."isBanned" = false
+    ORDER BY
+      "${sortBy}" ${sortDirection}
+  `;
+
+    const parameters = [`%${searchNameTerm}%`, pageSize, offset];
+    const parametersWithOutSkip = [`%${searchNameTerm}%`];
+
+    const items = await this.dataSource.query(query, parameters);
+    const itemsWithOutSkip = await this.dataSource.query(
+      queryWithOutSkip,
+      parametersWithOutSkip,
+    );
+
+    const pagesCount = Math.ceil(itemsWithOutSkip.length / pageSize);
+
+    return {
+      pagesCount: Number(pagesCount),
+      page: Number(pageNumber),
+      pageSize: Number(pageSize),
+      totalCount: itemsWithOutSkip.length,
+      items: items.map(this.helpers.blogMapperToViewSql),
+    };
+  }
+
+  async getBlogsRelatedToUser(
+    searchNameTerm = '',
+    pageNumber = 1,
+    sortBy = 'createdAt',
+    pageSize = 10,
+    sortDirection: 'asc' | 'desc' = 'desc',
+    userId?: string,
+  ): Promise<BlogViewModelWithQuery> {
+    const offset = (pageNumber - 1) * pageSize;
+
+
+    const query = `
+    SELECT
+      *
+    FROM
+      blog_entity b
+    WHERE
+      (b.name ILIKE $1)  and b."userId" = $4  and b."isBanned" = false
+    ORDER BY
+      "${sortBy}" ${sortDirection}
+    LIMIT
+      $2
+    OFFSET
+      $3
+  `;
+
+    const queryWithOutSkip = `
+    SELECT
+      *
+    FROM
+      blog_entity b 
+    WHERE
+      (b.name ILIKE $1)  and b."userId" = $2 and b."isBanned" = false
     ORDER BY
       "${sortBy}" ${sortDirection}
   `;

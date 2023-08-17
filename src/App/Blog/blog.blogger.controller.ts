@@ -142,7 +142,7 @@ export class BlogBloggerController {
     @Res() response: Response,
     @Req() request: Request,
   ) {
-    const blogs = await this.blogQueryRep.getBlogs(
+    const blogs = await this.blogQueryRep.getBlogsRelatedToUser(
       searchNameTerm,
       pageNumber,
       sortBy,
