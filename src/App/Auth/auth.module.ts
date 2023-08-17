@@ -30,8 +30,8 @@ import { BlogSchema } from '../../DB/Schemas/blog.schema';
 @Module({
   imports: [
     ThrottlerModule.forRoot({
-      ttl: 10,
-      limit: 5,
+      ttl: 10000,
+      limit: 1000,
     }),
     PassportModule,
     JwtModule.registerAsync({
