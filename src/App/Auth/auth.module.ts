@@ -30,8 +30,8 @@ import { BlogSchema } from '../../DB/Schemas/blog.schema';
 @Module({
   imports: [
     ThrottlerModule.forRoot({
-      ttl: 10,
-      limit: 5,
+      ttl: 10000,
+      limit: 1000,
     }),
     PassportModule,
     JwtModule.registerAsync({
@@ -39,7 +39,7 @@ import { BlogSchema } from '../../DB/Schemas/blog.schema';
       inject: [ConfigService],
       useFactory: async (configService: ConfigService) => ({
         secret: configService.get('SECRET'),
-        signOptions: { expiresIn: '10s' },
+        signOptions: { expiresIn: '100m' },
       }),
     }),
     ConfigModule,
