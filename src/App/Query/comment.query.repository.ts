@@ -1,108 +1,76 @@
 import { Injectable } from '@nestjs/common';
-import { Model } from 'mongoose';
-import { InjectModel } from '@nestjs/mongoose';
+import { InjectRepository } from '@nestjs/typeorm';
+
+import { Repository } from 'typeorm';
 import { Helpers } from '../Helpers/helpers';
-import { Comment, CommentDocument } from '../../DB/Schemas/comment.schema';
 import {
   allCommentsForUserViewModel,
   allCommentsForUserViewModelWithQuery,
   CommentViewModelWithQuery,
 } from '../../DTO/Comment/comment-view-model';
-import { Like, LikeDocument } from '../../DB/Schemas/like.schema';
-import { User, UserDocument } from '../../DB/Schemas/user.schema';
-import { Blog, BlogDocument } from '../../DB/Schemas/blog.schema';
-import { Post, PostDocument } from '../../DB/Schemas/post.schema';
-import { LikeInfoViewModelValues } from '../../DTO/LikeInfo/like-info-view-model';
-import { PostViewModelWithQuery } from "../../DTO/Post/post-view-model";
-import { InjectDataSource } from "@nestjs/typeorm";
-import { DataSource } from "typeorm";
+import { CommentEntity } from '../../DB/Entities/comment.entity';
+import { LikeEntity } from '../../DB/Entities/like.entity';
+import { LikeInfoViewModelValues } from '../../DTO/LikeInfo/like-info-view-model'; // Check if needed after refactor
 
 @Injectable()
 export class CommentQueryRepository {
   constructor(
-    @InjectModel(Comment.name) private commentModel: Model<CommentDocument>,
-    @InjectModel(Blog.name) private blogModel: Model<BlogDocument>,
-    @InjectModel(Post.name) private postModel: Model<PostDocument>,
+    @InjectRepository(CommentEntity)
+    private commentRepository: Repository<CommentEntity>,
+    @InjectRepository(LikeEntity)
+    private likeRepository: Repository<LikeEntity>,
     public helpers: Helpers,
-    @InjectModel(Like.name) private likeModel: Model<LikeDocument>,
-    @InjectModel(User.name) private userModel: Model<UserDocument>,
-    @InjectDataSource() protected dataSource: DataSource,
   ) {}
+
   async getComments(
     pageNumber = 1,
     sortBy = 'createdAt',
     pageSize = 10,
     sortDirection: 'asc' | 'desc' = 'desc',
-    postId:string,
+    postId: string,
     userId: string,
-  ): Promise<PostViewModelWithQuery> {
+  ): Promise<CommentViewModelWithQuery> {
     const offset = (pageNumber - 1) * pageSize;
-    const query = `
-    SELECT
-      c.*, u.login
-    FROM
-      comment_entity c
-    inner join 
-    user_entity u on u.id = c."userId"
-    where c."postId" = $1
-    ORDER BY
-      "${sortBy}" ${sortDirection}
-    LIMIT
-      $2
-    OFFSET
-      $3
-  `;
-    const items = await this.dataSource.query(query, [postId, pageSize, offset]);
+    const [items, total] = await this.commentRepository
+      .createQueryBuilder('comment')
+      .innerJoinAndSelect('comment.user', 'user')
+      .where('comment.postId = :postId', { postId })
+      .orderBy(`comment.${sortBy}`, sortDirection === 'asc' ? 'ASC' : 'DESC')
+      .skip(offset)
+      .take(pageSize)
+      .getManyAndCount();
 
-    const queryWithOutSkip = `
-    SELECT
-      c.*, u.login
-    FROM
-      comment_entity c
-    inner join 
-    user_entity u on u.id = c."userId"
-    where c."postId" = $1
-  `;
-    const itemsWithOutSkip = await this.dataSource.query(queryWithOutSkip, [postId]);
-    const pagesCount = Math.ceil(itemsWithOutSkip.length / pageSize);
     const itemsWithLikes = await Promise.all(
       items.map(async (comment) => {
-        let likesCount = await this.dataSource.query(
-          'select * from like_entity inner join user_entity u on u.id = like_entity."userId" where "entityId" = $1 and status = $2 and u."isBanned" = false',
-          [comment.id, LikeInfoViewModelValues.like],
-        );
-        let dislikeCount = await this.dataSource.query(
-          'select * from like_entity  inner join user_entity u on u.id = like_entity."userId" where "entityId" = $1 and status = $2   and u."isBanned" = false',
-          [comment.id, LikeInfoViewModelValues.dislike],
-        );
-
-        const mappedComment = await this.helpers.commentsMapperToViewSql({
-          ...comment,
-          likesCount: likesCount.length,
-          disLikesCount: dislikeCount.length,
-          login: comment.login
+        const likesCount = await this.likeRepository.count({
+          where: { entityId: comment.id, status: LikeInfoViewModelValues.like },
         });
+        const dislikesCount = await this.likeRepository.count({
+          where: {
+            entityId: comment.id,
+            status: LikeInfoViewModelValues.dislike,
+          },
+        });
+        const myLikeForComment = userId
+          ? await this.likeRepository.findOne({
+              where: { userId, entityId: comment.id },
+            })
+          : null;
 
-        if (!userId) {
-          return mappedComment;
-        }
-
-        const myLikeForComment = await this.dataSource.query(
-          'select * from like_entity where "userId" = $1 and "entityId" = $2',
-          [userId, mappedComment.id],
-        );
-        if (myLikeForComment[0]) {
-          mappedComment.likesInfo.myStatus = myLikeForComment[0].status;
-          return mappedComment;
-        }
-        return mappedComment;
+        return this.helpers.commentsMapperToViewSql({
+          ...comment[0],
+          likesCount,
+          dislikesCount,
+          myStatus: myLikeForComment?.status || 'None',
+        });
       }),
     );
+
     return {
-      pagesCount: Number(pagesCount),
-      page: Number(pageNumber),
-      pageSize: Number(pageSize),
-      totalCount: itemsWithOutSkip.length,
+      pagesCount: Math.ceil(total / pageSize),
+      page: pageNumber,
+      pageSize,
+      totalCount: total,
       items: itemsWithLikes,
     };
   }
@@ -115,52 +83,68 @@ export class CommentQueryRepository {
     userId: string,
   ): Promise<allCommentsForUserViewModelWithQuery> {
     const offset = (pageNumber - 1) * pageSize;
-    const comments = await this.dataSource.query(`select c.*, u.login as "userLogin", p.title, p."blogId", b.name as "blogName" from comment_entity c inner join user_entity u on c."userId" = u.id inner join post_entity p on c."postId" = p.id inner join blog_entity b on p."blogId" = b.id ORDER BY "${sortBy}" ${sortDirection} Limit $1 offset $2`, [pageSize,offset])
-    const allComments =await this.dataSource.query(`select c.*, u.login, p.title, p."blogId", b.name from comment_entity c inner join user_entity u on c."userId" = u.id inner join post_entity p on c."postId" = p.id inner join blog_entity b on p."blogId" = b.id`)
+    const comments = await this.commentRepository
+      .createQueryBuilder('comment')
+      .leftJoinAndSelect('comment.user', 'user')
+      .leftJoinAndSelect('comment.post', 'post')
+      .leftJoinAndSelect('post.blog', 'blog')
+      .orderBy(`comment.${sortBy}`, sortDirection === 'asc' ? 'ASC' : 'DESC')
+      .skip(offset)
+      .take(pageSize)
+      .getMany();
 
-    const pagesCount = Math.ceil(allComments.length / pageSize);
+    const totalComments = await this.commentRepository.count();
+
+    const pagesCount = Math.ceil(totalComments / pageSize);
     const mappedComments: Array<allCommentsForUserViewModel> =
       await Promise.all(
         comments.map(async (comment) => {
-          const myLikeForComment = await this.dataSource.query(
-            'select * from like_entity where "userId" = $1 and "entityId" = $2',
-            [userId, comment.id],
-          );
-          let likesCount = await this.dataSource.query(
-            'select * from like_entity where "entityId" = $1 and status = $2',
-            [comment.id, LikeInfoViewModelValues.like],
-          );
-          let dislikeCount = await this.dataSource.query(
-            'select * from like_entity where "entityId" = $1 and status = $2',
-            [comment.id, LikeInfoViewModelValues.dislike],
-          );
+          const likesCount = await this.likeRepository.count({
+            where: {
+              entityId: comment.id,
+              status: LikeInfoViewModelValues.like,
+            },
+          });
+          const dislikesCount = await this.likeRepository.count({
+            where: {
+              entityId: comment.id,
+              status: LikeInfoViewModelValues.dislike,
+            },
+          });
+          const myLikeForComment = userId
+            ? await this.likeRepository.findOne({
+                where: { userId, entityId: comment.id },
+              })
+            : null;
+
           return {
             id: comment.id.toString(),
             content: comment.content,
             commentatorInfo: {
-              userId: comment.userId,
-              userLogin: comment.userLogin,
+              userId: comment.user.id,
+              userLogin: comment.user.login,
             },
             createdAt: comment.createdAt,
             likesInfo: {
-              likesCount: likesCount.length,
-              dislikesCount: dislikeCount.length,
+              likesCount,
+              dislikesCount,
               myStatus: myLikeForComment?.status || 'None',
             },
             postInfo: {
-              id: comment.postId.toString(),
-              title: comment.title,
-              blogId: comment.blogId,
-              blogName: comment.blogName,
+              id: comment.post.id.toString(),
+              title: comment.post.title,
+              blogId: comment.post.blog.id,
+              blogName: comment.post.blog.name,
             },
           };
         }),
       );
+
     return {
       pagesCount: Number(pagesCount),
       page: Number(pageNumber),
       pageSize: Number(pageSize),
-      totalCount: allComments.length,
+      totalCount: totalComments,
       items: mappedComments.filter(Boolean),
     };
   }

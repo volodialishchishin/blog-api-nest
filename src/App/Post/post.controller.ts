@@ -85,6 +85,7 @@ export class PostController {
     @Res() response: Response,
   ) {
     const { content } = createCommentDto;
+    // @ts-ignore
     const { userInfo } = request.user;
 
     const foundPost = await this.postService.getPost(
@@ -96,14 +97,15 @@ export class PostController {
     } else {
       console.log('3123');
       const userAccess = await this.commentService.checkIfUserBanned(
+        // @ts-ignore
         userInfo.userId,
         params.id,
       );
       console.log(userAccess);
       if (userAccess) {
-        response.sendStatus(403)
-        return
-      };
+        response.sendStatus(403);
+        return;
+      }
       const result = await this.commentService.createComment(
         params.id,
         content,
@@ -112,7 +114,7 @@ export class PostController {
       );
 
       response.status(201).json(result);
-      return
+      return;
     }
   }
 
@@ -156,9 +158,9 @@ export class PostController {
   ) {
     const result = await this.postService.updateLikeStatus(
       likeInputModel.likeStatus,
+      // @ts-ignore
       request.user.userInfo.userId,
       params.postId,
-      request.user.userInfo.login,
     );
     if (result) {
       response.sendStatus(204);

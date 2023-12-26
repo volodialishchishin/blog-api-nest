@@ -45,11 +45,11 @@ export class UserService {
     return this.userRep.createUser(resolvedUser);
   }
 
-  async deleteUser(userId: string): Promise<number> {
+  async deleteUser(userId: string): Promise<boolean> {
     return await this.userRep.deleteUser(userId);
   }
-  async updateUser(userId: string, field: string, value): Promise<number> {
-    return await this.userRep.updateUser(userId, field, value);
+  async updateUser(userId: string, field: string, value): Promise<boolean> {
+    return await this.userRep.updateUser(userId, { [field]: value });
   }
 
   async getUserByLoginOrEmail(login: string, email: string) {

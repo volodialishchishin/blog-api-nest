@@ -64,6 +64,7 @@ export class UserBloggerController {
     );
 
     const accessToBan = await this.userService.checkIfUserHasAccessToBan(
+      // @ts-ignore
       request.user.userInfo.userId,
       params.blogId,
     );
@@ -85,10 +86,11 @@ export class UserBloggerController {
     @Body() banInputModel: BanUserForBlogInputModelDto,
   ) {
     const accessToBan = await this.userService.checkIfUserHasAccessToBan(
+      // @ts-ignore
       request.user.userInfo.userId,
       banInputModel.blogId,
     );
-    if (!accessToBan) return response.sendStatus(403)
+    if (!accessToBan) return response.sendStatus(403);
     if (banInputModel.isBanned) {
       const banUserStatus = await this.userService.banUserForBlog(
         params.id,

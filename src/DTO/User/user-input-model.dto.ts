@@ -1,7 +1,7 @@
 import { IsNotEmpty, Length, Matches } from 'class-validator';
 
 export class UserInputModel {
-  @Length(3, 10)
+  @Length(10, 500)
   @IsNotEmpty()
   @Matches(/^[a-zA-Z0-9_-]*$/)
   login: string;

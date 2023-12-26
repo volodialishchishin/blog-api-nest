@@ -26,6 +26,15 @@ import { SecurityController } from './Security/security.controller';
 import { CommentSchema } from '../../DB/Schemas/comment.schema';
 import { BannedUsersForBlogSchema } from '../../DB/Schemas/banned-users-for-blog.schema';
 import { BlogSchema } from '../../DB/Schemas/blog.schema';
+import { SessionEntity } from '../../DB/Entities/session.entity';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { UserEntity } from '../../DB/Entities/user.entity';
+import { RecoveryPasswordsEntity } from '../../DB/Entities/recovery-passwords.entity';
+import { PostEntity } from '../../DB/Entities/post.entity';
+import { BlogEntity } from '../../DB/Entities/blog.entity';
+import { LikeEntity } from '../../DB/Entities/like.entity';
+import { UserBlogsBanEntity } from '../../DB/Entities/user-blogs-ban.entity';
+import { CommentEntity } from '../../DB/Entities/comment.entity';
 
 @Module({
   imports: [
@@ -42,6 +51,16 @@ import { BlogSchema } from '../../DB/Schemas/blog.schema';
         signOptions: { expiresIn: '100m' },
       }),
     }),
+    TypeOrmModule.forFeature([
+      UserEntity,
+      SessionEntity,
+      RecoveryPasswordsEntity,
+      PostEntity,
+      BlogEntity,
+      LikeEntity,
+      UserBlogsBanEntity,
+      CommentEntity,
+    ]),
     ConfigModule,
     MongooseModule.forFeature([{ name: 'User', schema: UserSchema }]),
     MongooseModule.forFeature([{ name: 'Token', schema: TokenSchema }]),

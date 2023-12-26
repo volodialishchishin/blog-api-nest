@@ -18,8 +18,7 @@ export class PostService {
     blogName: string,
     userId: string,
   ): Promise<PostViewModel> {
-    let newPost: Post;
-    newPost = {
+    const newPost = {
       blogName: blogName,
       shortDescription,
       content,
@@ -34,6 +33,7 @@ export class PostService {
       },
       createdAt: new Date().toISOString(),
     };
+    //@ts-ignore
     return this.postRep.createPost(newPost);
   }
   async updatePost(
@@ -43,13 +43,12 @@ export class PostService {
     shortDescription: string,
     id: string,
   ): Promise<boolean> {
-    return await this.postRep.updatePost(
-      blogId,
+    return await this.postRep.updatePost(blogId, {
       title,
       content,
       shortDescription,
       id,
-    );
+    });
   }
   async deletePost(id: string): Promise<boolean> {
     return this.postRep.deletePost(id);
@@ -58,12 +57,7 @@ export class PostService {
     return this.postRep.getPost(id, userId);
   }
 
-  async updateLikeStatus(
-    likeStatus,
-    userId: string,
-    postId: string,
-    login: string,
-  ) {
-    return this.postRep.updateLikeStatus(likeStatus, userId, postId, login);
+  async updateLikeStatus(likeStatus, userId: string, postId: string) {
+    return this.postRep.updateLikeStatus(likeStatus, userId, postId);
   }
 }

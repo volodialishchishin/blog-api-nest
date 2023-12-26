@@ -48,11 +48,7 @@ export class BlogsService {
   }
   async banBlog(blogId: string): Promise<boolean> {
     console.log(blogId);
-    return this.blogRep.updateBanStatusOfBlog(
-      blogId,
-      new Date().toISOString(),
-      true,
-    );
+    return this.blogRep.updateBanStatusOfBlog(blogId, new Date(), true);
   }
   async unbanBlog(blogId: string): Promise<boolean> {
     return this.blogRep.updateBanStatusOfBlog(blogId, null, false);

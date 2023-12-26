@@ -47,13 +47,15 @@ export class CommentController {
   ) {
     const comment = await this.commentService.getComment(
       params.id,
-      request.user.userInfo.userId,
+      // @ts-ignore
+      request.user?.userInfo?.userId,
     );
     if (!comment) {
       response.sendStatus(404);
       return;
     }
-    if (comment.commentatorInfo.userId !== request.user.userInfo.userId) {
+    // @ts-ignore
+    if (comment.commentatorInfo?.userId !== request.user?.userInfo?.userId) {
       response.sendStatus(403);
       return;
     }
@@ -77,13 +79,15 @@ export class CommentController {
   ) {
     const comment = await this.commentService.getComment(
       params.id,
-      request.user.userInfo.userId,
+      // @ts-ignore
+      request.user?.userInfo?.userId,
     );
     if (!comment) {
       response.sendStatus(404);
       return;
     }
-    if (comment.commentatorInfo.userId !== request.user.userInfo.userId) {
+    // @ts-ignore
+    if (comment.commentatorInfo.userId !== request.user?.userInfo?.userId) {
       response.sendStatus(403);
       return;
     }
@@ -107,11 +111,10 @@ export class CommentController {
   ) {
     const result = await this.commentService.updateLikeStatus(
       likeUpdateDto.likeStatus,
+      // @ts-ignore
       request.user.userInfo.userId,
       params.id,
-      request.user.userInfo.login,
     );
-    console.log('result',result);
     if (result) {
       response.sendStatus(204);
     } else {

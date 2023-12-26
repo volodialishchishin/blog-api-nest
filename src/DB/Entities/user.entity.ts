@@ -1,5 +1,16 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
-import { Prop } from '@nestjs/mongoose';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  OneToMany,
+  ManyToOne,
+} from 'typeorm';
+import { BlogEntity } from './blog.entity';
+import { CommentEntity } from './comment.entity';
+import { UserBlogsBanEntity } from './user-blogs-ban.entity';
+import { LikeEntity } from './like.entity';
+import { SessionEntity } from './session.entity';
+import { RecoveryPasswordsEntity } from './recovery-passwords.entity';
 
 @Entity()
 export class UserEntity {
@@ -38,4 +49,24 @@ export class UserEntity {
 
   @Column({ type: 'varchar', nullable: true })
   banReason: string;
+
+  @OneToMany(() => BlogEntity, (blog) => blog.user)
+  blogs: BlogEntity[];
+
+  @OneToMany(() => CommentEntity, (comment) => comment.user)
+  comments: CommentEntity[];
+
+  @OneToMany(() => UserBlogsBanEntity, (ban) => ban.user)
+  bannedBlogs: UserBlogsBanEntity[];
+
+  @OneToMany(() => LikeEntity, (like) => like.user)
+  likes: LikeEntity[];
+
+  @OneToMany(() => SessionEntity, (session) => session.user)
+  sessions: SessionEntity[];
+  @OneToMany(
+    () => RecoveryPasswordsEntity,
+    (recoveryPasswords) => recoveryPasswords.user,
+  )
+  recoveryPasswords: RecoveryPasswordsEntity[];
 }

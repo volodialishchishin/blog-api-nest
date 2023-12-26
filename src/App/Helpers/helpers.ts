@@ -16,7 +16,7 @@ import { UserEntity } from '../../DB/Entities/user.entity';
 import { SessionEntity } from '../../DB/Entities/session.entity';
 import { BlogEntity } from '../../DB/Entities/blog.entity';
 import { PostEntity } from '../../DB/Entities/post.entity';
-import { CommentEntity } from "../../DB/Entities/comment.entity";
+import { CommentEntity } from '../../DB/Entities/comment.entity';
 
 Injectable();
 export class Helpers {
@@ -36,6 +36,7 @@ export class Helpers {
   }
 
   public userMapperToViewSql(user: UserEntity): UserViewModel {
+    console.log(user);
     return {
       id: user.id.toString(),
       email: user.email,
@@ -106,15 +107,14 @@ export class Helpers {
 
   public postMapperToViewSql(
     post: PostEntity & {
-      blogName: string;
-      dateAdded: string;
-      userLogin: string;
-      userId: string;
-      likesCount: number;
-      dislikesCount: number;
+      blogName?: string;
+      dateAdded?: string;
+      userLogin?: string;
+      userId?: string;
+      likesCount?: number;
+      dislikesCount?: number;
     },
   ): PostViewModel {
-    console.log(post.blogName, post);
     return {
       id: post.id.toString(),
       title: post.title,
@@ -124,7 +124,7 @@ export class Helpers {
       blogName: post.blogName,
       createdAt: post.createdAt,
       extendedLikesInfo: {
-        likesCount: post.likesCount||0,
+        likesCount: post.likesCount || 0,
         dislikesCount: post.dislikesCount || 0,
         myStatus: LikeInfoViewModelValues.none,
         newestLikes: [],
@@ -166,9 +166,13 @@ export class Helpers {
   }
 
   public async commentsMapperToViewSql(
-    comment: CommentEntity & {login:string, likesCount:number, disLikesCount:number},
+    comment: CommentEntity & {
+      login: string;
+      likesCount: number;
+      disLikesCount: number;
+    },
   ): Promise<CommentViewModel> {
-    console.log('mapper',comment);
+    console.log('mapper', comment);
     return {
       content: comment.content,
       commentatorInfo: {

@@ -45,6 +45,7 @@ export class BlogBloggerController {
     @Body() createBlogDto: BlogInputModel,
     @Req() request: Request,
   ) {
+    // @ts-ignore
     return this.blogService.createBlog(createBlogDto, request.user.userInfo);
   }
 
@@ -64,6 +65,7 @@ export class BlogBloggerController {
     }
     const userAccess = await this.blogService.checkIfBlogBelongsToUser(
       params.blogId,
+      // @ts-ignore
       request.user.userInfo.userId,
     );
     if (!userAccess) response.sendStatus(403);
@@ -73,6 +75,7 @@ export class BlogBloggerController {
       createPostDto.content,
       createPostDto.shortDescription,
       blog.name,
+      // @ts-ignore
       request.user.userInfo.userId,
     );
     response.json(post);
@@ -93,6 +96,7 @@ export class BlogBloggerController {
     }
     const userAccess = await this.blogService.checkIfBlogBelongsToUser(
       params.id,
+      // @ts-ignore
       request.user.userInfo.userId,
     );
     if (!userAccess) response.sendStatus(403);
@@ -123,6 +127,7 @@ export class BlogBloggerController {
     }
     const userAccess = await this.blogService.checkIfBlogBelongsToUser(
       params.id,
+      // @ts-ignore
       request.user.userInfo.userId,
     );
     if (!userAccess) response.sendStatus(403);
@@ -148,6 +153,7 @@ export class BlogBloggerController {
       sortBy,
       pageSize,
       sortDirection,
+      // @ts-ignore
       request.user.userInfo.userId,
     );
     response.json(blogs);
@@ -173,6 +179,7 @@ export class BlogBloggerController {
 
     const userAccess = await this.blogService.checkIfBlogBelongsToUser(
       params.blogId,
+      // @ts-ignore
       request.user.userInfo.userId,
     );
     if (!userAccess) response.sendStatus(403);
@@ -183,6 +190,7 @@ export class BlogBloggerController {
       pageSize,
       sortDirection,
       params.blogId,
+      // @ts-ignore
       request.user.userInfo.userId,
     );
     response.json(posts);
@@ -203,6 +211,7 @@ export class BlogBloggerController {
     }
     const userAccess = await this.blogService.checkIfBlogBelongsToUser(
       params.blogId,
+      // @ts-ignore
       request.user.userInfo.userId,
     );
     if (!userAccess) response.sendStatus(403);
@@ -234,6 +243,7 @@ export class BlogBloggerController {
     }
     const userAccess = await this.blogService.checkIfBlogBelongsToUser(
       params.blogId,
+      // @ts-ignore
       request.user.userInfo.userId,
     );
     if (!userAccess) response.sendStatus(403);
@@ -262,6 +272,7 @@ export class BlogBloggerController {
       sortBy,
       pageSize,
       sortDirection,
+      // @ts-ignore
       request.user.userInfo.userId,
     );
     if (comments.items.length) {

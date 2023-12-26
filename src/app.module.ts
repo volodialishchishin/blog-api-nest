@@ -60,6 +60,10 @@ import { BlogEntity } from './DB/Entities/blog.entity';
 import { LikeEntity } from './DB/Entities/like.entity';
 import { UserBlogsBanEntity } from './DB/Entities/user-blogs-ban.entity';
 import { CommentEntity } from './DB/Entities/comment.entity';
+import { QuestionEntity } from './DB/Entities/question.entity';
+import { QuestionsControllerSa } from './App/Questions/questions.sa.controller';
+import { QuestionsRepository } from './App/Questions/questions.repository';
+import { QuestionsService } from './App/Questions/questions.service';
 
 @Module({
   imports: [
@@ -83,6 +87,17 @@ import { CommentEntity } from './DB/Entities/comment.entity';
       }),
       inject: [ConfigService],
     }),
+    TypeOrmModule.forFeature([
+      UserEntity,
+      SessionEntity,
+      RecoveryPasswordsEntity,
+      PostEntity,
+      BlogEntity,
+      LikeEntity,
+      UserBlogsBanEntity,
+      CommentEntity,
+      QuestionEntity,
+    ]),
     AuthModule,
     JwtModule,
     MailerModule.forRoot({
@@ -110,6 +125,7 @@ import { CommentEntity } from './DB/Entities/comment.entity';
         LikeEntity,
         UserBlogsBanEntity,
         CommentEntity,
+        QuestionEntity,
       ],
       synchronize: true,
       ssl: true,
@@ -124,6 +140,7 @@ import { CommentEntity } from './DB/Entities/comment.entity';
     BlogBloggerController,
     BlogSaController,
     UserBloggerController,
+    QuestionsControllerSa,
   ],
   providers: [
     AppService,
@@ -145,6 +162,8 @@ import { CommentEntity } from './DB/Entities/comment.entity';
     isBlogExists,
     JwtService,
     AuthRepository,
+    QuestionsRepository,
+    QuestionsService,
   ],
   exports: [UserService, UserRepository, Helpers],
 })

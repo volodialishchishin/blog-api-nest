@@ -51,18 +51,8 @@ export class CommentService {
   async deleteComment(id: string): Promise<boolean> {
     return this.commentRep.deleteComment(id);
   }
-  async updateLikeStatus(
-    likeStatus,
-    userId: string,
-    commentId: string,
-    login: string,
-  ) {
-    return this.commentRep.updateLikeStatus(
-      likeStatus,
-      userId,
-      commentId,
-      login,
-    );
+  async updateLikeStatus(likeStatus, userId: string, commentId: string) {
+    return this.commentRep.updateLikeStatus(likeStatus, userId, commentId);
   }
   async checkIfUserBanned(userId: string, postId: string) {
     const userBanStatus = await this.userRep.isUserBanned(userId, postId);

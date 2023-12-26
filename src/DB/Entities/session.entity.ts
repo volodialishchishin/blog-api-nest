@@ -1,5 +1,12 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
-import { Prop } from '@nestjs/mongoose';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  OneToMany,
+  ManyToOne,
+} from 'typeorm';
+import { LikeEntity } from './like.entity';
+import { UserEntity } from './user.entity';
 
 @Entity()
 export class SessionEntity {
@@ -8,14 +15,22 @@ export class SessionEntity {
 
   @Column({ type: 'varchar' })
   userId: string;
+
   @Column({ type: 'varchar' })
   refreshToken: string;
+
   @Column({ type: 'varchar' })
   ip: string;
+
   @Column({ type: 'varchar' })
   title: string;
+
   @Column({ type: 'varchar' })
   lastActiveDate: string;
+
   @Column({ type: 'varchar' })
   deviceId: string;
+
+  @ManyToOne(() => UserEntity, (user) => user.sessions)
+  user: UserEntity;
 }
